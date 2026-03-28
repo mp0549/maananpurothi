@@ -1,0 +1,605 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Global CSS — The Cartographer's Study
+   Tailwind base + custom properties + utility classes used across all pages
+───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Google Fonts — must be before @tailwind directives ──────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=IM+Fell+English:ital@0;1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS custom properties (mirrors Tailwind tokens) ─────────────────────── */
+:root {
+  --color-parchment:       #F5ECD7;
+  --color-parchment-light: #FAF4E6;
+  --color-parchment-aged:  #EAD9B8;
+  --color-ink:             #1C1208;
+  --color-ink-muted:       #7C6A4E;
+  --color-gold:            #8B6914;
+  --color-gold-light:      #B8922E;
+  --color-gold-pale:       #C4A96A;
+}
+
+/* ── Base resets & defaults ───────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-parchment text-ink font-body;
+    line-height: 1.85;
+    /* Subtle overall texture overlay — applied via pseudo on a wrapper instead */
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+    line-height: 1.2;
+  }
+
+  a {
+    @apply text-gold transition-colors duration-200;
+  }
+
+  a:hover {
+    @apply text-gold-light;
+  }
+
+  /* Remove default list styles in nav contexts */
+  nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+/* ── Component-level classes ──────────────────────────────────────────────── */
+@layer components {
+
+  /* ── Section label — map-region style header ────────────────────────────── */
+  .section-label {
+    @apply font-display uppercase tracking-[0.25em] text-sm text-gold;
+  }
+
+  /* ── Section heading ────────────────────────────────────────────────────── */
+  .section-heading {
+    @apply font-display text-3xl md:text-4xl text-ink mt-2 mb-1;
+  }
+
+  /* ── Ornamental rule beneath a heading ──────────────────────────────────── */
+  .heading-rule {
+    @apply block mt-3 mb-8;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--color-gold-pale) 20%,
+      var(--color-gold) 50%,
+      var(--color-gold-pale) 80%,
+      transparent
+    );
+  }
+
+  /* ── Parchment card (project cards, note previews) ───────────────────────── */
+  .parchment-card {
+    @apply bg-parchment-light rounded-sm shadow-paper;
+    border: 1px solid var(--color-gold-pale);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .parchment-card:hover {
+    @apply shadow-paper-hover;
+    transform: translateY(-3px) rotate(0.2deg);
+  }
+
+  /* ── Tag / domain pill ───────────────────────────────────────────────────── */
+  .tag-pill {
+    @apply inline-block text-xs font-display tracking-widest uppercase px-2 py-0.5 rounded-sm;
+    background: var(--color-parchment-aged);
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-gold-pale);
+  }
+
+  /* ── Specimen stamp — herbarium oval tag ─────────────────────────────────── */
+  .specimen-stamp {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.5rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid currentColor;
+    border-radius: 45% 55% 50% 50% / 45% 45% 55% 55%;
+    line-height: 1.6;
+  }
+
+  /* ── Nav link with drawing underline ────────────────────────────────────── */
+  .nav-link {
+    @apply font-display text-sm uppercase tracking-widest text-ink relative pb-0.5;
+    transition: color 0.2s ease;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute left-0 bottom-0 h-px bg-gold;
+    width: 0;
+    transition: width 0.3s ease;
+  }
+
+  .nav-link:hover {
+    @apply text-gold;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  /* ── Texture overlay mixin ───────────────────────────────────────────────── */
+  .texture-overlay {
+    position: relative;
+  }
+
+  .texture-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/textures/parchment_texture1.jpg');
+    background-size: 400px 400px;
+    background-repeat: repeat;
+    mix-blend-mode: multiply;
+    opacity: 0.35;
+    filter: sepia(0.3);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Children of texture-overlay need z-index to sit above the overlay */
+  .texture-overlay > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ── Ornamental divider character ────────────────────────────────────────── */
+  .ornament {
+    @apply font-decorative text-gold text-xl text-center block my-2;
+  }
+
+  /* ── Double-border section wrapper ───────────────────────────────────────── */
+  .bordered-section {
+    border: 1px solid var(--color-gold-pale);
+    box-shadow:
+      inset 0 0 0 3px var(--color-parchment),
+      inset 0 0 0 4px var(--color-gold-pale);
+    padding: 2rem;
+  }
+
+  /* ── Scroll-reveal: hidden initial state (JS will add .revealed) ─────────── */
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(4px) saturate(0.5);
+    transition:
+      opacity 0.8s ease,
+      transform 0.8s ease,
+      filter 0.8s ease;
+  }
+
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0) saturate(1);
+  }
+}
+
+/* ── Utility extras ───────────────────────────────────────────────────────── */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* ── Map page ─────────────────────────────────────────────────────────────── */
+
+/* ── Expedition destination markers ─────────────────────────────────────── */
+
+.map-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+}
+
+.marker-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.marker-svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Outer halo ring — pulses on hover */
+.marker-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes halo-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50%       { transform: scale(1.3); opacity: 0.15; }
+}
+
+.map-marker:hover .marker-halo,
+.map-marker:focus-within .marker-halo {
+  animation: halo-pulse 600ms ease;
+}
+
+.marker-label {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #1C1208;
+  text-shadow: 0 1px 3px rgba(245, 236, 215, 0.8);
+  white-space: nowrap;
+  display: block;
+  font-variant-caps: small-caps;
+  border-bottom: 3px dashed #8B6914;
+  padding-bottom: 2px;
+  transition: color 0.2s ease;
+}
+
+.map-marker:hover .marker-label,
+.map-marker:focus-within .marker-label {
+  color: var(--color-gold);
+}
+
+/* Parchment card — expands to the right by default */
+.marker-card {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 10px);
+  min-width: 165px;
+  max-width: 215px;
+  background: #F0E6C8;
+  border: 1px solid rgba(139, 105, 20, 0.38);
+  box-shadow:
+    2px 4px 14px rgba(28, 18, 8, 0.18),
+    0 1px 3px rgba(28, 18, 8, 0.1);
+  padding: 10px 13px 12px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 250ms ease-out, opacity 200ms ease-out;
+  z-index: 30;
+}
+
+/* Card flips to the left for markers in the right half */
+.map-marker[data-card-side="left"] .marker-card {
+  left: auto;
+  right: calc(100% + 10px);
+}
+
+.map-marker:hover .marker-card,
+.map-marker:focus-within .marker-card {
+  max-height: 120px;
+  opacity: 1;
+}
+
+.marker-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #1C1208;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.marker-card-desc {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: #7C6A4E;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Cartouche — decorative title box on the map */
+.cartouche {
+  position: absolute;
+  left: 30%;
+  transform: translateX(-50%);
+  text-align: center;
+  padding: 1.25rem 2.75rem 1.5rem;
+  background: rgba(250, 244, 230, 0.93);
+  border: 1px solid var(--color-gold);
+  box-shadow:
+    inset 0 0 0 4px rgba(250, 244, 230, 0.95),
+    inset 0 0 0 5px var(--color-gold-pale),
+    0 8px 40px rgba(28, 18, 8, 0.38),
+    0 3px 10px rgba(28, 18, 8, 0.2);
+  min-width: 220px;
+  max-width: 360px;
+  z-index: 20;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.cartouche-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  color: var(--color-gold);
+  margin-bottom: 0.4rem;
+}
+
+.cartouche-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1.1;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.cartouche-rule {
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-gold), transparent);
+  margin: 0.5rem auto;
+}
+
+.cartouche-tagline {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ── Branch end markers — external side expeditions ─────────────────────── */
+
+.branch-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+}
+
+.branch-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.branch-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #1C1208;
+  text-shadow: 0 1px 3px rgba(245, 236, 215, 0.9);
+  white-space: nowrap;
+  display: block;
+  font-variant-caps: small-caps;
+  border-bottom: 2px dashed rgba(139, 105, 20, 0.6);
+  padding-bottom: 1px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.branch-marker:hover .branch-label,
+.branch-marker:focus-within .branch-label {
+  opacity: 1;
+  color: var(--color-gold);
+}
+
+/* Mobile map destination links */
+.map-mobile-link {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-gold);
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.6rem 1.25rem;
+  border: 1px solid var(--color-gold-pale);
+  background: rgba(250, 244, 230, 0.75);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.map-mobile-link:hover {
+  background: rgba(250, 244, 230, 0.95);
+  color: var(--color-gold-light);
+  border-color: var(--color-gold);
+}
+
+.map-mobile-link small {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  color: var(--color-ink-muted);
+  text-transform: none;
+}
+
+/* ── Interior nav ─────────────────────────────────────────────────────────── */
+
+.interior-nav {
+  background: rgba(245, 236, 215, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--color-gold-pale);
+}
+
+/* ── Folder tabs (codex filter) ───────────────────────────────────────────── */
+
+.folder-tab {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--color-gold-pale);
+  border-bottom: none;
+  background: var(--color-parchment-aged);
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  position: relative;
+  top: 1px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.folder-tab.active,
+.folder-tab:hover {
+  background: var(--color-parchment-light);
+  color: var(--color-gold);
+}
+
+/* ── Garden notes — herbarium redesign (styles live in garden.astro) ─────── */
+
+/* ── About page — pinned notes with tape ─────────────────────────────────── */
+
+.pinned-note {
+  position: relative;
+  background: var(--color-parchment-light);
+  border: 1px solid var(--color-gold-pale);
+  padding: 1.5rem;
+  box-shadow: 2px 4px 12px rgba(28, 18, 8, 0.1);
+}
+
+.pinned-note::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 1.5rem;
+  width: 40px;
+  height: 10px;
+  background: rgba(196, 169, 106, 0.3);
+  border: 1px solid rgba(196, 169, 106, 0.45);
+  border-radius: 1px;
+}
+
+/* ── Portrait frame ───────────────────────────────────────────────────────── */
+
+.portrait-frame {
+  border: 2px solid var(--color-gold);
+  box-shadow:
+    inset 0 0 0 4px var(--color-parchment-light),
+    inset 0 0 0 6px var(--color-gold-pale),
+    4px 4px 24px rgba(28, 18, 8, 0.22);
+  padding: 6px;
+  background: var(--color-parchment-aged);
+}
+
+/* ── Ink Bleed Page Transition ────────────────────────────────────────────── */
+
+/*
+  Pre-paint coverage: applied to <html> by the inline head script before
+  the first frame so the page never flashes uncovered on entry.
+*/
+html.ink-entry #ink-blob {
+  top:       50% !important;
+  left:      50% !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+  animation: none !important;
+}
+
+#ink-overlay {
+  position:       fixed;
+  inset:          0;
+  z-index:        9999;
+  overflow:       hidden;
+  pointer-events: none;
+  /*
+    Gooey effect: high contrast snaps the blurred blob edges from a soft
+    gradient into crisp, irregular organic shapes — the ink-bleed look.
+  */
+  filter: contrast(15);
+}
+
+/*
+  The blob is a circle large enough to cover the viewport from any corner.
+  300vmax radius (= 1.5× the larger dimension) exceeds the viewport diagonal
+  for any realistic screen size.
+  top/left default to 50%/50% (centred); JS overrides them to the click origin.
+*/
+#ink-blob {
+  position:      absolute;
+  width:         300vmax;
+  height:        300vmax;
+  top:           50%;
+  left:          50%;
+  background:    #1c1208;
+  border-radius: 50%;
+  transform:     translate(-50%, -50%) scale(0);
+  /*
+    Blur creates a soft gradient at the blob's edge. Combined with the
+    parent's contrast filter this snaps to organic ink-bleed shapes.
+  */
+  filter:        blur(30px);
+  will-change:   transform;
+}
+
+/* Keyframes — translate preserved so the blob stays at its origin position */
+@keyframes ink-spread {
+  from { transform: translate(-50%, -50%) scale(0); }
+  to   { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes ink-recede {
+  from { transform: translate(-50%, -50%) scale(1); }
+  to   { transform: translate(-50%, -50%) scale(0); }
+}
+
+/* Spreading outward: blocks interaction so nothing can be clicked mid-flight */
+#ink-overlay.ink-spreading {
+  pointer-events: all;
+}
+#ink-overlay.ink-spreading #ink-blob {
+  animation: ink-spread 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Statically covered — snap to full coverage with no animation */
+#ink-overlay.ink-covered {
+  pointer-events: all;
+}
+#ink-overlay.ink-covered #ink-blob {
+  transform: translate(-50%, -50%) scale(1);
+  animation: none;
+}
+
+/* Receding to reveal the new page */
+#ink-overlay.ink-receding {
+  pointer-events: all;
+}
+#ink-overlay.ink-receding #ink-blob {
+  animation: ink-recede 340ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+/* Respect motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  #ink-overlay {
+    display: none;
+  }
+}

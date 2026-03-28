@@ -1,0 +1,53 @@
+---
+/**
+ * ProjectCard.astro — a single project/expedition card
+ * Styled as a pinned parchment slip with slight rotation.
+ */
+interface Props {
+  title: string;
+  dateRange: string;
+  description: string;
+  tags: string[];
+  href?: string;
+  /** Slight CSS rotation for pinned-slip feel — pass a small deg value */
+  rotation?: number;
+}
+
+const {
+  title,
+  dateRange,
+  description,
+  tags,
+  href = '#',
+  rotation = 0,
+} = Astro.props;
+---
+
+<article
+  class="parchment-card p-6 flex flex-col gap-4 scroll-reveal"
+  style={`transform: rotate(${rotation}deg);`}
+>
+  <!-- Date range — like a map legend label -->
+  <p class="section-label text-xs">{dateRange}</p>
+
+  <!-- Title -->
+  <h3 class="font-display text-xl text-ink leading-tight">{title}</h3>
+
+  <!-- Description -->
+  <p class="text-ink-muted text-sm leading-relaxed flex-1">{description}</p>
+
+  <!-- Tags -->
+  <div class="flex flex-wrap gap-2">
+    {tags.map((tag) => (
+      <span class="tag-pill">{tag}</span>
+    ))}
+  </div>
+
+  <!-- CTA link -->
+  <a
+    href={href}
+    class="mt-2 self-start font-display text-xs uppercase tracking-widest text-gold hover:text-gold-light transition-colors"
+  >
+    Read Dispatch &rarr;
+  </a>
+</article>

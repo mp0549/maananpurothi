@@ -1,0 +1,216 @@
+---
+/**
+ * codex.astro — The Codex
+ * Archive room: expedition cards styled as worn journal entries.
+ * Filter tabs: All / Research / Engineering / Community
+ */
+import Layout from '@/layouts/Layout.astro';
+import SectionDivider from '@/components/SectionDivider.astro';
+
+const entries = [
+  {
+    title: 'Expedition I — The Cognition Engine',
+    dateRange: '2024 – Present',
+    description:
+      'An ongoing survey of uncharted terrain at the intersection of machine cognition and collaborative sense-making. The expedition produced three working prototypes and a published field report.',
+    tags: ['AI/ML', 'Research', 'Python', 'HCI'],
+    href: '/garden',
+    rotation: -0.6,
+    categories: ['Research'],
+  },
+  {
+    title: 'Expedition II — Social Architecture',
+    dateRange: '2023 – 2024',
+    description:
+      'A cartographic project mapping the social architecture of nascent communities. Produced field guides, frameworks, and a small constellation of tools still in active use.',
+    tags: ['Community', 'Product', 'TypeScript'],
+    href: '/garden',
+    rotation: 0.4,
+    categories: ['Community', 'Engineering'],
+  },
+  {
+    title: 'Expedition III — Sparse Signal',
+    dateRange: '2022 – 2023',
+    description:
+      'Deep reconnaissance into systems that learn from sparse signals. The resulting instruments have since been adopted by several downstream expeditions.',
+    tags: ['Systems', 'Data', 'Rust', 'ML'],
+    href: '/garden',
+    rotation: -0.3,
+    categories: ['Research', 'Engineering'],
+  },
+  {
+    title: 'Expedition IV — The Infrastructure Layer',
+    dateRange: '2021 – 2022',
+    description:
+      'A foundational survey establishing the underlying terrain for everything that followed. Not glamorous; essential. Built the roads that later expeditions walked.',
+    tags: ['Infrastructure', 'DevOps', 'Go'],
+    href: '/garden',
+    rotation: 0.7,
+    categories: ['Engineering'],
+  },
+  {
+    title: 'Research Fellowship — Institute Name',
+    dateRange: 'Summer 2023',
+    description:
+      'A concentrated season of deep work at a selective research fellowship. Produced two position papers and one working prototype. Relationships formed here continue to shape the work.',
+    tags: ['Research', 'Fellowship', 'Writing'],
+    href: '/garden',
+    rotation: -0.5,
+    categories: ['Research'],
+  },
+  {
+    title: 'Open Source — Toolkit Name',
+    dateRange: '2022 – Present',
+    description:
+      'A small but useful library for a narrow problem that turned out to be more common than anticipated. Maintained by a loose coalition of contributors across four time zones.',
+    tags: ['Open Source', 'TypeScript'],
+    href: '/garden',
+    rotation: 0.3,
+    categories: ['Engineering', 'Community'],
+  },
+];
+---
+
+<Layout
+  title="The Codex — The Cartographer's Study"
+  description="Archive of expeditions, projects, and experiences — a record of territories explored."
+  variant="interior"
+  pageTitle="The Codex"
+>
+
+  <!-- Subtle texture -->
+  <div
+    class="fixed inset-0 pointer-events-none"
+    style="background-image: url('/textures/ricepaper2.webp'); background-size: 300px 300px; mix-blend-mode: multiply; opacity: 0.18; z-index: 0;"
+    aria-hidden="true"
+  ></div>
+
+  <div class="relative z-10 max-w-wide mx-auto px-6 md:px-12 py-14">
+
+    <!-- Intro inscription -->
+    <div class="max-w-prose mb-10 scroll-reveal">
+      <p class="section-label text-xs mb-1">Archive of Expeditions</p>
+      <p class="text-ink-muted font-body leading-relaxed">
+        A chronicle of territories explored, instruments built, and problems pursued.
+        Each entry is a sustained engagement — recorded here for those who follow the same routes.
+      </p>
+    </div>
+
+    <SectionDivider glyph="✦" />
+
+    <!-- ── Filter tabs ──────────────────────────────────────────────── -->
+    <div class="flex flex-wrap gap-0 border-b border-gold-pale mb-8 mt-8" role="tablist" aria-label="Filter expeditions">
+      {['All', 'Research', 'Engineering', 'Community'].map((tab) => (
+        <button
+          class:list={['folder-tab', { active: tab === 'All' }]}
+          data-filter={tab}
+          role="tab"
+          aria-selected={tab === 'All' ? 'true' : 'false'}
+        >
+          {tab}
+        </button>
+      ))}
+    </div>
+
+    <!-- ── Expedition card grid ─────────────────────────────────────── -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="entries-grid">
+      {entries.map((entry, i) => (
+        <div
+          class="expedition-card"
+          data-categories={entry.categories.join(' ')}
+          style={`transition: opacity 0.25s ease; animation-delay: ${i * 0.06}s;`}
+        >
+          <article
+            class="parchment-card p-6 h-full flex flex-col gap-3"
+            style={`transform: rotate(${entry.rotation}deg); transition: transform 0.25s ease, box-shadow 0.25s ease;`}
+          >
+            <!-- Date stamp -->
+            <p class="section-label text-xs">{entry.dateRange}</p>
+
+            <!-- Title -->
+            <h2 class="font-display text-base text-ink leading-snug">{entry.title}</h2>
+
+            <!-- Thin rule -->
+            <div style="height: 1px; background: linear-gradient(to right, var(--color-gold-pale), transparent); opacity: 0.7;"></div>
+
+            <!-- Description -->
+            <p class="text-ink-muted text-sm leading-relaxed flex-1 font-body">{entry.description}</p>
+
+            <!-- Tags -->
+            <div class="flex flex-wrap gap-1.5">
+              {entry.tags.map((tag) => <span class="tag-pill">{tag}</span>)}
+            </div>
+
+            <!-- Link -->
+            <a
+              href={entry.href}
+              class="self-start font-display text-xs uppercase tracking-widest text-gold hover:text-gold-light transition-colors mt-1"
+            >
+              Read Dispatch &rarr;
+            </a>
+          </article>
+        </div>
+      ))}
+    </div>
+
+    <SectionDivider glyph="⁕" />
+
+    <!-- ── Stations Occupied (experience timeline) ─────────────────── -->
+    <section class="mt-4 max-w-2xl">
+      <p class="section-label text-xs mb-2 scroll-reveal">Professional Record</p>
+      <h2 class="font-display text-2xl text-ink mb-1 scroll-reveal">Stations Occupied</h2>
+      <span class="heading-rule max-w-[10rem] scroll-reveal"></span>
+
+      <div class="space-y-10 mt-6">
+        {[
+          { role: 'Role Title', org: 'Company or Organization', period: '2024 – Present', desc: 'Brief description of your responsibilities and what you built or achieved in this role.' },
+          { role: 'Previous Role', org: 'Previous Company', period: '2022 – 2024', desc: 'What you did, what you shipped, and what you learned in the field.' },
+          { role: 'Earlier Role', org: 'Earlier Company', period: '2020 – 2022', desc: 'Foundational experience — the apprenticeship that taught the craft.' },
+        ].map(({ role, org, period, desc }) => (
+          <div class="flex gap-6 items-start scroll-reveal">
+            <div class="w-px self-stretch bg-gold-pale flex-shrink-0 mt-1" aria-hidden="true"></div>
+            <div class="space-y-1 pb-6">
+              <p class="section-label text-xs">{period}</p>
+              <h3 class="font-display text-base text-ink">{role}</h3>
+              <p class="text-gold font-display text-xs tracking-wide">{org}</p>
+              <p class="text-ink-muted text-sm leading-relaxed mt-2 font-body">{desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+  </div>
+
+</Layout>
+
+<script>
+  // Filter tabs — vanilla JS, no framework
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.folder-tab');
+  const cards = document.querySelectorAll<HTMLElement>('.expedition-card');
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      // Update active tab
+      tabs.forEach((t) => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+
+      const filter = tab.dataset.filter ?? 'All';
+
+      // Show/hide cards
+      cards.forEach((card) => {
+        const cats = card.dataset.categories ?? '';
+        if (filter === 'All' || cats.includes(filter)) {
+          card.style.display = '';
+          card.style.opacity = '1';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>

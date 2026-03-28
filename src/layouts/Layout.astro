@@ -1,0 +1,151 @@
+---
+/**
+ * Layout.astro — shared wrapper
+ * variant="map"      → full-viewport map page (no nav, no footer)
+ * variant="interior" → interior page with back-to-map nav + footer
+ */
+import InteriorNav from '@/components/InteriorNav.astro';
+import Footer from '@/components/Footer.astro';
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  variant?: 'map' | 'interior';
+  pageTitle?: string;
+}
+
+const {
+  title = "The Cartographer's Study",
+  description = "Personal site of a cartographer mapping the intellectual frontier — projects, writing, and dispatches from the edge of the known.",
+  variant = 'interior',
+  pageTitle,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://example.com');
+const isMap = variant === 'map';
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>{title}</title>
+
+    <!-- Ink-entry: applied before first paint so new page starts already covered -->
+    <script is:inline>
+      try {
+        if (sessionStorage.getItem('ink-pending') === '1') {
+          document.documentElement.classList.add('ink-entry');
+        }
+      } catch (_) {}
+    </script>
+  </head>
+
+  <body
+    class={isMap ? 'h-screen overflow-hidden' : 'min-h-screen flex flex-col'}
+    data-variant={variant}
+  >
+    {!isMap && <InteriorNav pageTitle={pageTitle ?? ''} />}
+
+    <main class={isMap ? '' : 'flex-1 pt-14'}>
+      <slot />
+    </main>
+
+    {!isMap && <Footer />}
+
+    <!-- Scroll-reveal observer (no-op on pages without .scroll-reveal elements) -->
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      );
+      document.querySelectorAll('.scroll-reveal').forEach((el) => {
+        observer.observe(el);
+      });
+    </script>
+
+    <!-- ── Ink bleed transition overlay ───────────────────────────────────── -->
+    <div id="ink-overlay" aria-hidden="true">
+      <div id="ink-blob"></div>
+    </div>
+
+    <!-- Ink transition logic -->
+    <script is:inline>
+    (function () {
+      var overlay = document.getElementById('ink-overlay');
+      var blob    = document.getElementById('ink-blob');
+      if (!overlay || !blob) return;
+
+      /* ── On new-page entry: start covered, then recede ─────────────────── */
+      if (document.documentElement.classList.contains('ink-entry')) {
+        try { sessionStorage.removeItem('ink-pending'); } catch (_) {}
+        overlay.classList.add('ink-covered');
+        document.documentElement.classList.remove('ink-entry');
+
+        // Two rAF frames ensure the covered state is painted before we
+        // start the recede animation.
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            overlay.classList.remove('ink-covered');
+            overlay.classList.add('ink-receding');
+            setTimeout(function () {
+              overlay.classList.remove('ink-receding');
+            }, 340);
+          });
+        });
+      }
+
+      /* ── Spread: cover the screen, then navigate ────────────────────────── */
+      function spread(originX, originY, href) {
+        blob.style.left = originX + 'px';
+        blob.style.top  = originY + 'px';
+        overlay.classList.add('ink-spreading');
+
+        setTimeout(function () {
+          try { sessionStorage.setItem('ink-pending', '1'); } catch (_) {}
+          window.location.href = href;
+        }, 295);
+      }
+
+      /* ── Click interception ──────────────────────────────────────────────── */
+      document.addEventListener('click', function (e) {
+        if (!(e.target instanceof Element)) return;
+        var link = e.target.closest('a[href]');
+        if (!link) return;
+
+        var href = link.getAttribute('href');
+        if (!href) return;
+        if (/^(#|https?:|\/\/|mailto:|tel:)/.test(href)) return;
+        if (link.target === '_blank') return;
+
+        var variant   = document.body.dataset.variant;
+        var goesToMap = (href === '/');
+
+        // Only intercept: map → interior  OR  interior → map
+        if (!(variant === 'map' && !goesToMap) && !(variant === 'interior' && goesToMap)) return;
+
+        e.preventDefault();
+
+        var x = (typeof e.clientX === 'number') ? e.clientX : window.innerWidth  / 2;
+        var y = (typeof e.clientY === 'number') ? e.clientY : window.innerHeight / 2;
+
+        spread(x, y, href);
+      });
+    })();
+    </script>
+  </body>
+</html>

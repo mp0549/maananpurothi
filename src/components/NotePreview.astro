@@ -1,0 +1,25 @@
+---
+/**
+ * NotePreview.astro — a stub preview card for Garden notes
+ */
+interface Props {
+  title: string;
+  date: string;
+  excerpt: string;
+  href?: string;
+}
+
+const { title, date, excerpt, href = '#' } = Astro.props;
+---
+
+<article class="parchment-card p-5 flex flex-col gap-3 scroll-reveal">
+  <p class="section-label text-xs">{date}</p>
+  <h3 class="font-display text-lg text-ink leading-snug">{title}</h3>
+  <p class="text-ink-muted text-sm leading-relaxed flex-1">{excerpt}</p>
+  <a
+    href={href}
+    class="self-start font-display text-xs uppercase tracking-widest text-gold hover:text-gold-light transition-colors"
+  >
+    Open Field Notes &rarr;
+  </a>
+</article>

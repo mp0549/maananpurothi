@@ -1,0 +1,101 @@
+---
+/**
+ * Nav.astro — fixed top navigation
+ * Desktop: name-logo left, links right
+ * Mobile: hamburger → full-screen overlay (vanilla JS, no framework needed)
+ */
+const links = [
+  { href: '/',      label: 'Home'   },
+  { href: '/now',   label: 'Now'    },
+  { href: '/codex', label: 'Codex'  },
+  { href: '/garden',label: 'Garden' },
+  { href: '#connect', label: 'Connect' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  id="site-nav"
+  class="fixed top-0 inset-x-0 z-50 h-16
+         bg-parchment/80 backdrop-blur-sm
+         border-b border-gold-pale/40
+         transition-shadow duration-300"
+>
+  <div class="max-w-wide mx-auto px-6 md:px-12 h-full flex items-center justify-between">
+
+    <!-- Logo / name -->
+    <a href="/" class="font-display text-sm md:text-base uppercase tracking-[0.2em] text-ink hover:text-gold transition-colors">
+      Your Name
+    </a>
+
+    <!-- Desktop nav links -->
+    <nav class="hidden md:flex items-center gap-8" aria-label="Primary">
+      {links.map(({ href, label }) => (
+        <a
+          href={href}
+          class:list={['nav-link', { 'text-gold': currentPath === href }]}
+        >
+          {label}
+        </a>
+      ))}
+    </nav>
+
+    <!-- Mobile: hamburger button -->
+    <button
+      id="nav-toggle"
+      aria-label="Open navigation menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      class="md:hidden flex flex-col gap-1.5 p-2 group"
+    >
+      <span class="block w-6 h-px bg-ink transition-all duration-300 group-aria-[expanded=true]:rotate-45 group-aria-[expanded=true]:translate-y-2.5"></span>
+      <span class="block w-6 h-px bg-ink transition-all duration-300 group-aria-[expanded=true]:opacity-0"></span>
+      <span class="block w-6 h-px bg-ink transition-all duration-300 group-aria-[expanded=true]:-rotate-45 group-aria-[expanded=true]:-translate-y-2.5"></span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile full-screen overlay nav -->
+<div
+  id="mobile-menu"
+  role="dialog"
+  aria-label="Navigation menu"
+  aria-modal="true"
+  class="fixed inset-0 z-40 bg-parchment flex flex-col items-center justify-center
+         opacity-0 pointer-events-none transition-opacity duration-300"
+>
+  <nav class="flex flex-col items-center gap-10" aria-label="Mobile primary">
+    {links.map(({ href, label }) => (
+      <a
+        href={href}
+        class="font-display text-2xl uppercase tracking-[0.3em] text-ink hover:text-gold transition-colors mobile-nav-link"
+      >
+        {label}
+      </a>
+    ))}
+  </nav>
+  <span class="ornament mt-16">✦</span>
+</div>
+
+<script>
+  const toggle = document.getElementById('nav-toggle')!;
+  const menu   = document.getElementById('mobile-menu')!;
+
+  toggle.addEventListener('click', () => {
+    const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+    menu.classList.toggle('opacity-0', isOpen);
+    menu.classList.toggle('pointer-events-none', isOpen);
+    document.body.style.overflow = isOpen ? '' : 'hidden';
+  });
+
+  // Close menu when a mobile link is clicked
+  menu.querySelectorAll('.mobile-nav-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      toggle.setAttribute('aria-expanded', 'false');
+      menu.classList.add('opacity-0', 'pointer-events-none');
+      document.body.style.overflow = '';
+    });
+  });
+</script>

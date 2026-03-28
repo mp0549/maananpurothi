@@ -1,0 +1,33 @@
+body {
+  padding:1rem 2rem;
+  line-height:80px;
+  font-size:50px;
+  font-family:Times, sans-serif;
+  color:#020010;
+}
+
+.fadein {
+  position:relative;
+  background-color:#fff;
+  filter:contrast(7); 
+  max-width:1000px;
+  margin:0 auto;
+}
+
+.blurred {
+  position:relative;
+  background: linear-gradient(129deg, #fff 0%, #909090 100%);
+  animation: fadein 5s infinite ease-in-out;
+}
+
+@keyframes fadein {
+    0%,100% {
+      opacity:0.7;
+      filter:blur(10px);
+    }        
+    50% {
+      opacity:1;
+      filter:blur(0);
+    }     
+}
+

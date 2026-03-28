@@ -1,0 +1,24 @@
+---
+/**
+ * SectionDivider.astro — ornamental rule between sections
+ * Usage: <SectionDivider glyph="✦" /> or default ❧
+ */
+interface Props {
+  glyph?: string;
+  class?: string;
+}
+const { glyph = '❧', class: extraClass = '' } = Astro.props;
+---
+
+<div class:list={['flex items-center gap-4 my-12 px-6 md:px-12', extraClass]} aria-hidden="true">
+  <!-- Left rule -->
+  <div class="flex-1 h-px"
+       style="background: linear-gradient(to right, transparent, var(--color-gold-pale) 80%, var(--color-gold));"></div>
+
+  <!-- Glyph -->
+  <span class="font-decorative text-gold text-lg flex-shrink-0">{glyph}</span>
+
+  <!-- Right rule -->
+  <div class="flex-1 h-px"
+       style="background: linear-gradient(to left, transparent, var(--color-gold-pale) 80%, var(--color-gold));"></div>
+</div>

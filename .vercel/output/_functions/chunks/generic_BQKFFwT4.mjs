@@ -1,5 +1,5 @@
 import { i as isRemoteAllowed, j as joinPaths, a as isRemotePath, t as typeHandlers, b as types } from './index_ty8FbXfT.mjs';
-import { A as AstroError, E as ExpectedImage, L as LocalImageUsedWrongly, M as MissingImageDimension, U as UnsupportedImageFormat, I as IncompatibleDescriptorOptions, a as UnsupportedImageConversion, t as toStyleString, N as NoImageMetadata, F as FailedToFetchRemoteImageDimensions, R as RemoteImageNotAllowed, b as ExpectedImageOptions, c as ExpectedNotESMImage, d as InvalidImageService, e as createComponent, f as ImageMissingAlt, m as maybeRenderHead, g as addAttribute, s as spreadAttributes, r as renderTemplate, h as createAstro, i as ExperimentalFontsNotEnabled, j as FontFamilyNotFound, u as unescapeHTML } from './astro/server_rqQWen4l.mjs';
+import { A as AstroError, E as ExpectedImage, L as LocalImageUsedWrongly, M as MissingImageDimension, U as UnsupportedImageFormat, I as IncompatibleDescriptorOptions, a as UnsupportedImageConversion, t as toStyleString, N as NoImageMetadata, F as FailedToFetchRemoteImageDimensions, R as RemoteImageNotAllowed, b as ExpectedImageOptions, c as ExpectedNotESMImage, d as InvalidImageService, e as createAstro, f as createComponent, g as ImageMissingAlt, m as maybeRenderHead, h as addAttribute, s as spreadAttributes, r as renderTemplate, i as ExperimentalFontsNotEnabled, j as FontFamilyNotFound, u as unescapeHTML } from './astro/server_BisCJTvH.mjs';
 import 'clsx';
 import * as mime from 'mrmime';
 import 'piccolore';
@@ -531,7 +531,7 @@ async function getConfiguredImageService() {
   if (!globalThis?.astroAsset?.imageService) {
     const { default: service } = await import(
       // @ts-expect-error
-      './sharp_CeGhkTcE.mjs'
+      './sharp_DHOewz25.mjs'
     ).catch((e) => {
       const error = new AstroError(InvalidImageService);
       error.cause = e;
@@ -694,7 +694,7 @@ async function getImage$1(options, imageConfig) {
   };
 }
 
-const $$Astro$2 = createAstro();
+const $$Astro$2 = createAstro("https://maananpurothi.vercel.app/");
 const $$Image = createComponent(async ($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro$2, $$props, $$slots);
   Astro2.self = $$Image;
@@ -723,7 +723,7 @@ const $$Image = createComponent(async ($$result, $$props, $$slots) => {
   return renderTemplate`${maybeRenderHead()}<img${addAttribute(image.src, "src")}${spreadAttributes(attributes)}${addAttribute(className, "class")}>`;
 }, "C:/Users/maana/Desktop/person_web/node_modules/astro/components/Image.astro", void 0);
 
-const $$Astro$1 = createAstro();
+const $$Astro$1 = createAstro("https://maananpurothi.vercel.app/");
 const $$Picture = createComponent(async ($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro$1, $$props, $$slots);
   Astro2.self = $$Picture;
@@ -833,7 +833,7 @@ function checkWeight(input, target) {
   return input === target;
 }
 
-const $$Astro = createAstro();
+const $$Astro = createAstro("https://maananpurothi.vercel.app/");
 const $$Font = createComponent(($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
   Astro2.self = $$Font;

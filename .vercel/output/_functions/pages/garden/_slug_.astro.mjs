@@ -1,10 +1,10 @@
-import { e as createComponent, k as renderComponent, r as renderTemplate, h as createAstro, m as maybeRenderHead, g as addAttribute } from '../../chunks/astro/server_rqQWen4l.mjs';
+import { e as createAstro, f as createComponent, k as renderComponent, r as renderTemplate, m as maybeRenderHead, h as addAttribute } from '../../chunks/astro/server_BisCJTvH.mjs';
 import 'piccolore';
-import { $ as $$Layout } from '../../chunks/Layout_B_0CfVOH.mjs';
+import { $ as $$Layout } from '../../chunks/Layout_DfTXD5F0.mjs';
 /* empty css                                     */
 export { renderers } from '../../renderers.mjs';
 
-const $$Astro = createAstro();
+const $$Astro = createAstro("https://maananpurothi.vercel.app/");
 const $$slug = createComponent(($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
   Astro2.self = $$slug;

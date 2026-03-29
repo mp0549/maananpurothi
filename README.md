@@ -121,3 +121,13 @@ Then `npm run build` produces a static `dist/` folder.
 - **Framer Motion components** use `client:visible` so they hydrate lazily when scrolled into view.
 - **Mobile nav** is pure vanilla JS — no framework overhead.
 - All placeholder text is written in the "map annotation" voice; replace with your real content.
+
+
+## Updating the website:
+- ### default message
+-- .\scripts\task.ps1 ship
+
+- # custom message
+-- .\scripts\task.ps1 ship "Redesigned simple view"
+- # or named
+-- .\scripts\task.ps1 ship -Message "Redesigned simple view"

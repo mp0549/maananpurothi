@@ -1,4 +1,4 @@
-import { am as NOOP_MIDDLEWARE_HEADER, an as REDIRECT_STATUS_CODES, A as AstroError, ao as ActionsReturnedInvalidDataError, V as DEFAULT_404_COMPONENT } from './astro/server_rqQWen4l.mjs';
+import { am as NOOP_MIDDLEWARE_HEADER, an as REDIRECT_STATUS_CODES, A as AstroError, ao as ActionsReturnedInvalidDataError, V as DEFAULT_404_COMPONENT } from './astro/server_BisCJTvH.mjs';
 import { parse, stringify } from 'devalue';
 import { escape } from 'html-escaper';
 
@@ -12,7 +12,7 @@ const ACTION_QUERY_PARAMS$1 = {
   actionName: "_action"};
 const ACTION_RPC_ROUTE_PATTERN = "/_actions/[...path]";
 
-const __vite_import_meta_env__ = {"ASSETS_PREFIX": undefined, "BASE_URL": "/", "DEV": false, "MODE": "production", "PROD": true, "SITE": undefined, "SSR": true};
+const __vite_import_meta_env__ = {"ASSETS_PREFIX": undefined, "BASE_URL": "/", "DEV": false, "MODE": "production", "PROD": true, "SITE": "https://maananpurothi.vercel.app/", "SSR": true};
 const ACTION_QUERY_PARAMS = ACTION_QUERY_PARAMS$1;
 const codeToStatusMap = {
   // Implemented from IANA HTTP Status Code Registry
@@ -126,7 +126,7 @@ function getActionQueryString(name) {
 }
 function serializeActionResult(res) {
   if (res.error) {
-    if (Object.assign(__vite_import_meta_env__, { _: process.env._ })?.DEV) {
+    if (Object.assign(__vite_import_meta_env__, {})?.DEV) {
       actionResultErrorStack.set(res.error.stack);
     }
     let body2;
@@ -193,7 +193,7 @@ function deserializeActionResult(res) {
         })
       };
     }
-    if (Object.assign(__vite_import_meta_env__, { _: process.env._ })?.PROD) {
+    if (Object.assign(__vite_import_meta_env__, {})?.PROD) {
       return { error: ActionError.fromJson(json), data: void 0 };
     } else {
       const error = ActionError.fromJson(json);

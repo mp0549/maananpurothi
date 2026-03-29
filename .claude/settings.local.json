@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npm run:*)",
-      "WebFetch(domain:codepen.io)"
+      "WebFetch(domain:codepen.io)",
+      "Bash(npx astro:*)"
     ]
   }
 }

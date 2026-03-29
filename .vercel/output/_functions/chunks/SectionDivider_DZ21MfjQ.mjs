@@ -1,8 +1,8 @@
-import { e as createAstro, c as createComponent, m as maybeRenderHead, d as addAttribute, a as renderTemplate } from './astro/server_CJ-luqlO.mjs';
+import { e as createAstro, f as createComponent, m as maybeRenderHead, h as addAttribute, r as renderTemplate } from './astro/server_BisCJTvH.mjs';
 import 'piccolore';
 import 'clsx';
 
-const $$Astro = createAstro("https://mp0549.github.io");
+const $$Astro = createAstro("https://maananpurothi.vercel.app/");
 const $$SectionDivider = createComponent(($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
   Astro2.self = $$SectionDivider;

@@ -5,48 +5,55 @@
 
 .DESCRIPTION
     A simple PowerShell task runner. Available tasks:
-      dev     — Start the Astro dev server
-      build   — Build the project for production
-      deploy  — Build then deploy to Vercel
-      lint    — Check TypeScript types + Astro check
-      setup   — Install dependencies
+      dev     - Start the Astro dev server
+      build   - Build the project for production
+      deploy  - Build then deploy to Vercel
+      ship    - Stage, commit, build, deploy to Vercel, then push to git
+      lint    - Check TypeScript types + Astro check
+      setup   - Install dependencies
 
 .EXAMPLE
     .\scripts\task.ps1 dev
     .\scripts\task.ps1 deploy
+    .\scripts\task.ps1 ship
+    .\scripts\task.ps1 ship "Redesigned homepage"
+    .\scripts\task.ps1 ship -Message "Redesigned homepage"
     .\scripts\task.ps1 lint
 
 .NOTES
-    Requires Node.js and npm. The 'deploy' task also requires the Vercel CLI
-    (install globally with: npm i -g vercel).
+    Requires Node.js and npm. The deploy and ship tasks also require the
+    Vercel CLI (install globally with: npm i -g vercel).
 #>
 
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet('dev', 'build', 'deploy', 'lint', 'setup')]
-    [string]$Task
+    [ValidateSet('dev', 'build', 'deploy', 'ship', 'lint', 'setup')]
+    [string]$Task,
+
+    [Parameter(Position = 1)]
+    [string]$Message = 'Updated site'
 )
 
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# -- Helpers ------------------------------------------------------------------
 
 function Write-Step {
-    param([string]$Message)
+    param([string]$Msg)
     Write-Host ""
-    Write-Host "  ✦  $Message" -ForegroundColor DarkYellow
+    Write-Host "  >>  $Msg" -ForegroundColor DarkYellow
     Write-Host ""
 }
 
 function Write-Success {
-    param([string]$Message)
-    Write-Host "  ✓  $Message" -ForegroundColor Green
+    param([string]$Msg)
+    Write-Host "  OK  $Msg" -ForegroundColor Green
 }
 
 function Write-Fail {
-    param([string]$Message)
-    Write-Host "  ✗  $Message" -ForegroundColor Red
+    param([string]$Msg)
+    Write-Host "  !!  $Msg" -ForegroundColor Red
 }
 
-function Invoke-Task {
+function Invoke-Step {
     param(
         [string]$Label,
         [scriptblock]$ScriptBlock
@@ -54,7 +61,7 @@ function Invoke-Task {
     Write-Step $Label
     & $ScriptBlock
     if ($LASTEXITCODE -ne 0) {
-        Write-Fail "Task '$Task' failed (exit code $LASTEXITCODE)."
+        Write-Fail "Step failed (exit code $LASTEXITCODE). Aborting."
         exit $LASTEXITCODE
     }
 }
@@ -63,68 +70,94 @@ function Invoke-Task {
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $ProjectRoot
 Write-Host ""
-Write-Host "  The Cartographer's Study — Task Runner" -ForegroundColor DarkCyan
+Write-Host "  The Cartographer's Study -- Task Runner" -ForegroundColor DarkCyan
 Write-Host "  Working directory: $ProjectRoot" -ForegroundColor DarkGray
 
-# ── Tasks ────────────────────────────────────────────────────────────────────
+# -- Tasks --------------------------------------------------------------------
 
 switch ($Task) {
 
-    # ── dev: start the Astro development server ───────────────────────────────
+    # dev: start the Astro development server
     'dev' {
         Write-Step "Starting development server..."
-        Invoke-Task "npm run dev" {
+        Invoke-Step "npm run dev" {
             npm run dev
         }
     }
 
-    # ── build: compile the project for production ─────────────────────────────
+    # build: compile the project for production
     'build' {
-        Invoke-Task "Building project for production..." {
+        Invoke-Step "Building project for production..." {
             npm run build
         }
         Write-Success "Build complete. Output is in ./dist/"
     }
 
-    # ── deploy: build first, then push to Vercel ──────────────────────────────
+    # deploy: build first, then push to Vercel
     'deploy' {
-        # Check that the Vercel CLI is available
         $vercelPath = Get-Command vercel -ErrorAction SilentlyContinue
         if (-not $vercelPath) {
-            Write-Fail "Vercel CLI not found. Install it with:  npm i -g vercel"
+            Write-Fail "Vercel CLI not found. Install it with: npm i -g vercel"
             exit 1
         }
 
-        # Build is a prerequisite for deploy
-        Write-Step "Running build before deploy..."
-        npm run build
-        if ($LASTEXITCODE -ne 0) {
-            Write-Fail "Build failed — aborting deploy."
-            exit $LASTEXITCODE
+        Invoke-Step "Building for production..." {
+            npm run build
         }
         Write-Success "Build complete."
 
-        # Deploy
-        Invoke-Task "Deploying to Vercel..." {
+        Invoke-Step "Deploying to Vercel..." {
             vercel --prod
         }
         Write-Success "Deploy complete. Check the Vercel dashboard for the live URL."
     }
 
-    # ── lint: TypeScript type-check + Astro check ─────────────────────────────
+    # ship: stage -> commit -> build -> vercel deploy -> git push
+    'ship' {
+        $vercelPath = Get-Command vercel -ErrorAction SilentlyContinue
+        if (-not $vercelPath) {
+            Write-Fail "Vercel CLI not found. Install it with: npm i -g vercel"
+            exit 1
+        }
+
+        Invoke-Step "Staging all changes..." {
+            git add .
+        }
+
+        Invoke-Step "Committing with message: $Message" {
+            git commit -m "$Message"
+        }
+
+        Invoke-Step "Building for production..." {
+            npm run build
+        }
+        Write-Success "Build complete."
+
+        Invoke-Step "Deploying to Vercel..." {
+            vercel --prod
+        }
+        Write-Success "Vercel deploy complete."
+
+        Invoke-Step "Pushing to remote..." {
+            git push
+        }
+        Write-Success "Shipped. All done."
+    }
+
+    # lint: TypeScript type-check + Astro check
     'lint' {
         Write-Step "Running Astro type-check..."
-        Invoke-Task "astro check" {
+        Invoke-Step "astro check" {
             npm run astro -- check
         }
         Write-Success "No type errors found."
     }
 
-    # ── setup: install all npm dependencies ───────────────────────────────────
+    # setup: install all npm dependencies
     'setup' {
-        Invoke-Task "Installing dependencies..." {
+        Invoke-Step "Installing dependencies..." {
             npm install
         }
-        Write-Success "Setup complete. Run '.\scripts\task.ps1 dev' to start the dev server."
+        Write-Success "Setup complete. Run .\scripts\task.ps1 dev to start the dev server."
     }
 }

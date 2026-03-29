@@ -14,6 +14,7 @@
     "@astrojs/tailwind": "^5.1.0",
     "@astrojs/vercel": "^8.0.0",
     "@imgly/background-removal-node": "^1.4.5",
+    "@vercel/analytics": "^2.0.1",
     "astro": "^5.0.0",
     "framer-motion": "^11.11.0",
     "react": "^18.3.1",

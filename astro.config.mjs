@@ -9,8 +9,10 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false }),
   ],
   // Switch to 'static' if you prefer a fully static export
-  output: 'static',
-  // adapter: vercel(),
-  site: 'https://mp0549.github.io',
-  base: '/maananpurothi/',
+  output: 'server',
+  adapter: vercel(),
+  // site: 'https://mp0549.github.io',
+  site: 'https://maananpurothi.vercel.app/',
+
+  // base: '/maananpurothi/',
 });

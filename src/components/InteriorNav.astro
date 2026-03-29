@@ -14,7 +14,7 @@ const { pageTitle } = Astro.props;
 <header class="interior-nav fixed top-0 left-0 right-0 z-50 h-14 flex items-center px-6 md:px-10">
   <!-- Back link -->
   <a
-    href="/"
+    href= {import.meta.env.BASE_URL}
     class="font-display text-xs uppercase tracking-widest text-ink-muted hover:text-gold transition-colors duration-200 flex items-center gap-2 shrink-0"
   >
     <span aria-hidden="true" class="text-gold-pale">←</span>

@@ -14,9 +14,9 @@ const $$InteriorNav = createComponent(($$result, $$props, $$slots) => {
 
 const $$Footer = createComponent(($$result, $$props, $$slots) => {
   const links = [
-    { href: "https://github.com/yourusername", label: "GitHub", external: true },
-    { href: "https://linkedin.com/in/yourprofile", label: "LinkedIn", external: true },
-    { href: "mailto:you@example.com", label: "Email", external: false },
+    { href: "https://github.com/mp0549", label: "GitHub", external: true },
+    { href: "https://linkedin.com/in/maananpurothi", label: "LinkedIn", external: true },
+    { href: "mailto:contactmaanan@gmail.com", label: "Email", external: false },
     { href: "/resume.pdf", label: "R\xE9sum\xE9", external: true }
   ];
   return renderTemplate`${maybeRenderHead()}<footer class="relative overflow-hidden border-t border-gold-pale/40 bg-parchment-aged/60"> <!-- Subtle texture --> <div class="absolute inset-0 opacity-20 mix-blend-multiply pointer-events-none" style="background-image: url('/textures/parchment_texture2.jpg'); background-size: 400px 400px;" aria-hidden="true"></div> <div class="relative z-10 max-w-wide mx-auto px-6 md:px-12 py-10 flex flex-col items-center gap-5 text-center"> <!-- Stamp accent --> <img src="/accents/postalstamps.avif" alt="" aria-hidden="true" class="w-16 opacity-30 mix-blend-multiply" style="filter: sepia(0.4);" loading="lazy"> <!-- Name + tagline --> <div> <p class="font-display text-sm uppercase tracking-[0.2em] text-ink">Your Name</p> <p class="font-body italic text-xs text-ink-muted mt-1">Mapping the intellectual frontier</p> </div> <!-- Links --> <nav aria-label="Connect links" class="flex flex-wrap justify-center gap-6"> ${links.map(({ href, label, external }) => renderTemplate`<a${addAttribute(href, "href")} class="nav-link text-xs"${spreadAttributes(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}> ${label} </a>`)} </nav> <!-- Ornament + copyright --> <span class="ornament text-sm" aria-hidden="true">⁕ &nbsp; ⁕ &nbsp; ⁕</span> <p class="text-ink-muted text-xs tracking-wider font-display">

@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Task runner for The Cartographer's Study (Astro project).
+    Task runner for The Archives (Astro project).
 
 .DESCRIPTION
     A simple PowerShell task runner. Available tasks:
@@ -70,7 +70,7 @@ function Invoke-Step {
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $ProjectRoot
 Write-Host ""
-Write-Host "  The Cartographer's Study -- Task Runner" -ForegroundColor DarkCyan
+Write-Host "  The Archives -- Task Runner" -ForegroundColor DarkCyan
 Write-Host "  Working directory: $ProjectRoot" -ForegroundColor DarkGray
 
 # -- Tasks --------------------------------------------------------------------

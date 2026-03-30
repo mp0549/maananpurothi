@@ -6,73 +6,125 @@
  */
 import Layout from '@/layouts/Layout.astro';
 import SectionDivider from '@/components/SectionDivider.astro';
+import { record } from 'astro:schema';
 
 const entries = [
   {
-    title: 'Expedition I — The Cognition Engine',
-    dateRange: '2024 – Present',
+    title: 'Influence Proxy Dashboard',
+    dateRange: 'March 2026',
     description:
-      'An ongoing survey of uncharted terrain at the intersection of machine cognition and collaborative sense-making. The expedition produced three working prototypes and a published field report.',
-    tags: ['AI/ML', 'Research', 'Python', 'HCI'],
-    href: '/garden',
+      "Built a full-stack research tool that lets AI safety researchers fine-tune language models and see exactly which training examples shaped the model's behavior, turning fine-tuning from a black box into an auditable process.",
+    detail:
+      "Built a full-stack research tool that lets AI safety researchers fine-tune language models and see exactly which training examples shaped the model's behavior — turning fine-tuning from a black box into an auditable process.<br />- Computed influence scores live during training using gradient dot products, with no checkpoint storage required<br />- Ran serverless A100 GPU jobs on Modal with async status updates streamed to the frontend in real time<br />- Visualized per-example influence as animated heatmaps and ranked leaderboards for intuitive data auditing<br />- Designed a full job pipeline from data upload through fine-tuning to influence score delivery via Supabase Realtime<br />- Visualized per-example influence as animated heatmaps and ranked leaderboards for intuitive data auditing<br />- Designed a full job pipeline from data upload through fine-tuning to influence score delivery via Supabase Realtime",
+    links: [
+      { label: 'GitHub', href: 'https://github.com/LCodingX/generalization-bet' },
+      { label: 'Live Demo', href: 'https://frontend-tau-seven-58.vercel.app/runs' },
+    ],
+    tags: ['Pinned', 'AI/ML', 'Research', 'HCI'],
     rotation: -0.6,
-    categories: ['Research'],
+    categories: ['Pinned', 'Research', 'Engineering'],
   },
   {
-    title: 'Expedition II — Social Architecture',
-    dateRange: '2023 – 2024',
+    title: 'Senior Consultant @ Google Developer Groups',
+    dateRange: 'July 2025 – Present',
     description:
-      'A cartographic project mapping the social architecture of nascent communities. Produced field guides, frameworks, and a small constellation of tools still in active use.',
-    tags: ['Community', 'Product', 'TypeScript'],
-    href: '/garden',
+      'Acting Senior Consultant for Google Developer Groups, advising a student-led tech community worldwide on growth strategy, event programming, and community engagement to foster inclusive, vibrant ecosystems for learning and collaboration.',
+    detail:
+      'Acting Senior Consultant for Google Developer Groups, advising a student-led tech community worldwide on growth strategy, event programming, and community engagement to foster inclusive, vibrant ecosystems for learning and collaboration.<br />- Organized developer workshops and advised on technical content and speaker engagement. <br />- Organized a 430 member hackathon: prepared sponsors, planned the event, etc.<br />- Recruited 500+ members through targeted outreach and event planning',
+    links: [      { label: 'Org page', href: 'https://gdg.community.dev/gdg-on-campus-university-of-wisconsin-madison-madison-united-states/' },
+    ],
+    tags: ['Pinned', 'Community', 'Consulting'],
     rotation: 0.4,
-    categories: ['Community', 'Engineering'],
+    categories: ['Pinned', 'Community'],
   },
   {
-    title: 'Expedition III — Sparse Signal',
-    dateRange: '2022 – 2023',
+    title: 'Technical Team @ WAISI',
+    dateRange: 'Oct 2025 – Present',
     description:
-      'Deep reconnaissance into systems that learn from sparse signals. The resulting instruments have since been adopted by several downstream expeditions.',
-    tags: ['Systems', 'Data', 'Rust', 'ML'],
-    href: '/garden',
+      'Lead a cohort of students pursuing technical AI safety, facilitating discussions and learning sessions on reward specification, interpretability, and adversarial evaluation.',
+    detail:
+      'Lead a cohort of students pursuing technical AI safety, facilitating discussions and learning sessions on reward specification, interpretability, and adversarial evaluation.<br />- Update and refine curriculum to incorporate the latest AI safety research and materials from BlueDot Impact curriculum<br />- Participate in a reading group and conduct structured research replications of relevant papers<br />- Completed technical AI safety training in reward specification, interpretability, and adversarial evaluation<br />- Studied AI policy frameworks including compute governance and international coordination',
+    links: [{ label: 'Org page', href: 'https://www.waisi.org/' }],
+    tags: ['AI Safety', 'Leadership', 'Research'],
+    rotation: -0.5,
+    categories: ['Pinned', 'Community', 'Research'],
+  },
+  {
+    title: 'Perception Engineer & Mentor @ Wisconsin Autonomous',
+    dateRange: 'Sep 2024 – Present',
+    description:
+      'Developing computer vision algorithms for detection, lane recognition, and segmentation for an autonomous driving challenge while mentoring junior engineers.',
+    detail:
+      'Developing computer vision algorithms for detection, lane recognition, and segmentation for an autonomous driving challenge while mentoring junior engineers.<br />- Developed computer vision algorithms for detection, lane recognition, and segmentation<br />- Reduced compute cost by 40% through optimized trajectory mapping<br />- Mentored two engineers on CV fundamentals and integration workflows',
+    links: [],
+    tags: ['Computer Vision', 'Engineering', 'Mentorship'],
+    rotation: 0.7,
+    categories: ['Engineering', 'Community'],
+  },
+  {
+    title: 'Founder & Full-Stack Dev @ Student Success Club',
+    dateRange: 'Nov 2022 – Present',
+    description:
+      'Launched a student-run tutoring initiative and built a full-stack React platform to connect students with volunteer tutors, advocating for educational equity through peer-driven support.',
+    detail:
+      'Launched a student-run tutoring initiative and built a full-stack React platform to connect students with volunteer tutors, advocating for educational equity through peer-driven support.<br />- Designed and built a React website to advertise services, facilitate student-tutor connections, and improve accessibility<br />- Developed full-stack registration and contact forms, storing submissions in a database and enabling automated tutor-student matching<br />- Implemented real-time notifications to phone and email for new submissions<br />- Led a team of volunteer tutors and promoted peer support and educational equity through free, community-driven resources',
+    links: [
+      { label: 'Website', href: '#' },
+      { label: 'GitHub', href: '#' }
+    ],
+    tags: ['Community', 'React', 'Full-Stack'],
     rotation: -0.3,
+    categories: ['Pinned', 'Engineering', 'Community'],
+  },
+{
+    title: 'Covid-19 Vaccine Stance Classification',
+    dateRange: '2024',
+    description:
+      'Built a stance classification system to label tweets as in-favor, against, or neutral-or-unclear toward COVID-19 vaccination under tight data and GPU constraints.',
+    detail:
+      'Built a stance classification system to label tweets as in-favor, against, or neutral-or-unclear toward COVID-19 vaccination under tight data and GPU constraints.<br />- Fine-tuned FLAN-T5-Large using LoRA adapters, training on limited resources<br />- Designed a curriculum learning strategy to stabilize 3-way stance classification<br />- Mitigated failure modes including neutral collapse, sarcasm, and more<br />- Achieved improved macro-F1 and neutral recall compared to zero-shot and standard fine-tuning baselines',
+    links: [
+      { label: 'GitHub', href: '#' }
+    ],
+    tags: ['NLP', 'PyTorch', 'Research'],
+    rotation: 0.5,
     categories: ['Research', 'Engineering'],
   },
   {
-    title: 'Expedition IV — The Infrastructure Layer',
-    dateRange: '2021 – 2022',
+    title: 'AI Interview Prep Platform',
+    dateRange: '2024',
     description:
-      'A foundational survey establishing the underlying terrain for everything that followed. Not glamorous; essential. Built the roads that later expeditions walked.',
-    tags: ['Infrastructure', 'DevOps', 'Go'],
-    href: '/garden',
-    rotation: 0.7,
+      'Built a full-stack AI interview prep platform that generates personalized questions from resumes and job descriptions and provides structured performance feedback.',
+    detail:
+      'Built a full-stack AI interview prep platform that generates personalized questions from resumes and job descriptions and provides structured performance feedback.<br />- Designed REST APIs for interview sessions, questions, and responses<br />- Integrated Claude API for dynamic question generation and answer grading<br />- Implemented persistent storage for interview history using SQLite<br />- Built a multi-step frontend flow for interview practice and results review',
+    links: [
+      { label: 'GitHub', href: '#' },
+      { label: 'Live Demo', href: '#' }
+    ],
+    tags: ['Full-Stack', 'AI/ML', 'Python'],
+    rotation: -0.8,
     categories: ['Engineering'],
   },
   {
-    title: 'Research Fellowship — Institute Name',
-    dateRange: 'Summer 2023',
+    title: 'Gesture-Based Game Control',
+    dateRange: '2023',
     description:
-      'A concentrated season of deep work at a selective research fellowship. Produced two position papers and one working prototype. Relationships formed here continue to shape the work.',
-    tags: ['Research', 'Fellowship', 'Writing'],
-    href: '/garden',
-    rotation: -0.5,
-    categories: ['Research'],
-  },
-  {
-    title: 'Open Source — Toolkit Name',
-    dateRange: '2022 – Present',
-    description:
-      'A small but useful library for a narrow problem that turned out to be more common than anticipated. Maintained by a loose coalition of contributors across four time zones.',
-    tags: ['Open Source', 'TypeScript'],
-    href: '/garden',
-    rotation: 0.3,
-    categories: ['Engineering', 'Community'],
+      'Built a real-time, gesture-based controller that allows players to control Mario Kart using hand movements instead of a physical controller.',
+    detail:
+      'Built a real-time, gesture-based controller that allows players to control Mario Kart using hand movements instead of a physical controller.<br />- Implemented real-time hand tracking and gesture recognition<br />- Mapped hand gestures to in-game controls such as steering, acceleration, and item usage<br />- Supported multiplayer by splitting camera feed for independent gesture control<br />- Optimized for low-latency input to ensure smooth and responsive gameplay',
+    links: [
+      { label: 'GitHub', href: '#' },
+      { label: 'Demo Video', href: '#' }
+    ],
+    tags: ['Computer Vision', 'HCI', 'Python'],
+    rotation: 0.2,
+    categories: ['Pinned', 'Engineering'],
   },
 ];
 ---
 
 <Layout
-  title="The Codex — The Cartographer's Study"
+  title="The Codex — The Archives"
   description="Archive of expeditions, projects, and experiences — a record of territories explored."
   variant="interior"
   pageTitle="The Codex"
@@ -96,16 +148,51 @@ const entries = [
       </p>
     </div>
 
+    <!-- ── Author's Note ─────────────────────────────────────────────── -->
+    <!-- TODO: replace # hrefs with your actual portfolio URL and LinkedIn URL -->
+    <aside
+      class="scroll-reveal my-8 border border-gold-pale rounded-sm px-7 py-6 relative"
+      style="background: rgba(234,217,184,0.28); box-shadow: inset 0 0 0 1px rgba(139,105,20,0.08);"
+      aria-label="Author's note to recruiters"
+    >
+      <!-- Ornamental corner marks -->
+      <span class="absolute top-2 left-3 font-display text-gold-light text-xs opacity-50 select-none" aria-hidden="true">✦</span>
+      <span class="absolute top-2 right-3 font-display text-gold-light text-xs opacity-50 select-none" aria-hidden="true">✦</span>
+
+      <p class="section-label text-xs mb-2 text-center tracking-[0.2em]">A Note to the Reader</p>
+
+      <p class="font-body text-sm text-ink-muted leading-relaxed text-center max-w-xl mx-auto">
+        This Codex is a curated journal — a space for narrative, personality, and experimental thought.
+        It is <em>not</em> exhaustive. For a comprehensive, formal record of technical credentials,
+        publications, and full work history, consult the official archives:
+      </p>
+
+      <div class="flex flex-wrap justify-center gap-5 mt-5">
+        <a
+          href="https://mp0549.github.io/my-portfolio/"
+          class="font-display text-xs uppercase tracking-widest text-gold hover:text-gold-light transition-colors border border-gold-pale px-4 py-2 rounded-sm hover:border-gold transition-all"
+        >
+          View the Formal Portfolio &rarr;
+        </a>
+        <a
+          href=""
+          class="font-display text-xs uppercase tracking-widest text-gold hover:text-gold-light transition-colors border border-gold-pale px-4 py-2 rounded-sm hover:border-gold transition-all"
+        >
+          Review LinkedIn Dossier &rarr;
+        </a>
+      </div>
+    </aside>
+
     <SectionDivider glyph="✦" />
 
     <!-- ── Filter tabs ──────────────────────────────────────────────── -->
     <div class="flex flex-wrap gap-0 border-b border-gold-pale mb-8 mt-8" role="tablist" aria-label="Filter expeditions">
-      {['All', 'Research', 'Engineering', 'Community'].map((tab) => (
+      {['Pinned', 'Research', 'Engineering', 'Community'].map((tab) => (
         <button
-          class:list={['folder-tab', { active: tab === 'All' }]}
+          class:list={['folder-tab', { active: tab === 'Pinned' }]}
           data-filter={tab}
           role="tab"
-          aria-selected={tab === 'All' ? 'true' : 'false'}
+          aria-selected={tab === 'Pinned' ? 'true' : 'false'}
         >
           {tab}
         </button>
@@ -118,7 +205,7 @@ const entries = [
         <div
           class="expedition-card"
           data-categories={entry.categories.join(' ')}
-          style={`transition: opacity 0.25s ease; animation-delay: ${i * 0.06}s;`}
+          style={`transition: opacity 0.25s ease; animation-delay: ${i * 0.06}s; ${!entry.categories.includes('Pinned') ? 'display: none;' : ''}`}
         >
           <article
             class="parchment-card p-6 h-full flex flex-col gap-3"
@@ -138,16 +225,20 @@ const entries = [
 
             <!-- Tags -->
             <div class="flex flex-wrap gap-1.5">
-              {entry.tags.map((tag) => <span class="tag-pill">{tag}</span>)}
+              {entry.tags.map((tag) =>
+                tag === 'Pinned'
+                  ? <span class="tag-pill" style="background: rgba(139,105,20,0.15); color: var(--color-gold); border-color: rgba(139,105,20,0.3);">✦ Pinned</span>
+                  : <span class="tag-pill">{tag}</span>
+              )}
             </div>
 
-            <!-- Link -->
-            <a
-              href={entry.href}
-              class="self-start font-display text-xs uppercase tracking-widest text-gold hover:text-gold-light transition-colors mt-1"
+            <!-- Expand button -->
+            <button
+              class="dispatch-btn self-start font-display text-xs uppercase tracking-widest text-gold hover:text-gold-light transition-colors mt-1 cursor-pointer bg-transparent border-none p-0"
+              data-idx={i}
             >
               Read Dispatch &rarr;
-            </a>
+            </button>
           </article>
         </div>
       ))}
@@ -163,9 +254,44 @@ const entries = [
 
       <div class="space-y-10 mt-6">
         {[
-          { role: 'Role Title', org: 'Company or Organization', period: '2024 – Present', desc: 'Brief description of your responsibilities and what you built or achieved in this role.' },
-          { role: 'Previous Role', org: 'Previous Company', period: '2022 – 2024', desc: 'What you did, what you shipped, and what you learned in the field.' },
-          { role: 'Earlier Role', org: 'Earlier Company', period: '2020 – 2022', desc: 'Foundational experience — the apprenticeship that taught the craft.' },
+          {
+            role: 'Edge Network Services Intern',
+            org: 'Meta',
+            period: 'Summer 2025',
+            desc: [
+              '❧ Deployed an end-to-end ML pipeline for LLaMa models in production to catch delays in deployment.',
+              '❧ Built a scalable agent framework to navigate complex, multi-step tasks.',
+              '❧ Designed analytics dashboards that enabled cross-functional teams to act on over 100K weekly datapoints.'
+            ]
+          },
+          { 
+            role: 'Research Engineer', 
+            org: 'Equistamp @ Redwood Research', 
+            period: 'Mar 2026 - Present', 
+            desc: [
+              '❧ Partnered with Redwood Research to study AI safety and the dynamics of detecting deliberate sabotage in machine learning research.',
+              '❧ Audited paper-codebase pairs to identify compromised logic or configuration settings.'
+            ]
+          },
+          { 
+            role: 'Researcher', 
+            org: 'UW Graphics Lab', 
+            period: 'Sep 2025 - Present', 
+            desc: [
+              '❧ Investigated representational limitations of visualization design guidelines for automated synthesis.',
+              '❧ Authoring a paper on a 7-dimension classification schema.'
+            ]
+          },
+          { 
+            role: 'Technical Business Analyst', 
+            org: 'Jumpshot', 
+            period: 'Mar 2024 – April 2025', 
+            desc: [
+              '❧ Acted as liason between client and engineering team to gather and relay product requirements.',
+              '❧ Implemented frontend and backend features across application stack',
+              '❧ Led testing and QA efforts, resolving issues pre-release to improve performance and user experience.'
+            ]
+          },
         ].map(({ role, org, period, desc }) => (
           <div class="flex gap-6 items-start scroll-reveal">
             <div class="w-px self-stretch bg-gold-pale flex-shrink-0 mt-1" aria-hidden="true"></div>
@@ -173,7 +299,11 @@ const entries = [
               <p class="section-label text-xs">{period}</p>
               <h3 class="font-display text-base text-ink">{role}</h3>
               <p class="text-gold font-display text-xs tracking-wide">{org}</p>
-              <p class="text-ink-muted text-sm leading-relaxed mt-2 font-body">{desc}</p>
+              <ul class="mt-2 space-y-1 text-ink-muted text-sm leading-relaxed font-body">
+                {desc.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
             </div>
           </div>
         ))}
@@ -182,16 +312,111 @@ const entries = [
 
   </div>
 
+  <!-- Entry data island (read by modal script) -->
+  <script is:inline type="application/json" id="entries-json" set:html={JSON.stringify(entries.map(({ title, dateRange, detail, tags, links }) => ({ title, dateRange, detail, tags, links })))} />
+
+  <!-- ── Dispatch Modal ─────────────────────────────────────────────── -->
+  <div
+    id="dispatch-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    style="display:none; position:fixed; inset:0; z-index:50; overflow-y:auto; padding:2.5rem 1.25rem;"
+  >
+    <!-- Backdrop -->
+    <div
+      id="modal-backdrop"
+      style="position:fixed; inset:0; background:rgba(20,13,5,0.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); opacity:0; transition:opacity 0.3s ease;"
+    ></div>
+
+    <!-- Panel -->
+    <div
+      id="modal-panel"
+      class="parchment-card relative max-w-3xl mx-auto my-10 overflow-hidden"
+      style="opacity:0; transform:translateY(22px) scale(0.97); transition:opacity 0.32s ease, transform 0.32s ease;"
+    >
+      <!-- Gold accent bar across the top -->
+      <div style="height:2px; background:linear-gradient(to right, transparent, var(--color-gold-pale), var(--color-gold), var(--color-gold-pale), transparent);"></div>
+
+      <div class="p-8 md:p-12">
+
+        <!-- Date + close -->
+        <div class="flex items-center justify-between mb-5">
+          <p id="modal-date" class="section-label text-xs tracking-[0.18em]"></p>
+          <button
+            id="modal-close"
+            class="font-display text-ink-muted hover:text-gold transition-colors text-base leading-none bg-transparent border-none cursor-pointer w-7 h-7 flex items-center justify-center rounded-sm hover:bg-gold/10"
+            aria-label="Close dispatch"
+          >✕</button>
+        </div>
+
+        <!-- Title -->
+        <h2 id="modal-title" class="font-display text-2xl md:text-3xl text-ink leading-tight"></h2>
+
+        <!-- Gold rule -->
+        <div class="my-6" style="height:1px; background:linear-gradient(to right, var(--color-gold), var(--color-gold-pale), transparent); opacity:0.6;"></div>
+
+        <!-- Two-column body -->
+        <div class="grid md:grid-cols-[10rem_1fr] gap-8 md:gap-10">
+
+          <!-- Left: meta sidebar -->
+          <div class="flex flex-col gap-6">
+
+            <!-- Links -->
+            <div id="modal-links-wrap">
+              <p class="section-label text-xs mb-2 tracking-[0.15em]">Dispatches</p>
+              <div id="modal-links" class="flex flex-col gap-2"></div>
+            </div>
+
+            <!-- Tags -->
+            <div>
+              <p class="section-label text-xs mb-2 tracking-[0.15em]">Filed Under</p>
+              <div id="modal-tags" class="flex flex-wrap gap-1.5"></div>
+            </div>
+
+          </div>
+
+          <!-- Right: detail -->
+          <div>
+            <p id="modal-detail" class="font-body text-sm text-ink leading-[1.9] opacity-80"></p>
+          </div>
+
+        </div>
+
+        <!-- Footer ornament -->
+        <p class="text-center mt-10 font-display text-gold opacity-30 select-none tracking-[0.5em] text-xs">✦ &nbsp; ⁕ &nbsp; ✦</p>
+
+      </div>
+
+      <!-- Subtle bottom accent bar -->
+      <div style="height:1px; background:linear-gradient(to right, transparent, var(--color-gold-pale), transparent); opacity:0.5;"></div>
+    </div>
+  </div>
+
 </Layout>
 
 <script>
-  // Filter tabs — vanilla JS, no framework
+  // ── Entry data ────────────────────────────────────────────────────
+  type EntryLink = { label: string; href: string };
+  type Entry = {
+    title: string; dateRange: string; detail: string;
+    tags: string[]; links: EntryLink[];
+  };
+
+  const ENTRIES: Entry[] = [
+    ...(() => {
+      // Inline the data at build time via a data island
+      const el = document.getElementById('entries-json');
+      return el ? JSON.parse(el.textContent ?? '[]') : [];
+    })()
+  ];
+
+  // ── Filter tabs ───────────────────────────────────────────────────
   const tabs = document.querySelectorAll<HTMLButtonElement>('.folder-tab');
   const cards = document.querySelectorAll<HTMLElement>('.expedition-card');
 
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
-      // Update active tab
       tabs.forEach((t) => {
         t.classList.remove('active');
         t.setAttribute('aria-selected', 'false');
@@ -199,18 +424,96 @@ const entries = [
       tab.classList.add('active');
       tab.setAttribute('aria-selected', 'true');
 
-      const filter = tab.dataset.filter ?? 'All';
+      const filter = tab.dataset.filter ?? 'Pinned';
 
-      // Show/hide cards
       cards.forEach((card) => {
         const cats = card.dataset.categories ?? '';
-        if (filter === 'All' || cats.includes(filter)) {
+        if (cats.includes(filter)) {
           card.style.display = '';
           card.style.opacity = '1';
         } else {
           card.style.display = 'none';
         }
       });
+    });
+  });
+
+  // ── Modal ─────────────────────────────────────────────────────────
+  const modal   = document.getElementById('dispatch-modal') as HTMLElement;
+  const panel   = document.getElementById('modal-panel') as HTMLElement;
+  const backdrop = document.getElementById('modal-backdrop') as HTMLElement;
+
+  function openModal(idx: number) {
+    const entry = ENTRIES[idx];
+    if (!entry) return;
+
+    // Populate header
+    (document.getElementById('modal-date') as HTMLElement).textContent = entry.dateRange;
+    (document.getElementById('modal-title') as HTMLElement).textContent = entry.title;
+
+    // Populate links
+    const linksEl = document.getElementById('modal-links') as HTMLElement;
+    const linksWrap = document.getElementById('modal-links-wrap') as HTMLElement;
+    linksEl.innerHTML = '';
+    const realLinks = entry.links.filter(({ href }) => href && href !== '#');
+    realLinks.forEach(({ label, href }) => {
+      const a = document.createElement('a');
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = label + ' ↗';
+      a.className = 'font-display text-xs uppercase tracking-widest text-gold hover:text-gold-light transition-colors border border-gold-pale px-3 py-1.5 rounded-sm hover:border-gold inline-block';
+      linksEl.appendChild(a);
+    });
+    linksWrap.style.display = realLinks.length ? '' : 'none';
+
+    // Populate tags
+    const tagsEl = document.getElementById('modal-tags') as HTMLElement;
+    tagsEl.innerHTML = '';
+    entry.tags.forEach((tag) => {
+      const span = document.createElement('span');
+      span.textContent = tag === 'Pinned' ? '✦ Pinned' : tag;
+      span.className = 'tag-pill';
+      if (tag === 'Pinned') {
+        span.style.cssText = 'background:rgba(139,105,20,0.15);color:var(--color-gold);border-color:rgba(139,105,20,0.3);';
+      }
+      tagsEl.appendChild(span);
+    });
+
+    // Populate detail
+    (document.getElementById('modal-detail') as HTMLElement).textContent = entry.detail;
+
+    // Show modal — double rAF so the transition fires after display:block
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      backdrop.style.opacity = '1';
+      panel.style.opacity = '1';
+      panel.style.transform = 'translateY(0) scale(1)';
+    }));
+    (document.getElementById('modal-close') as HTMLElement).focus();
+  }
+
+  function closeModal() {
+    backdrop.style.opacity = '0';
+    panel.style.opacity = '0';
+    panel.style.transform = 'translateY(16px) scale(0.97)';
+    panel.addEventListener('transitionend', () => {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }, { once: true });
+  }
+
+  document.getElementById('modal-close')!.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display !== 'none') closeModal();
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.dispatch-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.idx ?? '0', 10);
+      openModal(idx);
     });
   });
 </script>

@@ -1,6 +1,6 @@
 ---
 /**
- * about.astro — The Cartographer's Study
+ * about.astro — The Archives
  * Two-column: ornate portrait frame left, pinned notes right.
  * Warm library room feel — NOT a portfolio page.
  */
@@ -9,10 +9,10 @@ import SectionDivider from '@/components/SectionDivider.astro';
 ---
 
 <Layout
-  title="The Cartographer — The Cartographer's Study"
+  title="Biographical Notes — The Archives"
   description="Who I am, what I care about, and where I am going."
   variant="interior"
-  pageTitle="The Cartographer"
+  pageTitle="Biographical Notes"
 >
 
   <!-- Page texture layer -->
@@ -38,7 +38,7 @@ import SectionDivider from '@/components/SectionDivider.astro';
               <span
                 class="font-display text-5xl text-ink-muted"
                 style="line-height: 1;"
-              >YN</span>
+              >MP</span>
               <div style="width: 30px; height: 1px; background: var(--color-gold-pale);"></div>
               <span class="font-decorative text-xs tracking-widest text-gold-pale uppercase" style="font-size: 0.5rem;">Portrait</span>
             </div>
@@ -47,10 +47,10 @@ import SectionDivider from '@/components/SectionDivider.astro';
           <!-- Small caption -->
           <div class="text-center space-y-1">
             <p class="font-decorative text-xs text-gold uppercase tracking-widest" style="font-size: 0.55rem; letter-spacing: 0.2em;">
-              Cartographer ✦ Researcher ✦ Builder
+              Engineer ♦ Researcher ♦ Data Scientist
             </p>
             <p class="font-body italic text-xs text-ink-muted">
-              [City, Country]
+              [Madison, Wisconsin]
             </p>
           </div>
 
@@ -66,9 +66,9 @@ import SectionDivider from '@/components/SectionDivider.astro';
             <h2 class="font-display text-lg text-ink mb-3">Who I Am</h2>
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
               <p>
-                I am a builder, researcher, and chronic explorer of ideas that sit at the
-                edges of disciplines — the places where the maps run out and the interesting
-                work begins.
+                I enjoy building things and figuring out how they work. I’m studying Computer Science and Statistics, which gives a broad toolkit and lets me approach problems from different angles.
+                <br/>
+                I’m drawn to both sides of the spectrum- the quick satisfaction of building something people can use right away, and the slower, methodological process of research. Most of the time, I end up somewhere in between, using a mix of skills to break down complex problems and turn them into something tangible.
               </p>
               <p>
                 My background spans [your actual background here]. I care most about building
@@ -85,10 +85,9 @@ import SectionDivider from '@/components/SectionDivider.astro';
             <h2 class="font-display text-lg text-ink mb-3">What I Care About</h2>
             <div class="space-y-3 font-body">
               {[
-                { glyph: '❧', text: 'How external tools and systems extend — or constrain — human thought.' },
-                { glyph: '❧', text: 'The design of communities and institutions that make collective reasoning better.' },
-                { glyph: '❧', text: 'Ensuring increasingly capable AI systems remain legible, steerable, and genuinely beneficial.' },
-                { glyph: '❧', text: 'The aesthetics of the frontier — maps, diagrams, field notes, and the poetics of exploration.' },
+                { glyph: '❧', text: 'Algorithmic Transparency: Turning black-box ML models into auditable, legible systems, ensuring we understand exactly how and why a model behaves the way it does.' },
+                { glyph: '❧', text: 'The Craft of Toolmaking: Building end-to-end, full-stack infrastructure—from serverless GPU pipelines to intuitive dashboards—that empowers other researchers and users.' },
+                { glyph: '❧', text: 'Community & Mentorship: Designing accessible platforms and leading cohorts that make technical learning collaborative and equitable.' },
               ].map(({ glyph, text }) => (
                 <div class="flex gap-3 items-baseline">
                   <span class="text-gold font-decorative text-xs shrink-0 mt-0.5">{glyph}</span>
@@ -105,13 +104,14 @@ import SectionDivider from '@/components/SectionDivider.astro';
             <h2 class="font-display text-lg text-ink mb-3">How I Got Here</h2>
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
               <p>
-                The route was not direct. [Describe your actual background — education, pivots,
-                formative experiences.] Each leg of the journey left instruments I still carry.
+                The route hasn't been direct, and I consider that an asset. I initially set my sights strictly on pure NLP research and a traditional PhD track. However, a stint building full-stack ML pipelines at Meta shifted my trajectory; I discovered the dopamine that comes with shipping products that solve immediate, real-world problems.
+                <br/>
+                Today, my work spans both territories. Whether I am analyzing visualization guidelines in a university research lab, fine-tuning LLMs on tight compute constraints, developing computer vision for autonomous vehicles, or studying AI Safety, I carry the instruments of both the software engineer and the data scientist.
               </p>
-              <p>
+              {/*<p>
                 The thing I learned earliest and forget most often: the map is not the territory.
                 The model is not the system. The plan is not the expedition.
-              </p>
+              </p>*/}
             </div>
           </section>
 
@@ -122,8 +122,9 @@ import SectionDivider from '@/components/SectionDivider.astro';
             <h2 class="font-display text-lg text-ink mb-3">Where I'm Going</h2>
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
               <p>
-                Right now: [brief description of current focus area or direction].
-                The work is harder than I expected, which is a reliable sign it's worth pursuing.
+                Right now, I am focused on deconstructing how artificial intelligence actually functions under the hood. I am actively upskilling in technical AI safety through rigorous programs like ARENA, studying interpretability, and constantly prototyping new ideas in my experimental playground.
+                <br/>
+                Because I find deep value in both the laboratory and engineering sprints, I am keeping my compass calibrated for both domains, looking for the next frontier where my generalist background can make the highest impact.
               </p>
               <p class="font-fell italic text-ink" style="font-size: 1rem;">
                 "Not all those who wander are lost — but most of them are making maps."

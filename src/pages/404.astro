@@ -1,0 +1,486 @@
+---
+/**
+ * 404.astro — Missing from the Archives
+ * Immersive archival / manuscript 404. Stamped, aged, cartographic.
+ */
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout
+  title="404 — Missing from the Archives"
+  description="The page you are looking for does not exist in the current record."
+  variant="interior"
+>
+  <div class="page-root">
+
+    <!-- Parchment grain texture (fixed, behind everything) -->
+    <div class="texture-bg" aria-hidden="true"></div>
+
+    <!-- Centered frame -->
+    <div class="content-wrap">
+      <article class="manuscript-frame">
+
+        <!-- Foxed-paper edge vignette (ages the frame corners) -->
+        <div class="foxing" aria-hidden="true"></div>
+
+        <!-- Faint map ghost behind content -->
+        <div class="map-ghost" aria-hidden="true"></div>
+
+        <!-- Floating dust motes (8 particles) -->
+        <span class="dust" style="--x:12%;--bot:8%;--sz:2px;--dur:24s;--del:0s;--drift:10px;--op:0.55;" aria-hidden="true"></span>
+        <span class="dust" style="--x:30%;--bot:15%;--sz:3px;--dur:19s;--del:3.5s;--drift:-8px;--op:0.45;" aria-hidden="true"></span>
+        <span class="dust" style="--x:52%;--bot:6%;--sz:2px;--dur:28s;--del:7s;--drift:12px;--op:0.4;" aria-hidden="true"></span>
+        <span class="dust" style="--x:70%;--bot:20%;--sz:2px;--dur:21s;--del:1.5s;--drift:-10px;--op:0.5;" aria-hidden="true"></span>
+        <span class="dust" style="--x:22%;--bot:28%;--sz:3px;--dur:26s;--del:5s;--drift:6px;--op:0.35;" aria-hidden="true"></span>
+        <span class="dust" style="--x:83%;--bot:12%;--sz:2px;--dur:32s;--del:9s;--drift:-7px;--op:0.45;" aria-hidden="true"></span>
+        <span class="dust" style="--x:46%;--bot:24%;--sz:2px;--dur:18s;--del:4s;--drift:9px;--op:0.4;" aria-hidden="true"></span>
+        <span class="dust" style="--x:65%;--bot:9%;--sz:3px;--dur:23s;--del:12s;--drift:-5px;--op:0.5;" aria-hidden="true"></span>
+
+        <!-- Corner bracket ornaments -->
+        <span class="corner corner-tl" aria-hidden="true"></span>
+        <span class="corner corner-tr" aria-hidden="true"></span>
+        <span class="corner corner-bl" aria-hidden="true"></span>
+        <span class="corner corner-br" aria-hidden="true"></span>
+
+        <!-- Inner content (sits above map ghost and foxing) -->
+        <div class="inner">
+
+          <!-- Eyebrow classification -->
+          <p class="eyebrow">Archivum Codex &middot; Vol. &#8734;</p>
+
+          <!-- Top ornamental rule -->
+          <div class="ornamental-rule" aria-hidden="true">
+            <span class="rule-line"></span>
+            <span class="rule-glyph">✦</span>
+            <span class="rule-line"></span>
+          </div>
+
+          <!-- ── The dominant 404 stamp ────────────────────────────────── -->
+          <div class="stamp-area">
+            <div class="num-404" aria-label="Error 404">404</div>
+            <!-- LOST ENTRY stamp overlaid, rotated -->
+            <div class="lost-stamp" aria-label="Lost Entry">
+              <span class="lost-stamp-inner">Lost Entry</span>
+            </div>
+          </div>
+
+          <!-- Subtitle rule -->
+          <div class="subtitle-rule" aria-hidden="true"></div>
+
+          <!-- Main title -->
+          <h1 class="main-title">
+            Missing from<br />the Archives
+          </h1>
+
+          <!-- Coordinates line -->
+          <p class="coordinates" aria-hidden="true">
+            Coord.&nbsp;Unknown &ensp;&middot;&ensp; Ref.&nbsp;&#8212;&#183;&#8212; &ensp;&middot;&ensp; Entry&nbsp;Void
+          </p>
+
+          <!-- Body copy -->
+          <p class="body-text">
+            It appears you have navigated beyond the known edges of this codex.
+            The manuscript or coordinate you seek does not exist in the current record.
+          </p>
+
+          <!-- Bottom ornamental rule -->
+          <div class="ornamental-rule ornamental-rule--bottom" aria-hidden="true">
+            <span class="rule-line"></span>
+            <span class="rule-glyph rule-glyph--sm">&#10022;</span>
+            <span class="rule-line"></span>
+          </div>
+
+          <!-- CTA: archival label button -->
+          <a href="/" class="return-cta" aria-label="Return to the index page">
+            <span class="return-cta-fill" aria-hidden="true"></span>
+            <span class="return-cta-label">Return to the Index</span>
+          </a>
+
+          <!-- Classification footer -->
+          <p class="classification">
+            <span aria-hidden="true">&#9670;</span>&ensp;
+            Page Not Found&ensp;
+            <span aria-hidden="true">&#9670;</span>
+          </p>
+
+        </div>
+      </article>
+    </div>
+  </div>
+</Layout>
+
+<style>
+
+  /* ── Root layout ────────────────────────────────────────────────────────── */
+
+  .page-root {
+    position: relative;
+    min-height: calc(100vh - 3.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1.5rem 5rem;
+  }
+
+  /* ── Parchment grain (fixed, behind everything) ─────────────────────────── */
+
+  .texture-bg {
+    position: fixed;
+    inset: 0;
+    background-image: url('/textures/parchment_texture1.jpg');
+    background-size: 420px 420px;
+    mix-blend-mode: multiply;
+    opacity: 0.22;
+    filter: sepia(0.25);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Content centering wrapper ──────────────────────────────────────────── */
+
+  .content-wrap {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ── Manuscript frame ───────────────────────────────────────────────────── */
+
+  .manuscript-frame {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    background: var(--color-parchment-light);
+
+    /* Outer border + inset double-border */
+    border: 1px solid var(--color-gold-pale);
+    box-shadow:
+      inset 0 0 0 3px var(--color-parchment-light),
+      inset 0 0 0 4px var(--color-gold-pale),
+      0 24px 64px rgba(28, 18, 8, 0.18),
+      0 4px 16px rgba(28, 18, 8, 0.1);
+
+    overflow: hidden;
+  }
+
+  /* ── Foxed-paper vignette — ages the corners of the frame ──────────────── */
+
+  .foxing {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 50%,
+      rgba(139, 100, 20, 0.05) 72%,
+      rgba(90, 55, 10, 0.13) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Faint vintage map behind the content ──────────────────────────────── */
+
+  .map-ghost {
+    position: absolute;
+    inset: 0;
+    background-image: url('/maps/old_cool_map.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.045;
+    filter: sepia(0.9) saturate(0.4);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Dust mote particles ────────────────────────────────────────────────── */
+
+  @keyframes dust-float {
+    0%   { transform: translateY(0) translateX(0);                opacity: 0; }
+    12%  { opacity: var(--op); }
+    88%  { opacity: calc(var(--op) * 0.35); }
+    100% { transform: translateY(-70px) translateX(var(--drift)); opacity: 0; }
+  }
+
+  .dust {
+    position: absolute;
+    left: var(--x);
+    bottom: var(--bot);
+    width:  var(--sz);
+    height: var(--sz);
+    border-radius: 50%;
+    background: var(--color-gold-pale);
+    pointer-events: none;
+    z-index: 2;
+    animation: dust-float var(--dur) ease-in-out var(--del) infinite;
+  }
+
+  /* ── Corner bracket ornaments ───────────────────────────────────────────── */
+
+  .corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-color: var(--color-gold-pale);
+    border-style: solid;
+    z-index: 3;
+  }
+
+  .corner-tl { top: 10px;    left: 10px;    border-width: 1px 0 0 1px; }
+  .corner-tr { top: 10px;    right: 10px;   border-width: 1px 1px 0 0; }
+  .corner-bl { bottom: 10px; left: 10px;    border-width: 0 0 1px 1px; }
+  .corner-br { bottom: 10px; right: 10px;   border-width: 0 1px 1px 0; }
+
+  /* ── Inner content layer (above map ghost and foxing) ───────────────────── */
+
+  .inner {
+    position: relative;
+    z-index: 4;
+    padding: 2.75rem 2.5rem 2.5rem;
+    text-align: center;
+  }
+
+  /* ── Eyebrow classification ─────────────────────────────────────────────── */
+
+  .eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.48rem;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    opacity: 0.75;
+    margin-bottom: 1.25rem;
+  }
+
+  /* ── Ornamental rule (top + bottom) ────────────────────────────────────── */
+
+  .ornamental-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .ornamental-rule--bottom {
+    margin-top: 0;
+    margin-bottom: 1.75rem;
+  }
+
+  .rule-line {
+    flex: 1;
+    display: block;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--color-gold-pale) 70%, var(--color-gold));
+  }
+
+  .ornamental-rule--bottom .rule-line {
+    background: linear-gradient(to left, transparent, var(--color-gold-pale) 70%, var(--color-gold));
+  }
+
+  .ornamental-rule--bottom .rule-line:first-child {
+    background: linear-gradient(to right, transparent, var(--color-gold-pale) 70%, var(--color-gold));
+  }
+
+  .rule-glyph {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--color-gold);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .rule-glyph--sm {
+    font-size: 0.6rem;
+  }
+
+  /* ── Stamp area: 404 number + LOST ENTRY tag ────────────────────────────── */
+
+  .stamp-area {
+    position: relative;
+    margin-bottom: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* The dominant 404 — stamped ink on parchment */
+  .num-404 {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: clamp(5rem, 20vw, 7rem);
+    letter-spacing: 0.12em;
+    line-height: 1;
+    color: var(--color-ink);
+    /* Subtle ink-press shadow: slightly heavier at bottom like wet ink */
+    text-shadow:
+      0  1px 0 rgba(28, 18, 8, 0.18),
+      0  3px 6px rgba(28, 18, 8, 0.08),
+      1px 0 0 rgba(139, 105, 20, 0.08);
+    user-select: none;
+  }
+
+  /* LOST ENTRY rubber stamp */
+  .lost-stamp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.6rem;
+    padding: 0.28rem 1.1rem 0.25rem;
+    border: 1.5px solid rgba(122, 26, 26, 0.6);
+    /* Second inner border — double-framed like an archival stamp */
+    box-shadow:
+      inset 0 0 0 2px rgba(250, 244, 230, 0.9),
+      inset 0 0 0 3px rgba(122, 26, 26, 0.25),
+      0 1px 4px rgba(122, 26, 26, 0.08);
+    transform: rotate(-7.5deg);
+    /* Slight uneven opacity to simulate ink stamp wear */
+    opacity: 0.88;
+    animation: stamp-breathe 5s ease-in-out infinite;
+  }
+
+  .lost-stamp-inner {
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: rgba(122, 26, 26, 0.75);
+  }
+
+  @keyframes stamp-breathe {
+    0%,  100% { opacity: 0.88; }
+    50%        { opacity: 0.72; }
+  }
+
+  /* ── Subtitle rule (below stamp area) ──────────────────────────────────── */
+
+  .subtitle-rule {
+    width: 80px;
+    height: 1px;
+    margin: 1.5rem auto 1rem;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--color-gold-pale) 30%,
+      var(--color-gold) 50%,
+      var(--color-gold-pale) 70%,
+      transparent
+    );
+  }
+
+  /* ── Main title ─────────────────────────────────────────────────────────── */
+
+  .main-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 400;
+    font-size: clamp(1.35rem, 4vw, 1.65rem);
+    letter-spacing: 0.04em;
+    line-height: 1.25;
+    color: var(--color-ink);
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Archival coordinates ───────────────────────────────────────────────── */
+
+  .coordinates {
+    font-family: 'Cinzel', serif;
+    font-size: 0.46rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    opacity: 0.65;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── Body copy ──────────────────────────────────────────────────────────── */
+
+  .body-text {
+    font-family: 'Crimson Text', serif;
+    font-style: italic;
+    font-size: 1.0rem;
+    line-height: 1.85;
+    color: var(--color-ink-muted);
+    margin-bottom: 1.75rem;
+    /* Slightly higher contrast than ink-muted for legibility */
+    opacity: 0.92;
+  }
+
+  /* ── Return CTA: archival label button ──────────────────────────────────── */
+
+  .return-cta {
+    position: relative;
+    display: inline-block;
+    padding: 0.6rem 2rem 0.55rem;
+    text-decoration: none;
+    overflow: hidden;
+
+    /* Double-bordered archival label */
+    border: 1px solid var(--color-gold-pale);
+    box-shadow:
+      inset 0 0 0 2px var(--color-parchment-light),
+      inset 0 0 0 3px var(--color-gold-pale);
+
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  /* Ink-wash fill: rises from the bottom on hover */
+  .return-cta-fill {
+    position: absolute;
+    inset: 0;
+    background: rgba(122, 26, 26, 0.06);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
+  }
+
+  .return-cta-label {
+    position: relative;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    transition: color 0.3s ease;
+    display: block;
+  }
+
+  .return-cta:hover {
+    border-color: rgba(122, 26, 26, 0.45);
+    box-shadow:
+      inset 0 0 0 2px var(--color-parchment-light),
+      inset 0 0 0 3px rgba(122, 26, 26, 0.3);
+  }
+
+  .return-cta:hover .return-cta-fill {
+    transform: scaleY(1);
+  }
+
+  .return-cta:hover .return-cta-label {
+    color: #7A1A1A;
+  }
+
+  /* ── Classification footer ───────────────────────────────────────────────── */
+
+  .classification {
+    font-family: 'Cinzel', serif;
+    font-size: 0.44rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    opacity: 0.5;
+    margin-top: 1.75rem;
+    margin-bottom: 0;
+  }
+
+  /* ── Reduced-motion: disable dust + stamp pulse ─────────────────────────── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .dust             { animation: none; opacity: 0; }
+    .lost-stamp       { animation: none; }
+    .return-cta-fill  { transition: none; }
+  }
+
+</style>

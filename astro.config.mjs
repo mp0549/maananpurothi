@@ -10,7 +10,11 @@ export default defineConfig({
   ],
   // Switch to 'static' if you prefer a fully static export
   output: 'server',
-  adapter: vercel(),
+  adapter: vercel({
+    webAnalytics: {
+      enabled: true,
+    },
+  }),
   // site: 'https://mp0549.github.io',
   site: 'https://maananpurothi.vercel.app/',
 

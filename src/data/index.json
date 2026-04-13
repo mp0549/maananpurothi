@@ -1,0 +1,49 @@
+{
+  "destinations": [
+    {
+      "label": "Biographical Notes",
+      "desc": "The person behind the work. Background, guiding interests, and where I'm headed next.",
+      "path": "about/",
+      "x": "17%",
+      "y": "57%",
+      "cardSide": "right",
+      "external": false
+    },
+    {
+      "label": "The Codex",
+      "desc": "An archive of expeditions — projects, research, and experiences.",
+      "path": "codex/",
+      "x": "76%",
+      "y": "44%",
+      "cardSide": "left",
+      "external": false
+    },
+    {
+      "label": "The Garden",
+      "desc": "A space for thinking out loud. Notes, ideas, and works in progress.",
+      "path": "garden/",
+      "x": "27%",
+      "y": "75%",
+      "cardSide": "right",
+      "external": false
+    },
+    {
+      "label": "The Workshop",
+      "desc": "What I'm currently building, reading, and thinking about.",
+      "path": "now/",
+      "x": "70%",
+      "y": "29%",
+      "cardSide": "left",
+      "external": false
+    },
+    {
+      "label": "Credentials",
+      "desc": "Check out my LinkedIn",
+      "href": "https://linkedin.com/in/maananpurothi",
+      "x": "68%",
+      "y": "67%",
+      "cardSide": "left",
+      "external": true
+    }
+  ]
+}

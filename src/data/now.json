@@ -1,0 +1,29 @@
+{
+  "lastUpdated": "March 2025",
+  "building": [
+    "I'm currently deep in a project exploring [describe your main project here]. The problem is harder than I expected, which is a reliable sign that it's worth pursuing.",
+    "On the side: a small utility tool I built for myself that turns out to be useful for others. I'm deciding whether to invest in making it properly public or let it stay a personal instrument."
+  ],
+  "reading": [
+    {
+      "title": "Book Title One",
+      "author": "Author Name",
+      "note": "Dense but rewarding. The central argument reframes something I thought I understood. Taking it slowly."
+    },
+    {
+      "title": "Book Title Two",
+      "author": "Author Name",
+      "note": "Rereading this after a few years. Different book than I remember — either it changed or I did."
+    },
+    {
+      "title": "Paper / Essay Title",
+      "author": "Author",
+      "note": "Recommended by a collaborator. The framing is unusual; I keep thinking about the fourth section."
+    }
+  ],
+  "thinking": [
+    "How to build systems that remain legible as they scale — and whether legibility is even the right frame, or whether we need a different concept entirely.",
+    "The gap between what's measurable and what matters. Metrics are maps; maps are not the territory. Most institutions mistake the map for the territory and are surprised when it fails.",
+    "What distinguishes a tool from a medium. A hammer is a tool; language is a medium. Most software sits somewhere uncomfortable between the two, and I think that discomfort is actually important."
+  ]
+}

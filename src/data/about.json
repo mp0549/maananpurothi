@@ -1,0 +1,40 @@
+{
+  "caption": {
+    "roles": "Engineer ♦ Researcher ♦ Data Scientist",
+    "location": "Madison, Wisconsin"
+  },
+  "sections": [
+    {
+      "id": "who-i-am",
+      "heading": "Who I Am",
+      "paragraphs": [
+        "I enjoy building things and figuring out how they work. I'm studying Computer Science and Statistics, which gives a broad toolkit and lets me approach problems from different angles.\nI'm drawn to both sides of the spectrum- the quick satisfaction of building something people can use right away, and the slower, methodological process of research. Most of the time, I end up somewhere in between, using a mix of skills to break down complex problems and turn them into something tangible.",
+        "My background spans [your actual background here]. I care most about building things that matter, understanding systems that are too complex to understand fully, and finding the right framing for hard problems."
+      ]
+    },
+    {
+      "id": "what-i-care-about",
+      "heading": "What I Care About",
+      "items": [
+        { "glyph": "❧", "text": "Algorithmic Transparency: Turning black-box ML models into auditable, legible systems, ensuring we understand exactly how and why a model behaves the way it does." },
+        { "glyph": "❧", "text": "The Craft of Toolmaking: Building end-to-end, full-stack infrastructure—from serverless GPU pipelines to intuitive dashboards—that empowers other researchers and users." },
+        { "glyph": "❧", "text": "Community & Mentorship: Designing accessible platforms and leading cohorts that make technical learning collaborative and equitable." }
+      ]
+    },
+    {
+      "id": "how-i-got-here",
+      "heading": "How I Got Here",
+      "paragraphs": [
+        "The route hasn't been direct, and I consider that an asset. I initially set my sights strictly on pure NLP research and a traditional PhD track. However, a stint building full-stack ML pipelines at Meta shifted my trajectory; I discovered the dopamine that comes with shipping products that solve immediate, real-world problems.\nToday, my work spans both territories. Whether I am analyzing visualization guidelines in a university research lab, fine-tuning LLMs on tight compute constraints, developing computer vision for autonomous vehicles, or studying AI Safety, I carry the instruments of both the software engineer and the data scientist."
+      ]
+    },
+    {
+      "id": "where-im-going",
+      "heading": "Where I'm Going",
+      "paragraphs": [
+        "Right now, I am focused on deconstructing how artificial intelligence actually functions under the hood. I am actively upskilling in technical AI safety through rigorous programs like ARENA, studying interpretability, and constantly prototyping new ideas in my experimental playground.\nBecause I find deep value in both the laboratory and engineering sprints, I am keeping my compass calibrated for both domains, looking for the next frontier where my generalist background can make the highest impact."
+      ],
+      "quote": "Not all those who wander are lost — but most of them are making maps."
+    }
+  ]
+}

@@ -6,121 +6,10 @@
  */
 import Layout from '@/layouts/Layout.astro';
 import SectionDivider from '@/components/SectionDivider.astro';
-import { record } from 'astro:schema';
+import codexData from '@/data/codex.json';
 
-const entries = [
-  {
-    title: 'Influence Proxy Dashboard',
-    dateRange: 'March 2026',
-    description:
-      "Built a full-stack research tool that lets AI safety researchers fine-tune language models and see exactly which training examples shaped the model's behavior, turning fine-tuning from a black box into an auditable process.",
-    detail:
-      "Built a full-stack research tool that lets AI safety researchers fine-tune language models and see exactly which training examples shaped the model's behavior — turning fine-tuning from a black box into an auditable process.<br />- Computed influence scores live during training using gradient dot products, with no checkpoint storage required<br />- Ran serverless A100 GPU jobs on Modal with async status updates streamed to the frontend in real time<br />- Visualized per-example influence as animated heatmaps and ranked leaderboards for intuitive data auditing<br />- Designed a full job pipeline from data upload through fine-tuning to influence score delivery via Supabase Realtime<br />- Visualized per-example influence as animated heatmaps and ranked leaderboards for intuitive data auditing<br />- Designed a full job pipeline from data upload through fine-tuning to influence score delivery via Supabase Realtime",
-    links: [
-      { label: 'GitHub', href: 'https://github.com/LCodingX/generalization-bet' },
-      { label: 'Live Demo', href: 'https://frontend-tau-seven-58.vercel.app/runs' },
-    ],
-    tags: ['Pinned', 'AI/ML', 'Research', 'HCI'],
-    rotation: -0.6,
-    categories: ['Pinned', 'Research', 'Engineering'],
-  },
-  {
-    title: 'Senior Consultant @ Google Developer Groups',
-    dateRange: 'July 2025 – Present',
-    description:
-      'Acting Senior Consultant for Google Developer Groups, advising a student-led tech community worldwide on growth strategy, event programming, and community engagement to foster inclusive, vibrant ecosystems for learning and collaboration.',
-    detail:
-      'Acting Senior Consultant for Google Developer Groups, advising a student-led tech community worldwide on growth strategy, event programming, and community engagement to foster inclusive, vibrant ecosystems for learning and collaboration.<br />- Organized developer workshops and advised on technical content and speaker engagement. <br />- Organized a 430 member hackathon: prepared sponsors, planned the event, etc.<br />- Recruited 500+ members through targeted outreach and event planning',
-    links: [      { label: 'Org page', href: 'https://gdg.community.dev/gdg-on-campus-university-of-wisconsin-madison-madison-united-states/' },
-    ],
-    tags: ['Pinned', 'Community', 'Consulting'],
-    rotation: 0.4,
-    categories: ['Pinned', 'Community'],
-  },
-  {
-    title: 'Technical Team @ WAISI',
-    dateRange: 'Oct 2025 – Present',
-    description:
-      'Lead a cohort of students pursuing technical AI safety, facilitating discussions and learning sessions on reward specification, interpretability, and adversarial evaluation.',
-    detail:
-      'Lead a cohort of students pursuing technical AI safety, facilitating discussions and learning sessions on reward specification, interpretability, and adversarial evaluation.<br />- Update and refine curriculum to incorporate the latest AI safety research and materials from BlueDot Impact curriculum<br />- Participate in a reading group and conduct structured research replications of relevant papers<br />- Completed technical AI safety training in reward specification, interpretability, and adversarial evaluation<br />- Studied AI policy frameworks including compute governance and international coordination',
-    links: [{ label: 'Org page', href: 'https://www.waisi.org/' }],
-    tags: ['AI Safety', 'Leadership', 'Research'],
-    rotation: -0.5,
-    categories: ['Pinned', 'Community', 'Research'],
-  },
-  {
-    title: 'Perception Engineer & Mentor @ Wisconsin Autonomous',
-    dateRange: 'Sep 2024 – Present',
-    description:
-      'Developing computer vision algorithms for detection, lane recognition, and segmentation for an autonomous driving challenge while mentoring junior engineers.',
-    detail:
-      'Developing computer vision algorithms for detection, lane recognition, and segmentation for an autonomous driving challenge while mentoring junior engineers.<br />- Developed computer vision algorithms for detection, lane recognition, and segmentation<br />- Reduced compute cost by 40% through optimized trajectory mapping<br />- Mentored two engineers on CV fundamentals and integration workflows',
-    links: [],
-    tags: ['Computer Vision', 'Engineering', 'Mentorship'],
-    rotation: 0.7,
-    categories: ['Engineering', 'Community'],
-  },
-  {
-    title: 'Founder & Full-Stack Dev @ Student Success Club',
-    dateRange: 'Nov 2022 – Present',
-    description:
-      'Launched a student-run tutoring initiative and built a full-stack React platform to connect students with volunteer tutors, advocating for educational equity through peer-driven support.',
-    detail:
-      'Launched a student-run tutoring initiative and built a full-stack React platform to connect students with volunteer tutors, advocating for educational equity through peer-driven support.<br />- Designed and built a React website to advertise services, facilitate student-tutor connections, and improve accessibility<br />- Developed full-stack registration and contact forms, storing submissions in a database and enabling automated tutor-student matching<br />- Implemented real-time notifications to phone and email for new submissions<br />- Led a team of volunteer tutors and promoted peer support and educational equity through free, community-driven resources',
-    links: [
-      { label: 'Website', href: '#' },
-      { label: 'GitHub', href: '#' }
-    ],
-    tags: ['Community', 'React', 'Full-Stack'],
-    rotation: -0.3,
-    categories: ['Pinned', 'Engineering', 'Community'],
-  },
-{
-    title: 'Covid-19 Vaccine Stance Classification',
-    dateRange: '2024',
-    description:
-      'Built a stance classification system to label tweets as in-favor, against, or neutral-or-unclear toward COVID-19 vaccination under tight data and GPU constraints.',
-    detail:
-      'Built a stance classification system to label tweets as in-favor, against, or neutral-or-unclear toward COVID-19 vaccination under tight data and GPU constraints.<br />- Fine-tuned FLAN-T5-Large using LoRA adapters, training on limited resources<br />- Designed a curriculum learning strategy to stabilize 3-way stance classification<br />- Mitigated failure modes including neutral collapse, sarcasm, and more<br />- Achieved improved macro-F1 and neutral recall compared to zero-shot and standard fine-tuning baselines',
-    links: [
-      { label: 'GitHub', href: '#' }
-    ],
-    tags: ['NLP', 'PyTorch', 'Research'],
-    rotation: 0.5,
-    categories: ['Research', 'Engineering'],
-  },
-  {
-    title: 'AI Interview Prep Platform',
-    dateRange: '2024',
-    description:
-      'Built a full-stack AI interview prep platform that generates personalized questions from resumes and job descriptions and provides structured performance feedback.',
-    detail:
-      'Built a full-stack AI interview prep platform that generates personalized questions from resumes and job descriptions and provides structured performance feedback.<br />- Designed REST APIs for interview sessions, questions, and responses<br />- Integrated Claude API for dynamic question generation and answer grading<br />- Implemented persistent storage for interview history using SQLite<br />- Built a multi-step frontend flow for interview practice and results review',
-    links: [
-      { label: 'GitHub', href: '#' },
-      { label: 'Live Demo', href: '#' }
-    ],
-    tags: ['Full-Stack', 'AI/ML', 'Python'],
-    rotation: -0.8,
-    categories: ['Engineering'],
-  },
-  {
-    title: 'Gesture-Based Game Control',
-    dateRange: '2023',
-    description:
-      'Built a real-time, gesture-based controller that allows players to control Mario Kart using hand movements instead of a physical controller.',
-    detail:
-      'Built a real-time, gesture-based controller that allows players to control Mario Kart using hand movements instead of a physical controller.<br />- Implemented real-time hand tracking and gesture recognition<br />- Mapped hand gestures to in-game controls such as steering, acceleration, and item usage<br />- Supported multiplayer by splitting camera feed for independent gesture control<br />- Optimized for low-latency input to ensure smooth and responsive gameplay',
-    links: [
-      { label: 'GitHub', href: '#' },
-      { label: 'Demo Video', href: '#' }
-    ],
-    tags: ['Computer Vision', 'HCI', 'Python'],
-    rotation: 0.2,
-    categories: ['Pinned', 'Engineering'],
-  },
-];
+const entries = codexData.entries;
+const experience = codexData.experience;
 ---
 
 <Layout
@@ -253,46 +142,7 @@ const entries = [
       <span class="heading-rule max-w-[10rem] scroll-reveal"></span>
 
       <div class="space-y-10 mt-6">
-        {[
-          {
-            role: 'Edge Network Services Intern',
-            org: 'Meta',
-            period: 'Summer 2025',
-            desc: [
-              '❧ Deployed an end-to-end ML pipeline for LLaMa models in production to catch delays in deployment.',
-              '❧ Built a scalable agent framework to navigate complex, multi-step tasks.',
-              '❧ Designed analytics dashboards that enabled cross-functional teams to act on over 100K weekly datapoints.'
-            ]
-          },
-          { 
-            role: 'Research Engineer', 
-            org: 'Equistamp @ Redwood Research', 
-            period: 'Mar 2026 - Present', 
-            desc: [
-              '❧ Partnered with Redwood Research to study AI safety and the dynamics of detecting deliberate sabotage in machine learning research.',
-              '❧ Audited paper-codebase pairs to identify compromised logic or configuration settings.'
-            ]
-          },
-          { 
-            role: 'Researcher', 
-            org: 'UW Graphics Lab', 
-            period: 'Sep 2025 - Present', 
-            desc: [
-              '❧ Investigated representational limitations of visualization design guidelines for automated synthesis.',
-              '❧ Authoring a paper on a 7-dimension classification schema.'
-            ]
-          },
-          { 
-            role: 'Technical Business Analyst', 
-            org: 'Jumpshot', 
-            period: 'Mar 2024 – April 2025', 
-            desc: [
-              '❧ Acted as liason between client and engineering team to gather and relay product requirements.',
-              '❧ Implemented frontend and backend features across application stack',
-              '❧ Led testing and QA efforts, resolving issues pre-release to improve performance and user experience.'
-            ]
-          },
-        ].map(({ role, org, period, desc }) => (
+        {experience.map(({ role, org, period, desc }) => (
           <div class="flex gap-6 items-start scroll-reveal">
             <div class="w-px self-stretch bg-gold-pale flex-shrink-0 mt-1" aria-hidden="true"></div>
             <div class="space-y-1 pb-6">

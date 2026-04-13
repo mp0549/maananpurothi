@@ -166,7 +166,6 @@ const externalBranches = [
     width: 100%;
     min-height: 100vh;
     background: var(--color-parchment, #F5ECD7);
-    overflow: auto;
   }
 
   /* ── Background layers ────────────────────────────────────────── */
@@ -261,13 +260,21 @@ const externalBranches = [
 
   /* ── Stagger reveal animation ─────────────────────────────────── */
   @keyframes dispatch-in {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
   .dispatch-reveal {
-    animation: dispatch-in 0.55s ease-out both;
+    animation: dispatch-in 0.45s cubic-bezier(0.23, 1, 0.32, 1) both;
     animation-delay: var(--delay, 0s);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dispatch-reveal {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
   }
 
   /* ── Header ───────────────────────────────────────────────────── */
@@ -380,12 +387,16 @@ const externalBranches = [
     text-decoration: none;
     border-bottom: 1px solid rgba(196,169,106,0.18);
     position: relative;
-    transition: background 150ms ease;
+    transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
     overflow: hidden;
   }
 
   .dispatch-entry:last-child {
     border-bottom: none;
+  }
+
+  .dispatch-entry:active {
+    transform: scale(0.98);
   }
 
   .dispatch-entry::before {
@@ -397,8 +408,10 @@ const externalBranches = [
     transition: opacity 150ms ease;
   }
 
-  .dispatch-entry:hover::before {
-    opacity: 1;
+  @media (hover: hover) and (pointer: fine) {
+    .dispatch-entry:hover::before {
+      opacity: 1;
+    }
   }
 
   .entry-numeral {
@@ -443,8 +456,10 @@ const externalBranches = [
     transition: color 150ms ease;
   }
 
-  .dispatch-entry:hover .entry-label {
-    color: var(--color-gold, #8B6914);
+  @media (hover: hover) and (pointer: fine) {
+    .dispatch-entry:hover .entry-label {
+      color: var(--color-gold, #8B6914);
+    }
   }
 
   .entry-desc {
@@ -465,17 +480,21 @@ const externalBranches = [
     transition: opacity 150ms ease, transform 150ms ease;
   }
 
-  .dispatch-entry:hover .entry-arrow {
-    opacity: 0.75;
-    transform: translateX(0);
+  @media (hover: hover) and (pointer: fine) {
+    .dispatch-entry:hover .entry-arrow {
+      opacity: 0.75;
+      transform: translateX(0);
+    }
   }
 
   .dispatch-entry--external .entry-label {
     opacity: 0.7;
   }
 
-  .dispatch-entry--external:hover .entry-label {
-    opacity: 1;
+  @media (hover: hover) and (pointer: fine) {
+    .dispatch-entry--external:hover .entry-label {
+      opacity: 1;
+    }
   }
 
   /* ── Footer ───────────────────────────────────────────────────── */

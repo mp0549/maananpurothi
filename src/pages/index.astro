@@ -7,54 +7,12 @@
 import Layout from '@/layouts/Layout.astro';
 import MapView from '@/components/MapView.astro';
 import SimpleView from '@/components/SimpleView.astro';
+import indexData from '@/data/index.json';
 
-const destinations = [
-  {
-    label: 'Biographical Notes',
-    desc: "The person behind the work. Background, guiding interests, and where I'm headed next.",
-    href: `${import.meta.env.BASE_URL}about/`,
-    x: '17%',
-    y: '57%',
-    cardSide: 'right',
-    external: false,
-  },
-  {
-    label: 'The Codex',
-    desc: 'An archive of expeditions — projects, research, and experiences.',
-    href: `${import.meta.env.BASE_URL}codex/`,
-    x: '76%',
-    y: '44%',
-    cardSide: 'left',
-    external: false,
-  },
-  {
-    label: 'The Garden',
-    desc: 'A space for thinking out loud. Notes, ideas, and works in progress.',
-    href: `${import.meta.env.BASE_URL}garden/`,
-    x: '27%',
-    y: '75%',
-    cardSide: 'right',
-    external: false,
-  },
-  {
-    label: 'The Workshop',
-    desc: "What I'm currently building, reading, and thinking about.",
-    href: `${import.meta.env.BASE_URL}now/`,
-    x: '70%',
-    y: '29%',
-    cardSide: 'left',
-    external: false,
-  },
-  {
-    label: 'Credentials',
-    desc: 'Check out my LinkedIn',
-    href: 'https://linkedin.com/in/maananpurothi',
-    x: '68%',
-    y: '67%',
-    cardSide: 'left',
-    external: true,
-  },
-];
+const destinations = indexData.destinations.map((d) => ({
+  ...d,
+  href: d.external ? d.href : `${import.meta.env.BASE_URL}${d.path}`,
+}));
 ---
 
 <!-- Apply stored view before paint to avoid flash -->
@@ -125,6 +83,16 @@ const destinations = [
   /* ── Show correct view based on data attribute set by inline script  */
   :global([data-homepage-view="map"])    #view-map    { display: block; }
   :global([data-homepage-view="simple"]) #view-simple { display: block; }
+
+  /* ── Override body's map-mode constraints in simple view ───────────
+     The body always renders with h-screen overflow-hidden (map defaults).
+     This rule guarantees those constraints are lifted as soon as the
+     data attribute is set, regardless of JS classList timing.        */
+  :global(html[data-homepage-view="simple"] body) {
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+  }
 
   /* ── Toggle button ──────────────────────────────────────────────── */
   #view-toggle {

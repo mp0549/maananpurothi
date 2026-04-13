@@ -6,6 +6,13 @@
  */
 import Layout from '@/layouts/Layout.astro';
 import SectionDivider from '@/components/SectionDivider.astro';
+import aboutData from '@/data/about.json';
+
+const { caption, sections } = aboutData;
+const whoIAm       = sections.find((s) => s.id === "who-i-am")!;
+const whatICare    = sections.find((s) => s.id === "what-i-care-about")!;
+const howIGot      = sections.find((s) => s.id === "how-i-got-here")!;
+const whereImGoing = sections.find((s) => s.id === "where-im-going")!;
 ---
 
 <Layout
@@ -47,10 +54,10 @@ import SectionDivider from '@/components/SectionDivider.astro';
           <!-- Small caption -->
           <div class="text-center space-y-1">
             <p class="font-decorative text-xs text-gold uppercase tracking-widest" style="font-size: 0.55rem; letter-spacing: 0.2em;">
-              Engineer ♦ Researcher ♦ Data Scientist
+              {caption.roles}
             </p>
             <p class="font-body italic text-xs text-ink-muted">
-              [Madison, Wisconsin]
+              [{caption.location}]
             </p>
           </div>
 
@@ -63,18 +70,9 @@ import SectionDivider from '@/components/SectionDivider.astro';
 
           <!-- Note 1: Who I Am -->
           <section class="pinned-note scroll-reveal">
-            <h2 class="font-display text-lg text-ink mb-3">Who I Am</h2>
+            <h2 class="font-display text-lg text-ink mb-3">{whoIAm.heading}</h2>
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
-              <p>
-                I enjoy building things and figuring out how they work. I’m studying Computer Science and Statistics, which gives a broad toolkit and lets me approach problems from different angles.
-                <br/>
-                I’m drawn to both sides of the spectrum- the quick satisfaction of building something people can use right away, and the slower, methodological process of research. Most of the time, I end up somewhere in between, using a mix of skills to break down complex problems and turn them into something tangible.
-              </p>
-              <p>
-                My background spans [your actual background here]. I care most about building
-                things that matter, understanding systems that are too complex to understand fully,
-                and finding the right framing for hard problems.
-              </p>
+              {(whoIAm.paragraphs ?? []).map((p) => <p set:html={p.replace(/\n/g, "<br/>")} />)}
             </div>
           </section>
 
@@ -82,13 +80,9 @@ import SectionDivider from '@/components/SectionDivider.astro';
 
           <!-- Note 2: What I Care About -->
           <section class="pinned-note scroll-reveal">
-            <h2 class="font-display text-lg text-ink mb-3">What I Care About</h2>
+            <h2 class="font-display text-lg text-ink mb-3">{whatICare.heading}</h2>
             <div class="space-y-3 font-body">
-              {[
-                { glyph: '❧', text: 'Algorithmic Transparency: Turning black-box ML models into auditable, legible systems, ensuring we understand exactly how and why a model behaves the way it does.' },
-                { glyph: '❧', text: 'The Craft of Toolmaking: Building end-to-end, full-stack infrastructure—from serverless GPU pipelines to intuitive dashboards—that empowers other researchers and users.' },
-                { glyph: '❧', text: 'Community & Mentorship: Designing accessible platforms and leading cohorts that make technical learning collaborative and equitable.' },
-              ].map(({ glyph, text }) => (
+              {(whatICare.items ?? []).map(({ glyph, text }) => (
                 <div class="flex gap-3 items-baseline">
                   <span class="text-gold font-decorative text-xs shrink-0 mt-0.5">{glyph}</span>
                   <p class="text-ink-muted leading-relaxed">{text}</p>
@@ -101,17 +95,9 @@ import SectionDivider from '@/components/SectionDivider.astro';
 
           <!-- Note 3: How I Got Here -->
           <section class="pinned-note scroll-reveal">
-            <h2 class="font-display text-lg text-ink mb-3">How I Got Here</h2>
+            <h2 class="font-display text-lg text-ink mb-3">{howIGot.heading}</h2>
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
-              <p>
-                The route hasn't been direct, and I consider that an asset. I initially set my sights strictly on pure NLP research and a traditional PhD track. However, a stint building full-stack ML pipelines at Meta shifted my trajectory; I discovered the dopamine that comes with shipping products that solve immediate, real-world problems.
-                <br/>
-                Today, my work spans both territories. Whether I am analyzing visualization guidelines in a university research lab, fine-tuning LLMs on tight compute constraints, developing computer vision for autonomous vehicles, or studying AI Safety, I carry the instruments of both the software engineer and the data scientist.
-              </p>
-              {/*<p>
-                The thing I learned earliest and forget most often: the map is not the territory.
-                The model is not the system. The plan is not the expedition.
-              </p>*/}
+              {(howIGot.paragraphs ?? []).map((p) => <p set:html={p.replace(/\n/g, "<br/>")} />)}
             </div>
           </section>
 
@@ -119,16 +105,14 @@ import SectionDivider from '@/components/SectionDivider.astro';
 
           <!-- Note 4: Where I'm Going -->
           <section class="pinned-note scroll-reveal">
-            <h2 class="font-display text-lg text-ink mb-3">Where I'm Going</h2>
+            <h2 class="font-display text-lg text-ink mb-3">{whereImGoing.heading}</h2>
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
-              <p>
-                Right now, I am focused on deconstructing how artificial intelligence actually functions under the hood. I am actively upskilling in technical AI safety through rigorous programs like ARENA, studying interpretability, and constantly prototyping new ideas in my experimental playground.
-                <br/>
-                Because I find deep value in both the laboratory and engineering sprints, I am keeping my compass calibrated for both domains, looking for the next frontier where my generalist background can make the highest impact.
-              </p>
-              <p class="font-fell italic text-ink" style="font-size: 1rem;">
-                "Not all those who wander are lost — but most of them are making maps."
-              </p>
+              {(whereImGoing.paragraphs ?? []).map((p) => <p set:html={p.replace(/\n/g, "<br/>")} />)}
+              {whereImGoing.quote && (
+                <p class="font-fell italic text-ink" style="font-size: 1rem;">
+                  "{whereImGoing.quote}"
+                </p>
+              )}
             </div>
           </section>
 

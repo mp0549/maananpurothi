@@ -1,0 +1,83 @@
+---
+/**
+ * CodexModal.astro — Dispatch modal for expedition card detail view.
+ * All content is populated via JavaScript in codex.astro; no props needed.
+ */
+---
+
+<div
+  id="dispatch-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-title"
+  style="display:none; position:fixed; inset:0; z-index:50; overflow-y:auto; padding:2.5rem 1.25rem;"
+>
+  <!-- Backdrop -->
+  <div
+    id="modal-backdrop"
+    style="position:fixed; inset:0; background:rgba(20,13,5,0.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); opacity:0; transition:opacity 0.3s ease;"
+  ></div>
+
+  <!-- Panel -->
+  <div
+    id="modal-panel"
+    class="parchment-card relative max-w-3xl mx-auto my-10 overflow-hidden"
+    style="opacity:0; transform:translateY(22px) scale(0.97); transition:opacity 0.32s ease, transform 0.32s ease;"
+  >
+    <!-- Gold accent bar across the top -->
+    <div style="height:2px; background:linear-gradient(to right, transparent, var(--color-gold-pale), var(--color-gold), var(--color-gold-pale), transparent);"></div>
+
+    <div class="p-8 md:p-12">
+
+      <!-- Date + close -->
+      <div class="flex items-center justify-between mb-5">
+        <p id="modal-date" class="section-label text-xs tracking-[0.18em]"></p>
+        <button
+          id="modal-close"
+          class="font-display text-ink-muted hover:text-gold transition-colors text-base leading-none bg-transparent border-none cursor-pointer w-7 h-7 flex items-center justify-center rounded-sm hover:bg-gold/10"
+          aria-label="Close dispatch"
+        >✕</button>
+      </div>
+
+      <!-- Title -->
+      <h2 id="modal-title" class="font-display text-2xl md:text-3xl text-ink leading-tight"></h2>
+
+      <!-- Gold rule -->
+      <div class="my-6" style="height:1px; background:linear-gradient(to right, var(--color-gold), var(--color-gold-pale), transparent); opacity:0.6;"></div>
+
+      <!-- Two-column body -->
+      <div class="grid md:grid-cols-[10rem_1fr] gap-8 md:gap-10">
+
+        <!-- Left: meta sidebar -->
+        <div class="flex flex-col gap-6">
+
+          <!-- Links -->
+          <div id="modal-links-wrap">
+            <p class="section-label text-xs mb-2 tracking-[0.15em]">Dispatches</p>
+            <div id="modal-links" class="flex flex-col gap-2"></div>
+          </div>
+
+          <!-- Tags -->
+          <div>
+            <p class="section-label text-xs mb-2 tracking-[0.15em]">Filed Under</p>
+            <div id="modal-tags" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+        </div>
+
+        <!-- Right: detail -->
+        <div>
+          <p id="modal-detail" class="font-body text-sm text-ink leading-[1.9] opacity-80"></p>
+        </div>
+
+      </div>
+
+      <!-- Footer ornament -->
+      <p class="text-center mt-10 font-display text-gold opacity-30 select-none tracking-[0.5em] text-xs">✦ &nbsp; ⁕ &nbsp; ✦</p>
+
+    </div>
+
+    <!-- Subtle bottom accent bar -->
+    <div style="height:1px; background:linear-gradient(to right, transparent, var(--color-gold-pale), transparent); opacity:0.5;"></div>
+  </div>
+</div>

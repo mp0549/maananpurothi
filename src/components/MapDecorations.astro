@@ -1,0 +1,159 @@
+---
+interface Props {
+  showCartouche?: boolean;
+}
+const { showCartouche = true } = Astro.props;
+---
+
+{showCartouche && <div class="cartouche" style="top: 7%;">
+  <p class="cartouche-eyebrow">The Archives</p>
+  <h1 class="cartouche-name">Maanan Purothi</h1>
+  <div class="cartouche-rule"></div>
+  <p class="cartouche-tagline">Mapping the intellectual frontier</p>
+  <img
+    src="/accents/postalstamps.avif"
+    alt=""
+    style="position: absolute; bottom: -22px; right: -18px; width: 60px; opacity: 0.5; filter: sepia(0.6) contrast(1.05); transform: rotate(15deg); mix-blend-mode: multiply; pointer-events: none;"
+    aria-hidden="true"
+    loading="eager"
+  />
+</div>}
+
+<!-- Decorative coordinates -->
+<p
+  class="absolute font-display text-gold-pale pointer-events-none"
+  style="font-size: 0.45rem; letter-spacing: 0.25em; bottom: 18%; left: 42%; opacity: 0.55;"
+  aria-hidden="true"
+>48°32'N · 16°17'E</p>
+
+<p
+  class="absolute font-display text-gold-pale pointer-events-none"
+  style="font-size: 0.4rem; letter-spacing: 0.2em; top: 38%; left: 6%; opacity: 0.45; writing-mode: vertical-rl; transform: rotate(180deg);"
+  aria-hidden="true"
+>Terra Incognita</p>
+
+<p
+  class="absolute font-display text-gold-pale pointer-events-none"
+  style="font-size: 0.4rem; letter-spacing: 0.2em; top: 55%; right: 6%; opacity: 0.4; writing-mode: vertical-rl;"
+  aria-hidden="true"
+>Hic Svnt Leones</p>
+
+<!-- Scattered star ornaments -->
+<span class="absolute font-display pointer-events-none" style="top: 43%; left: 46%; font-size: 1.05rem; color: var(--color-gold); opacity: 0.15; transform: rotate(-6deg);" aria-hidden="true">✦</span>
+<span class="absolute font-display pointer-events-none" style="top: 56%; left: 52%; font-size: 0.7rem; color: var(--color-gold); opacity: 0.13; transform: rotate(9deg);" aria-hidden="true">✦</span>
+<span class="absolute font-display pointer-events-none" style="top: 38%; left: 41%; font-size: 0.55rem; color: var(--color-gold); opacity: 0.12; transform: rotate(-14deg);" aria-hidden="true">✦</span>
+<span class="absolute font-display pointer-events-none" style="top: 50%; left: 58%; font-size: 0.65rem; color: var(--color-gold); opacity: 0.14; transform: rotate(4deg);" aria-hidden="true">✦</span>
+
+<!-- Stamp accent — top-right corner -->
+<div class="absolute top-5 right-5 md:top-8 md:right-8 pointer-events-none" aria-hidden="true">
+  <img
+    src="/accents/postalstamps.avif"
+    alt=""
+    class="w-14 md:w-18 opacity-30 mix-blend-multiply"
+    style="filter: sepia(0.5); transform: rotate(-8deg);"
+    loading="eager"
+  />
+</div>
+
+<!-- Sea monster — lower-center -->
+<div class="absolute pointer-events-none hidden md:block" style="left: 49%; top: 80%; transform: translate(-50%, -50%) rotate(-8deg); z-index: 8;" aria-hidden="true">
+  <img src="/accents/nobg/seamonster1-nobg.png" alt="" style="width: 180px; opacity: 0.5; filter: sepia(0.5) grayscale(0.3) brightness(0.85); mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);" loading="eager" />
+</div>
+
+<!-- Dragon — upper center -->
+<div class="absolute pointer-events-none hidden md:block" style="left: 54%; top: 13%; transform: translate(-50%, -50%) rotate(-5deg) scaleX(-1); z-index: 8;" aria-hidden="true">
+  <img src="/accents/nobg/dragon1-nobg.png" alt="" style="width: 175px; opacity: 0.55; filter: sepia(0.5) grayscale(0.3) brightness(0.85); mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);" loading="eager" />
+</div>
+
+<!-- Sailing ship — open water below-left -->
+<div class="absolute pointer-events-none hidden md:block" style="left: 38%; top: 62%; transform: translate(-50%, -50%) rotate(15deg); z-index: 8;" aria-hidden="true">
+  <img src="/accents/nobg/ship1-nobg.png" alt="" style="width: 115px; opacity: 0.45; filter: sepia(0.5) grayscale(0.3) brightness(0.85); mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);" loading="eager" />
+</div>
+
+<!-- Small sea creature — lower-left corner -->
+<div class="absolute pointer-events-none hidden md:block" style="left: 9%; top: 79%; transform: translate(-50%, -50%) rotate(14deg); z-index: 8;" aria-hidden="true">
+  <img src="/accents/nobg/seamonster3-nobg.png" alt="" style="width: 88px; opacity: 0.45; filter: sepia(0.5) grayscale(0.3) brightness(0.85); mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);" loading="eager" />
+</div>
+
+<!-- Creature — upper-right open water -->
+<div class="absolute pointer-events-none hidden md:block" style="left: 84%; top: 20%; transform: translate(-50%, -50%) rotate(-5deg); z-index: 8;" aria-hidden="true">
+  <img src="/accents/nobg/seamonster4-nobg.png" alt="" style="width: 100px; opacity: 0.45; filter: sepia(0.5) grayscale(0.3) brightness(0.85); mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);" loading="eager" />
+</div>
+
+<!-- Ocean label — center-right open water -->
+<p class="absolute pointer-events-none font-display hidden md:block"
+   style="left: 62%; top: 48%; transform: translate(-50%,-50%) rotate(-3deg);
+          font-size: 1.8rem; letter-spacing: 0.22em; color: #8B6914;
+          opacity: 0.055; text-transform: uppercase; white-space: nowrap; z-index: 1;"
+   aria-hidden="true">Mare Ignotum</p>
+
+<!-- "Hic Svnt Dracones" annotation -->
+<p
+  class="absolute pointer-events-none font-display hidden md:block"
+  style="left: 57%; top: 60%; transform: translate(-50%, -50%) rotate(-2deg); font-size: 0.48rem; letter-spacing: 0.32em; color: var(--color-ink); opacity: 0.11; text-transform: uppercase; white-space: nowrap; z-index: 8;"
+  aria-hidden="true"
+>Hic Svnt Dracones</p>
+
+<!-- Compass rose (bottom-right) -->
+<div class="absolute bottom-5 right-5 md:bottom-8 md:right-8 opacity-70 pointer-events-none" aria-hidden="true">
+  <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
+    <circle cx="48" cy="48" r="46" stroke="#C4A96A" stroke-width="0.5" opacity="0.6"/>
+    <circle cx="48" cy="48" r="43" stroke="#8B6914" stroke-width="0.3" opacity="0.35"/>
+    <circle cx="48" cy="48" r="40" stroke="#C4A96A" stroke-width="0.4" opacity="0.5"/>
+    <circle cx="48" cy="48" r="32" stroke="#C4A96A" stroke-width="0.3" opacity="0.4" fill="none"/>
+    <line x1="64.0" y1="9.5"  x2="65.1" y2="6.7"  stroke="#C4A96A" stroke-width="0.7" opacity="0.55"/>
+    <line x1="86.5" y1="32.0" x2="89.3" y2="30.9" stroke="#C4A96A" stroke-width="0.7" opacity="0.55"/>
+    <line x1="86.5" y1="64.0" x2="89.3" y2="65.1" stroke="#C4A96A" stroke-width="0.7" opacity="0.55"/>
+    <line x1="64.0" y1="86.5" x2="65.1" y2="89.3" stroke="#C4A96A" stroke-width="0.7" opacity="0.55"/>
+    <line x1="32.0" y1="86.5" x2="30.9" y2="89.3" stroke="#C4A96A" stroke-width="0.7" opacity="0.55"/>
+    <line x1="9.5"  y1="64.0" x2="6.7"  y2="65.1" stroke="#C4A96A" stroke-width="0.7" opacity="0.55"/>
+    <line x1="9.5"  y1="32.0" x2="6.7"  y2="30.9" stroke="#C4A96A" stroke-width="0.7" opacity="0.55"/>
+    <line x1="32.0" y1="9.5"  x2="30.9" y2="6.7"  stroke="#C4A96A" stroke-width="0.7" opacity="0.55"/>
+    <polygon points="48,5 52.5,45 48,48 43.5,45" fill="#8B6914"/>
+    <polygon points="48,91 52.5,51 48,48 43.5,51" fill="#C4A96A"/>
+    <polygon points="91,48 51,43.5 48,48 51,52.5" fill="#8B6914"/>
+    <polygon points="5,48 45,43.5 48,48 45,52.5" fill="#C4A96A"/>
+    <polygon points="81,15 51.5,45 48,48 52,45" fill="#C4A96A" opacity="0.5"/>
+    <polygon points="15,15 45,45 48,48 44,45" fill="#C4A96A" opacity="0.5"/>
+    <polygon points="81,81 51.5,51 48,48 52,51" fill="#C4A96A" opacity="0.5"/>
+    <polygon points="15,81 45,51 48,48 44,51" fill="#C4A96A" opacity="0.5"/>
+    <circle cx="48" cy="22" r="1" fill="#C4A96A" opacity="0.4"/>
+    <circle cx="48" cy="74" r="1" fill="#C4A96A" opacity="0.4"/>
+    <circle cx="74" cy="48" r="1" fill="#C4A96A" opacity="0.4"/>
+    <circle cx="22" cy="48" r="1" fill="#C4A96A" opacity="0.4"/>
+    <line x1="44" y1="13" x2="52" y2="13" stroke="#8B6914" stroke-width="0.5" opacity="0.5"/>
+    <circle cx="48" cy="48" r="7"   fill="#8B6914"/>
+    <circle cx="48" cy="48" r="4.5" fill="#F5ECD7"/>
+    <circle cx="48" cy="48" r="2.5" fill="#8B6914"/>
+    <circle cx="48" cy="48" r="1.2" fill="#C4A96A"/>
+    <text x="48" y="20" text-anchor="middle" dominant-baseline="middle" font-family="Cinzel,serif" font-size="7.5" fill="#8B6914" font-weight="700">N</text>
+    <text x="48" y="80" text-anchor="middle" dominant-baseline="middle" font-family="Cinzel,serif" font-size="7"   fill="#8B6914">S</text>
+    <text x="85" y="49" text-anchor="middle" dominant-baseline="middle" font-family="Cinzel,serif" font-size="7"   fill="#8B6914">E</text>
+    <text x="11" y="49" text-anchor="middle" dominant-baseline="middle" font-family="Cinzel,serif" font-size="7"   fill="#8B6914">W</text>
+  </svg>
+</div>
+
+<!-- Postal stamp accent (bottom-left) -->
+<div class="absolute bottom-5 left-5 md:bottom-8 md:left-8 pointer-events-none" aria-hidden="true">
+  <img
+    src="/accents/postalstamps.avif"
+    alt=""
+    class="w-16 md:w-20 opacity-35 mix-blend-multiply"
+    style="filter: sepia(0.5);"
+    loading="eager"
+  />
+</div>
+
+<!-- Scale bar (decorative) -->
+<div
+  class="absolute pointer-events-none"
+  style="right: 7%; bottom: 7%; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0.45;"
+  aria-hidden="true"
+>
+  <div style="display: flex; align-items: center; gap: 0;">
+    <div style="width: 40px; height: 6px; background: #8B6914;"></div>
+    <div style="width: 40px; height: 6px; background: #F5ECD7; border: 1px solid #C4A96A;"></div>
+    <div style="width: 40px; height: 6px; background: #8B6914;"></div>
+  </div>
+  <p style="font-family: 'Cinzel', serif; font-size: 0.4rem; letter-spacing: 0.3em; color: #8B6914; text-transform: uppercase;">Scale of Miles</p>
+</div>

@@ -3,33 +3,31 @@
     {
       "title": "Influence Proxy Dashboard",
       "dateRange": "March 2026",
-      "description": "Built a full-stack research tool that lets AI safety researchers fine-tune language models and see exactly which training examples shaped the model's behavior, turning fine-tuning from a black box into an auditable process.",
-      "detail": "Built a full-stack research tool that lets AI safety researchers fine-tune language models and see exactly which training examples shaped the model's behavior — turning fine-tuning from a black box into an auditable process.<br />- Computed influence scores live during training using gradient dot products, with no checkpoint storage required<br />- Ran serverless A100 GPU jobs on Modal with async status updates streamed to the frontend in real time<br />- Visualized per-example influence as animated heatmaps and ranked leaderboards for intuitive data auditing<br />- Designed a full job pipeline from data upload through fine-tuning to influence score delivery via Supabase Realtime<br />- Visualized per-example influence as animated heatmaps and ranked leaderboards for intuitive data auditing<br />- Designed a full job pipeline from data upload through fine-tuning to influence score delivery via Supabase Realtime",
+      "description": "Fine-tuning usually hands you a model with no way to ask why. This lets you fine-tune something and then trace its behavior back to the specific training examples that caused it.",
+      "detail": "A full-stack research tool for auditable fine-tuning: researchers train a model and see which training examples shaped its behavior.\n\n• Computed influence scores live during training using gradient dot products, requiring no checkpoint storage\n• Ran serverless A100 GPU jobs on Modal with async status updates streamed to the frontend in real time\n• Visualized per-example influence as animated heatmaps and ranked leaderboards for data auditing\n• Designed the full job pipeline from data upload through fine-tuning to score delivery via Supabase Realtime",
       "links": [
         { "label": "GitHub", "href": "https://github.com/LCodingX/generalization-bet" },
         { "label": "Live Demo", "href": "https://frontend-tau-seven-58.vercel.app/runs" }
       ],
-      "tags": ["Pinned", "AI/ML", "Research", "HCI"],
+      "tags": ["AI/ML", "Research", "HCI"],
       "rotation": -0.6,
       "categories": ["Pinned", "Research", "Engineering"]
     },
     {
-      "title": "Senior Consultant @ Google Developer Groups",
+      "title": "President @ Google Developer Groups",
       "dateRange": "July 2025 – Present",
-      "description": "Acting Senior Consultant for Google Developer Groups, advising a student-led tech community worldwide on growth strategy, event programming, and community engagement to foster inclusive, vibrant ecosystems for learning and collaboration.",
-      "detail": "Acting Senior Consultant for Google Developer Groups, advising a student-led tech community worldwide on growth strategy, event programming, and community engagement to foster inclusive, vibrant ecosystems for learning and collaboration.<br />- Organized developer workshops and advised on technical content and speaker engagement. <br />- Organized a 430 member hackathon: prepared sponsors, planned the event, etc.<br />- Recruited 500+ members through targeted outreach and event planning",
-      "links": [
-        { "label": "Org page", "href": "https://gdg.community.dev/gdg-on-campus-university-of-wisconsin-madison-madison-united-states/" }
-      ],
-      "tags": ["Pinned", "Community", "Consulting"],
+      "description": "I run our campus chapter. Mostly this means finding people something worth showing up for, then making sure the thing actually happens.",
+      "detail": "President of the UW–Madison GDG on Campus chapter, leading growth strategy, event programming, and community engagement.\n\n• Organized developer workshops and advised on technical content and speaker engagement\n• Planned and ran a 430-person hackathon end-to-end, including sponsor coordination and event logistics\n• Recruited 500+ members through targeted outreach and event planning",
+      "links": [{ "label": "Org page", "href": "https://gdg.community.dev/gdg-on-campus-university-of-wisconsin-madison-madison-united-states/" }],
+      "tags": ["Community", "Consulting"],
       "rotation": 0.4,
       "categories": ["Pinned", "Community"]
     },
     {
-      "title": "Technical Team @ WAISI",
+      "title": "Cohort Lead @ WAISI",
       "dateRange": "Oct 2025 – Present",
-      "description": "Lead a cohort of students pursuing technical AI safety, facilitating discussions and learning sessions on reward specification, interpretability, and adversarial evaluation.",
-      "detail": "Lead a cohort of students pursuing technical AI safety, facilitating discussions and learning sessions on reward specification, interpretability, and adversarial evaluation.<br />- Update and refine curriculum to incorporate the latest AI safety research and materials from BlueDot Impact curriculum<br />- Participate in a reading group and conduct structured research replications of relevant papers<br />- Completed technical AI safety training in reward specification, interpretability, and adversarial evaluation<br />- Studied AI policy frameworks including compute governance and international coordination",
+      "description": "I take a group of students through eight weeks of technical AI safety. Teaching it turned out to be the fastest way to find the holes in my own understanding.",
+      "detail": "Cohort Lead on the technical team at the Wisconsin AI Safety Initiative, covering reward specification, interpretability, and adversarial evaluation.\n\n• Lead a cohort of students through an 8-week technical AI safety curriculum, facilitating discussions and learning sessions\n• Update and refine curriculum to incorporate the latest AI safety research and materials from BlueDot Impact\n• Participate in a reading group and conduct structured research replications of relevant papers\n• Completed the technical and policy fundamentals programs, including compute governance and international coordination\n• Leading a second cohort starting this fall",
       "links": [{ "label": "Org page", "href": "https://www.waisi.org/" }],
       "tags": ["AI Safety", "Leadership", "Research"],
       "rotation": -0.5,
@@ -38,8 +36,8 @@
     {
       "title": "Perception Engineer & Mentor @ Wisconsin Autonomous",
       "dateRange": "Sep 2024 – Present",
-      "description": "Developing computer vision algorithms for detection, lane recognition, and segmentation for an autonomous driving challenge while mentoring junior engineers.",
-      "detail": "Developing computer vision algorithms for detection, lane recognition, and segmentation for an autonomous driving challenge while mentoring junior engineers.<br />- Developed computer vision algorithms for detection, lane recognition, and segmentation<br />- Reduced compute cost by 40% through optimized trajectory mapping<br />- Mentored two engineers on CV fundamentals and integration workflows",
+      "description": "Teaching a car to see. I write the perception code that works out where the lanes are, and these days I spend about as much time explaining it to newer engineers as writing it.",
+      "detail": "Perception engineer and mentor on Wisconsin Autonomous, competing in the SAE AutoDrive Challenge.\n\n• Developed computer vision algorithms for detection, lane recognition, and segmentation\n• Reduced compute cost by 40% through optimized trajectory mapping\n• Mentored two engineers on CV fundamentals and integration workflows",
       "links": [],
       "tags": ["Computer Vision", "Engineering", "Mentorship"],
       "rotation": 0.7,
@@ -48,11 +46,11 @@
     {
       "title": "Founder & Full-Stack Dev @ Student Success Club",
       "dateRange": "Nov 2022 – Present",
-      "description": "Launched a student-run tutoring initiative and built a full-stack React platform to connect students with volunteer tutors, advocating for educational equity through peer-driven support.",
-      "detail": "Launched a student-run tutoring initiative and built a full-stack React platform to connect students with volunteer tutors, advocating for educational equity through peer-driven support.<br />- Designed and built a React website to advertise services, facilitate student-tutor connections, and improve accessibility<br />- Developed full-stack registration and contact forms, storing submissions in a database and enabling automated tutor-student matching<br />- Implemented real-time notifications to phone and email for new submissions<br />- Led a team of volunteer tutors and promoted peer support and educational equity through free, community-driven resources",
+      "description": "Free tutoring, run by students, for students who couldn't otherwise pay for it. I ended up building the website too, because someone had to.",
+      "detail": "Founder of a student-run tutoring initiative providing free, personalized academic support, plus the full-stack platform behind it.\n\n• Designed and built a React site to advertise services, connect students with tutors, and improve accessibility\n• Developed full-stack registration and contact forms with database storage and automated tutor-student matching\n• Implemented real-time phone and email notifications for new submissions\n• Led a team of volunteer tutors, advocating for educational equity through free, community-driven resources",
       "links": [
-        { "label": "Website", "href": "#" },
-        { "label": "GitHub", "href": "#" }
+        { "label": "Website", "href": "http://studentsuccessclub.org/" },
+        { "label": "GitHub", "href": "https://github.com/mp0549/landing-NGO" }
       ],
       "tags": ["Community", "React", "Full-Stack"],
       "rotation": -0.3,
@@ -61,11 +59,9 @@
     {
       "title": "Covid-19 Vaccine Stance Classification",
       "dateRange": "2024",
-      "description": "Built a stance classification system to label tweets as in-favor, against, or neutral-or-unclear toward COVID-19 vaccination under tight data and GPU constraints.",
-      "detail": "Built a stance classification system to label tweets as in-favor, against, or neutral-or-unclear toward COVID-19 vaccination under tight data and GPU constraints.<br />- Fine-tuned FLAN-T5-Large using LoRA adapters, training on limited resources<br />- Designed a curriculum learning strategy to stabilize 3-way stance classification<br />- Mitigated failure modes including neutral collapse, sarcasm, and more<br />- Achieved improved macro-F1 and neutral recall compared to zero-shot and standard fine-tuning baselines",
-      "links": [
-        { "label": "GitHub", "href": "#" }
-      ],
+      "description": "Can a model tell whether a tweet is pro-vaccine, anti-vaccine, or just being sarcastic? The third one is where everything falls apart.",
+      "detail": "A stance classification system labeling tweets as in-favor, against, or neutral-or-unclear toward COVID-19 vaccination, trained under tight data and GPU constraints.\n\n• Fine-tuned FLAN-T5-Large using LoRA adapters on limited hardware\n• Designed a curriculum learning strategy to stabilize 3-way stance classification\n• Mitigated failure modes including neutral collapse and sarcasm\n• Improved macro-F1 and neutral recall over both zero-shot and standard fine-tuning baselines",
+      "links": [{ "label": "GitHub", "href": "https://github.com/mp0549/COVID-19-Vaccine-Stance-Classification-FLAN-T5-Large" }],
       "tags": ["NLP", "PyTorch", "Research"],
       "rotation": 0.5,
       "categories": ["Research", "Engineering"]
@@ -73,67 +69,100 @@
     {
       "title": "AI Interview Prep Platform",
       "dateRange": "2024",
-      "description": "Built a full-stack AI interview prep platform that generates personalized questions from resumes and job descriptions and provides structured performance feedback.",
-      "detail": "Built a full-stack AI interview prep platform that generates personalized questions from resumes and job descriptions and provides structured performance feedback.<br />- Designed REST APIs for interview sessions, questions, and responses<br />- Integrated Claude API for dynamic question generation and answer grading<br />- Implemented persistent storage for interview history using SQLite<br />- Built a multi-step frontend flow for interview practice and results review",
+      "description": "Hand it your resume and a job description and it interviews you, then tells you where you were vague. Won first place at a Claude hackathon.",
+      "detail": "A full-stack AI interview prep platform that generates personalized questions from a resume and job description, then grades the answers. First place at the Claude hackathon.\n\n• Designed REST APIs for interview sessions, questions, and responses\n• Integrated the Claude API for dynamic question generation and answer grading\n• Implemented persistent storage for interview history using SQLite\n• Built a multi-step frontend flow for interview practice and results review",
       "links": [
-        { "label": "GitHub", "href": "#" },
-        { "label": "Live Demo", "href": "#" }
+        { "label": "GitHub", "href": "https://github.com/mp0549/ClaudeHacks-interview-prep-platform" },
+        { "label": "Live Demo", "href": "https://interview-prep-platform-qxx5.onrender.com/" }
       ],
-      "tags": ["Full-Stack", "AI/ML", "Python"],
+      "tags": ["Full-Stack", "AI/ML", "Hackathon Win"],
       "rotation": -0.8,
       "categories": ["Engineering"]
     },
     {
       "title": "Gesture-Based Game Control",
       "dateRange": "2023",
-      "description": "Built a real-time, gesture-based controller that allows players to control Mario Kart using hand movements instead of a physical controller.",
-      "detail": "Built a real-time, gesture-based controller that allows players to control Mario Kart using hand movements instead of a physical controller.<br />- Implemented real-time hand tracking and gesture recognition<br />- Mapped hand gestures to in-game controls such as steering, acceleration, and item usage<br />- Supported multiplayer by splitting camera feed for independent gesture control<br />- Optimized for low-latency input to ensure smooth and responsive gameplay",
+      "description": "You steer Mario Kart by holding your hands up like an actual wheel. Took fourth at a GDG hackathon and was easily the most fun thing I've ever had to demo.",
+      "detail": "A real-time gesture controller that lets players drive in Mario Kart with hand movements instead of a physical controller. Fourth place at the Google Developer Groups hackathon.\n\n• Implemented real-time hand tracking and gesture recognition with MediaPipe\n• Mapped gestures to in-game controls including steering, acceleration, and item usage\n• Supported multiplayer by splitting the camera feed for independent gesture control\n• Optimized for low-latency input to keep gameplay smooth and responsive",
       "links": [
-        { "label": "GitHub", "href": "#" },
-        { "label": "Demo Video", "href": "#" }
+        { "label": "GitHub", "href": "https://github.com/mp0549/CheeseHacks2024MarioKart" },
+        { "label": "Demo Video", "href": "https://drive.google.com/file/d/1LpZbgyQJinmTIPZYtY_HWPHl5WWt8byf/view?usp=sharing" }
       ],
-      "tags": ["Computer Vision", "HCI", "Python"],
+      "tags": ["Computer Vision", "HCI", "Hackathon Win"],
       "rotation": 0.2,
       "categories": ["Pinned", "Engineering"]
+    },
+    {
+      "title": "GPU-Accelerated Monte Carlo Option Pricing",
+      "dateRange": "2026",
+      "description": "Pricing options by simulating millions of random market paths, once on a CPU and once on a GPU, mostly to watch how far ahead the GPU pulls as the problem gets bigger.",
+      "detail": "A quantitative finance benchmark that prices European options by Monte Carlo simulation on both CPU and GPU, validates the results against the analytical Black-Scholes formula, and measures how GPU speedup scales with problem size.\n\n• Wrote a custom Numba CUDA kernel pricing one option path per GPU thread, generalized with a grid-stride loop so the same kernel scales from 10K to 10M paths\n• Cut memory contention with a block-level shared-memory reduction, copying back only two scalars to minimize PCIe transfer\n• Generated random numbers on-device with per-thread xoroshiro128+ streams, keeping the entire simulation on the GPU\n• Validated against the closed-form Black-Scholes price and benchmarked CPU vs GPU across problem sizes",
+      "links": [{ "label": "GitHub", "href": "https://github.com/mp0549/monte-carlo-simulation" }],
+      "tags": ["GPU", "Quant", "Python"],
+      "rotation": -0.4,
+      "categories": ["Pinned", "Engineering"]
+    },
+    {
+      "title": "Health App",
+      "dateRange": "In progress",
+      "description": "A workout app for people who find workout apps intimidating. Still building this one.",
+      "detail": "A beginner-friendly mobile health and fitness app focused on customizable workouts and accessibility. Actively in development.\n\n• Built a React Native frontend with modular components for workout creation and tracking\n• Designed backend logic in Python with local-first data storage via SQLite\n• Planned a scalable full-stack architecture with future cloud sync support\n• Researching AI-driven workout recommendations based on user goals, availability, and preferences",
+      "links": [{ "label": "GitHub", "href": "https://github.com/mp0549/Health-App" }],
+      "tags": ["React Native", "Mobile", "In Progress"],
+      "rotation": 0.6,
+      "categories": ["Engineering"]
+    },
+    {
+      "title": "Mechanical Engineer @ Baja SAE",
+      "dateRange": "Sep 2024 – May 2025",
+      "description": "A year of building an off-road race car with a multidisciplinary team. Turns out fabrication has its own kind of debugging, and it's much harder to undo.",
+      "detail": "Mechanical engineer on the Baja SAE team, designing and building an off-road vehicle for competition.\n\n• Designed and assembled an off-road vehicle for competitive Baja SAE events\n• Applied SolidWorks and hands-on fabrication to improve durability and performance\n• Collaborated with a multidisciplinary team to integrate mechanical subsystems",
+      "links": [],
+      "tags": ["Mechanical", "SolidWorks", "Teamwork"],
+      "rotation": -0.7,
+      "categories": ["Engineering", "Community"]
     }
   ],
   "experience": [
     {
-      "role": "Edge Network Services Intern",
-      "org": "Meta",
-      "period": "Summer 2025",
-      "desc": [
-        "❧ Deployed an end-to-end ML pipeline for LLaMa models in production to catch delays in deployment.",
-        "❧ Built a scalable agent framework to navigate complex, multi-step tasks.",
-        "❧ Designed analytics dashboards that enabled cross-functional teams to act on over 100K weekly datapoints."
-      ]
-    },
-    {
       "role": "Research Engineer",
-      "org": "Equistamp @ Redwood Research",
-      "period": "Mar 2026 - Present",
+      "org": "Equistamp · embedded with METR & Redwood Research",
+      "period": "Mar 2026 – Present",
       "desc": [
-        "❧ Partnered with Redwood Research to study AI safety and the dynamics of detecting deliberate sabotage in machine learning research.",
-        "❧ Audited paper-codebase pairs to identify compromised logic or configuration settings."
+        "❧ Contributing to Hawk, an evaluation platform now used by the UK AI Security Institute and the EU AI Office.",
+        "❧ Deployed and audited its AWS infrastructure end-to-end, and found and fixed several cross-tenant security issues with least-privilege patches.",
+        "❧ Built adversarial attack scenarios for LinuxArena, one of the largest AI control evaluation frameworks to date.",
+        "❧ Audited 10 AI research experiments for sabotage and evaluation-integrity failures, delivering code-cited findings for each."
       ]
     },
     {
       "role": "Researcher",
-      "org": "UW Graphics Lab",
-      "period": "Sep 2025 - Present",
+      "org": "UW Graphics Group",
+      "period": "Sep 2025 – Present",
       "desc": [
-        "❧ Investigated representational limitations of visualization design guidelines for automated synthesis.",
-        "❧ Authoring a paper on a 7-dimension classification schema."
+        "❧ Investigating the representational limits of visualization design guidelines for automated synthesis.",
+        "❧ Built and analyzed a corpus of 1.5K+ guidelines across 49 sources to surface inconsistencies between existing frameworks.",
+        "❧ Co-authoring a conference paper on a 7-dimension classification schema for comparing guidelines across sources."
+      ]
+    },
+    {
+      "role": "AI / Data Science / SWE Intern",
+      "org": "Meta · Edge Network Services",
+      "period": "May 2025 – July 2025",
+      "desc": [
+        "❧ Designed and deployed a production ML pipeline for unstructured text classification using LLaMA models, cutting misclassification by ~30%.",
+        "❧ Built a scalable LLaMA-based agent framework for multi-step task execution with memory and agent-chaining.",
+        "❧ Built a React analytics dashboard that let 12+ teams act on 100K+ weekly datapoints."
       ]
     },
     {
       "role": "Technical Business Analyst",
       "org": "Jumpshot",
-      "period": "Mar 2024 – April 2025",
+      "period": "Mar 2024 – Apr 2025",
       "desc": [
-        "❧ Acted as liason between client and engineering team to gather and relay product requirements.",
-        "❧ Implemented frontend and backend features across application stack",
-        "❧ Led testing and QA efforts, resolving issues pre-release to improve performance and user experience."
+        "❧ Built frontend and backend features for a mobile basketball training app, including CI/CD workflows and analytics integrations.",
+        "❧ Acted as primary liaison between coaches and engineers, translating product requirements into implementation plans.",
+        "❧ Led testing and QA, resolving issues pre-release to improve performance and user experience."
       ]
     }
   ]

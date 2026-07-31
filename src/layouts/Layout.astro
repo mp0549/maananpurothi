@@ -37,6 +37,7 @@ const isMap = variant === 'map';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <title>{title}</title>
+    <script defer src="/_vercel/insights/script.js"></script>
 
     <!-- Ink-entry: applied before first paint so new page starts already covered -->
     <script is:inline>
@@ -121,6 +122,13 @@ const isMap = variant === 'map';
         }, 295);
       }
 
+      /* ── Expose for non-<a> triggers (e.g. map.astro's "Mischief Managed."
+         button and the map's SVG home-link) that want the same ink-bleed
+         transition without duplicating the overlay/timing logic. ────────── */
+      window.__inkTo = function (href, originX, originY) {
+        spread(originX, originY, href);
+      };
+
       /* ── Click interception ──────────────────────────────────────────────── */
       document.addEventListener('click', function (e) {
         if (!(e.target instanceof Element)) return;
@@ -131,11 +139,15 @@ const isMap = variant === 'map';
         if (!href) return;
         if (/^(#|https?:|\/\/|mailto:|tel:)/.test(href)) return;
         if (link.target === '_blank') return;
+        // opt-out: let the ceremony be the transition into /map
+        if (link.hasAttribute('data-noink')) return;
 
         var variant   = document.body.dataset.variant;
-        var goesToMap = (href === '/');
+        // both hubs (the hero menu at "/" and the map at "/map") count as "map"
+        // for the transition — either is a hub ↔ interior crossing.
+        var goesToMap = (href === '/' || href === '/map');
 
-        // Only intercept: map → interior  OR  interior → map
+        // Only intercept: hub → interior  OR  interior → hub
         if (!(variant === 'map' && !goesToMap) && !(variant === 'interior' && goesToMap)) return;
 
         e.preventDefault();

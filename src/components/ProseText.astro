@@ -1,0 +1,165 @@
+---
+/**
+ * ProseText.astro — renders one block of copy from src/data/*.json, expanding
+ * the shared inline markup (see src/lib/prose.ts):
+ *
+ *   [text](url)              → hyperlink
+ *   [text|definition]        → glossary term with a tooltip
+ *   [text|definition](url)   → both
+ *   word(https://…)          → shorthand hyperlink
+ *
+ * Renders inline only — wrap it in whatever <p>/<span> the caller needs.
+ * The hero (PlainArchives) has its own copy of this treatment tuned to the
+ * landing page; this is the interior-page version.
+ */
+import { parseProse } from '@/lib/prose';
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+const parts = parseProse(text);
+---
+
+{parts.map((part) => {
+  if (part.type === 'text') return part.value;
+
+  const tip = part.def ? (
+    <span class="prose-tip" role="tooltip">{part.def}</span>
+  ) : null;
+
+  if (part.href) {
+    return (
+      <a
+        class={part.def ? 'prose-link prose-term' : 'prose-link'}
+        href={part.href}
+        {...(part.external ? { target: '_blank', rel: 'noopener' } : {})}
+      >
+        {part.text}
+        {tip}
+      </a>
+    );
+  }
+
+  return (
+    <span class="prose-term" tabindex="0">
+      {part.text}
+      {tip}
+    </span>
+  );
+})}
+
+<style>
+  /* ── Links ──────────────────────────────────────────────────────────────
+     A hand-inked underline rather than a browser one: a gold rule that sits
+     a little low and darkens on hover, so links read as annotation instead
+     of interruption. */
+  .prose-link {
+    color: var(--color-gold);
+    text-decoration: none;
+    background-image: linear-gradient(var(--color-gold-pale), var(--color-gold-pale));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+    padding-bottom: 0.05em;
+    transition:
+      color 0.18s ease,
+      background-size 0.18s ease,
+      background-image 0.18s ease;
+  }
+
+  .prose-link:hover,
+  .prose-link:focus-visible {
+    color: var(--color-ink);
+    background-image: linear-gradient(var(--color-gold), var(--color-gold));
+    background-size: 100% 2px;
+  }
+
+  .prose-link:focus-visible {
+    outline: 1px dotted var(--color-gold);
+    outline-offset: 3px;
+  }
+
+  /* ── Glossary terms ─────────────────────────────────────────────────────
+     Dotted underline, tooltip on hover/focus/tap. Tap works because the span
+     is focusable (tabindex="0"). */
+  .prose-term {
+    position: relative;
+    border-bottom: 1px dotted var(--color-gold-pale);
+    cursor: help;
+  }
+
+  .prose-link.prose-term {
+    /* The link already draws its own rule — don't stack two. */
+    border-bottom: 0;
+    cursor: pointer;
+  }
+
+  .prose-term:focus-visible {
+    outline: 1px dotted var(--color-gold);
+    outline-offset: 3px;
+  }
+
+  .prose-tip {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%) translateY(3px);
+    z-index: 30;
+    width: max-content;
+    max-width: min(20rem, 70vw);
+    padding: 0.5rem 0.7rem;
+    background: var(--color-parchment-light);
+    border: 1px solid var(--color-gold-pale);
+    box-shadow: 2px 4px 14px rgba(28, 18, 8, 0.18);
+    color: var(--color-ink-muted);
+    font-size: 0.78rem;
+    font-style: normal;
+    line-height: 1.45;
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.16s ease,
+      transform 0.16s ease,
+      visibility 0.16s;
+  }
+
+  /* Little parchment nib pointing back at the term. */
+  .prose-tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-top-color: var(--color-gold-pale);
+  }
+
+  .prose-term:hover .prose-tip,
+  .prose-term:focus .prose-tip,
+  .prose-term:focus-visible .prose-tip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prose-link,
+    .prose-tip {
+      transition: none;
+    }
+
+    .prose-tip {
+      transform: translateX(-50%);
+    }
+
+    .prose-term:hover .prose-tip,
+    .prose-term:focus .prose-tip,
+    .prose-term:focus-visible .prose-tip {
+      transform: translateX(-50%);
+    }
+  }
+</style>

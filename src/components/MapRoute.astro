@@ -1,0 +1,75 @@
+<!-- Expedition route paths -->
+<svg
+  class="absolute inset-0 w-full h-full pointer-events-none hidden md:block"
+  viewBox="0 0 100 100"
+  preserveAspectRatio="none"
+  overflow="visible"
+  aria-hidden="true"
+  style="z-index: 12;"
+>
+  <!-- Worn shadow beneath main route -->
+  <path
+    d="M 17,57 C 15,65 22,74 27,75 C 38,76 54,58 63,41 C 65,36 67,31 70,29 C 72,33 74,38 76,44"
+    fill="none" stroke="rgba(60,20,10,0.2)" stroke-width="4"
+    stroke-linecap="round" vector-effect="non-scaling-stroke"
+  />
+  <!-- Main route (animated on load) -->
+  <path
+    id="route-draw"
+    d="M 17,57 C 15,65 22,74 27,75 C 38,76 54,58 63,41 C 65,36 67,31 70,29 C 72,33 74,38 76,44"
+    fill="none" stroke="#8B1A1A" stroke-width="2"
+    stroke-linecap="round" opacity="0.9" vector-effect="non-scaling-stroke"
+  />
+  <!-- Branch: Portfolio — exits the western edge -->
+  <path
+    id="branch-portfolio"
+    d="M 17,57 C 12,50 5,41 -2,35"
+    fill="none" stroke="#8B1A1A" stroke-width="1.5" stroke-dasharray="4 6"
+    stroke-linecap="round" opacity="0.7" vector-effect="non-scaling-stroke"
+  />
+  <!-- Branch: Lab — exits the southern edge -->
+  <path
+    id="branch-lab"
+    d="M 27,75 C 25,84 22,92 20,102"
+    fill="none" stroke="#8B1A1A" stroke-width="1.5" stroke-dasharray="4 6"
+    stroke-linecap="round" opacity="0.7" vector-effect="non-scaling-stroke"
+  />
+  <!-- Survey terminus: Portfolio (+ crossbar at -2,35) -->
+  <line class="branch-terminus" x1="-2" y1="31" x2="-2" y2="39" stroke="#8B1A1A" stroke-width="1.5" stroke-linecap="round" opacity="0.8" vector-effect="non-scaling-stroke"/>
+  <line class="branch-terminus" x1="-6" y1="35" x2="2" y2="35" stroke="#8B1A1A" stroke-width="1.5" stroke-linecap="round" opacity="0.8" vector-effect="non-scaling-stroke"/>
+  <!-- Survey terminus: Lab (+ crossbar at 20,102) -->
+  <line class="branch-terminus" x1="20" y1="98" x2="20" y2="106" stroke="#8B1A1A" stroke-width="1.5" stroke-linecap="round" opacity="0.8" vector-effect="non-scaling-stroke"/>
+  <line class="branch-terminus" x1="16" y1="102" x2="24" y2="102" stroke="#8B1A1A" stroke-width="1.5" stroke-linecap="round" opacity="0.8" vector-effect="non-scaling-stroke"/>
+</svg>
+
+<style>
+  @keyframes edge-beacon {
+    0%, 100% { opacity: 0.85; }
+    50%       { opacity: 0.4;  }
+  }
+  .branch-terminus {
+    animation: edge-beacon 2.5s ease-in-out infinite;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    function animatePath(id: string, duration: string, delay: string) {
+      const path = document.getElementById(id) as SVGPathElement | null;
+      if (!path || typeof path.getTotalLength !== 'function') return;
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = String(len);
+      path.style.strokeDashoffset = String(len);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          path.style.transition = `stroke-dashoffset ${duration} ease-in-out ${delay}`;
+          path.style.strokeDashoffset = '0';
+        });
+      });
+    }
+
+    animatePath('route-draw', '3s', '0s');
+    animatePath('branch-portfolio', '1s', '3.2s');
+    animatePath('branch-lab', '1s', '3.2s');
+  });
+</script>

@@ -14,5 +14,13 @@ export default defineConfig({
   // site: 'https://mp0549.github.io',
   site: 'https://maananpurothi.vercel.app/',
 
+  vite: {
+    server: {
+      // The project lives on /mnt/c (WSL → Windows 9p mount), where native file
+      // events don't fire. Without polling, dev-server HMR silently misses edits.
+      watch: { usePolling: true, interval: 300 },
+    },
+  },
+
   // base: '/maananpurothi/',
 });

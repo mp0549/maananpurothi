@@ -13,10 +13,10 @@ const experience = codexData.experience;
 ---
 
 <Layout
-  title="The Codex — The Archives"
-  description="Archive of expeditions, projects, and experiences — a record of territories explored."
+  title="Library — The Archives"
+  description="Projects, research, and experience — a record of my journey."
   variant="interior"
-  pageTitle="The Codex"
+  pageTitle="Library"
 >
 
   <!-- Subtle texture -->
@@ -30,10 +30,9 @@ const experience = codexData.experience;
 
     <!-- Intro inscription -->
     <div class="max-w-prose mb-10 scroll-reveal">
-      <p class="section-label text-xs mb-1">Archive of Expeditions</p>
+      <p class="section-label text-xs mb-1">Projects & Research</p>
       <p class="text-ink-muted font-body leading-relaxed">
-        A chronicle of territories explored, instruments built, and problems pursued.
-        Each entry is a sustained engagement — recorded here for those who follow the same routes.
+        A collection of projects, research, and professional work. Each entry represents sustained effort and learning — documented for reflection and reference.
       </p>
     </div>
 
@@ -51,9 +50,9 @@ const experience = codexData.experience;
       <p class="section-label text-xs mb-2 text-center tracking-[0.2em]">A Note to the Reader</p>
 
       <p class="font-body text-sm text-ink-muted leading-relaxed text-center max-w-xl mx-auto">
-        This Codex is a curated journal — a space for narrative, personality, and experimental thought.
+        This library is a curated collection — a space for narrative, personality, and thoughtful reflection.
         It is <em>not</em> exhaustive. For a comprehensive, formal record of technical credentials,
-        publications, and full work history, consult the official archives:
+        publications, and full work history, consult the official sources:
       </p>
 
       <div class="flex flex-wrap justify-center gap-5 mt-5">
@@ -75,7 +74,7 @@ const experience = codexData.experience;
     <SectionDivider glyph="✦" />
 
     <!-- ── Filter tabs ──────────────────────────────────────────────── -->
-    <div class="flex flex-wrap gap-0 border-b border-gold-pale mb-8 mt-8" role="tablist" aria-label="Filter expeditions">
+    <div class="flex flex-wrap gap-0 border-b border-gold-pale mb-8 mt-8" role="tablist" aria-label="Filter projects">
       {['Pinned', 'Research', 'Engineering', 'Community'].map((tab) => (
         <button
           class:list={['folder-tab', { active: tab === 'Pinned' }]}
@@ -114,11 +113,10 @@ const experience = codexData.experience;
 
             <!-- Tags -->
             <div class="flex flex-wrap gap-1.5">
-              {entry.tags.map((tag) =>
-                tag === 'Pinned'
-                  ? <span class="tag-pill" style="background: rgba(139,105,20,0.15); color: var(--color-gold); border-color: rgba(139,105,20,0.3);">✦ Pinned</span>
-                  : <span class="tag-pill">{tag}</span>
+              {entry.categories.includes('Pinned') && (
+                <span class="tag-pill pinned-pill" title="Pinned" aria-label="Pinned">✦</span>
               )}
+              {entry.tags.map((tag) => <span class="tag-pill">{tag}</span>)}
             </div>
 
             <!-- Expand button -->
@@ -126,7 +124,7 @@ const experience = codexData.experience;
               class="dispatch-btn self-start font-display text-xs uppercase tracking-widest text-gold hover:text-gold-light transition-colors mt-1 cursor-pointer bg-transparent border-none p-0"
               data-idx={i}
             >
-              Read Dispatch &rarr;
+              Read more &rarr;
             </button>
           </article>
         </div>
@@ -135,10 +133,10 @@ const experience = codexData.experience;
 
     <SectionDivider glyph="⁕" />
 
-    <!-- ── Stations Occupied (experience timeline) ─────────────────── -->
+    <!-- ── Experience (work history) ─────────────────────────────── -->
     <section class="mt-4 max-w-2xl">
-      <p class="section-label text-xs mb-2 scroll-reveal">Professional Record</p>
-      <h2 class="font-display text-2xl text-ink mb-1 scroll-reveal">Stations Occupied</h2>
+      <p class="section-label text-xs mb-2 scroll-reveal">Work History</p>
+      <h2 class="font-display text-2xl text-ink mb-1 scroll-reveal">Where I've Worked</h2>
       <span class="heading-rule max-w-[10rem] scroll-reveal"></span>
 
       <div class="space-y-10 mt-6">
@@ -163,7 +161,7 @@ const experience = codexData.experience;
   </div>
 
   <!-- Entry data island (read by modal script) -->
-  <script is:inline type="application/json" id="entries-json" set:html={JSON.stringify(entries.map(({ title, dateRange, detail, tags, links }) => ({ title, dateRange, detail, tags, links })))} />
+  <script is:inline type="application/json" id="entries-json" set:html={JSON.stringify(entries.map(({ title, dateRange, detail, tags, links, categories }) => ({ title, dateRange, detail, tags, links, categories })))} />
 
   <!-- ── Dispatch Modal ─────────────────────────────────────────────── -->
   <div
@@ -196,7 +194,7 @@ const experience = codexData.experience;
           <button
             id="modal-close"
             class="font-display text-ink-muted hover:text-gold transition-colors text-base leading-none bg-transparent border-none cursor-pointer w-7 h-7 flex items-center justify-center rounded-sm hover:bg-gold/10"
-            aria-label="Close dispatch"
+            aria-label="Close entry"
           >✕</button>
         </div>
 
@@ -214,7 +212,7 @@ const experience = codexData.experience;
 
             <!-- Links -->
             <div id="modal-links-wrap">
-              <p class="section-label text-xs mb-2 tracking-[0.15em]">Dispatches</p>
+              <p class="section-label text-xs mb-2 tracking-[0.15em]">Resources</p>
               <div id="modal-links" class="flex flex-col gap-2"></div>
             </div>
 
@@ -228,7 +226,7 @@ const experience = codexData.experience;
 
           <!-- Right: detail -->
           <div>
-            <p id="modal-detail" class="font-body text-sm text-ink leading-[1.9] opacity-80"></p>
+            <p id="modal-detail" class="font-body text-sm text-ink leading-[1.9] opacity-80" style="white-space: pre-line;"></p>
           </div>
 
         </div>
@@ -250,7 +248,7 @@ const experience = codexData.experience;
   type EntryLink = { label: string; href: string };
   type Entry = {
     title: string; dateRange: string; detail: string;
-    tags: string[]; links: EntryLink[];
+    tags: string[]; links: EntryLink[]; categories: string[];
   };
 
   const ENTRIES: Entry[] = [
@@ -320,13 +318,18 @@ const experience = codexData.experience;
     // Populate tags
     const tagsEl = document.getElementById('modal-tags') as HTMLElement;
     tagsEl.innerHTML = '';
+    if (entry.categories?.includes('Pinned')) {
+      const pin = document.createElement('span');
+      pin.textContent = '✦';
+      pin.className = 'tag-pill pinned-pill';
+      pin.title = 'Pinned';
+      pin.setAttribute('aria-label', 'Pinned');
+      tagsEl.appendChild(pin);
+    }
     entry.tags.forEach((tag) => {
       const span = document.createElement('span');
-      span.textContent = tag === 'Pinned' ? '✦ Pinned' : tag;
+      span.textContent = tag;
       span.className = 'tag-pill';
-      if (tag === 'Pinned') {
-        span.style.cssText = 'background:rgba(139,105,20,0.15);color:var(--color-gold);border-color:rgba(139,105,20,0.3);';
-      }
       tagsEl.appendChild(span);
     });
 

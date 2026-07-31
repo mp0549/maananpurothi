@@ -1,0 +1,286 @@
+---
+interface Destination {
+  label: string;
+  desc: string;
+  href: string;
+  x: string;
+  y: string;
+  cardSide: string;
+  external: boolean;
+}
+interface Props {
+  destinations: Destination[];
+  showBranches?: boolean;
+}
+const { destinations, showBranches = true } = Astro.props;
+
+// Precompute sticky note props for internal destinations only
+const stickyMap = new Map<string, { topColor: string; baseRot: string; posStyle: string }>();
+let stickyCount = 0;
+for (const d of destinations) {
+  if (!d.external) {
+    const idx = stickyCount++;
+    const isEven = idx % 2 === 0;
+    stickyMap.set(d.label, {
+      topColor: isEven ? '#C4A96A' : '#8B1A1A',
+      baseRot: isEven ? '-2deg' : '1.5deg',
+      posStyle: d.cardSide === 'left'
+        ? 'right: calc(100% + 18px)'
+        : 'left: calc(100% + 18px)',
+    });
+  }
+}
+---
+
+<!-- Desktop: destination markers -->
+<div class="hidden md:block" aria-label="Map navigation">
+  {destinations.map(({ label, desc, href, x, y, cardSide, external }) => (
+    <div class="map-marker" style={`left: ${x}; top: ${y};`} data-card-side={cardSide}>
+      <a
+        href={href}
+        class="marker-body"
+        aria-label={label}
+        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      >
+        <svg class="marker-svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <circle class="marker-halo" cx="22" cy="22" r="18" fill="none" stroke="#8B6914" stroke-width="0.75" opacity="0.4"/>
+          <circle cx="22" cy="22" r="13" fill="none" stroke="#8B6914" stroke-width="1.5" opacity="0.9"/>
+          <circle class="marker-pin" cx="22" cy="22" r="7" fill="#A01E1E"/>
+        </svg>
+        <span class="marker-label">{label}</span>
+      </a>
+      <div class="marker-card" aria-hidden="true">
+        <strong class="marker-card-title">{label}</strong>
+        <p class="marker-card-desc">{desc}</p>
+      </div>
+      {!external && (() => {
+        const p = stickyMap.get(label);
+        if (!p) return null;
+        return (
+          <a
+            href={href}
+            class="sticky-note"
+            style={`${p.posStyle}; --base-rotation: ${p.baseRot};`}
+            aria-label={label}
+            tabindex="-1"
+          >
+            <div class="sticky-tape" style={`background: ${p.topColor};`}></div>
+            <div class="sticky-content">
+              <strong class="sticky-label">{label}</strong>
+              <span class="sticky-desc">{desc}</span>
+            </div>
+          </a>
+        );
+      })()}
+    </div>
+  ))}
+</div>
+
+<!-- Branch end markers at map edges -->
+{showBranches && <div class="hidden md:block">
+  <!-- Portfolio — western edge -->
+  <div class="branch-marker" style="left: 1%; top: 35%;">
+    <a
+      href="https://mp0549.github.io/my-portfolio/"
+      class="branch-body"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="The Portfolio"
+    >
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <circle cx="14" cy="14" r="10" fill="none" stroke="#8B6914" stroke-width="1" opacity="0.7"/>
+        <circle cx="14" cy="14" r="4.5" fill="#A01E1E" opacity="0.85"/>
+      </svg>
+      <span class="branch-label">THE PORTFOLIO ›</span>
+      <span class="branch-subtitle">Beyond the western reach</span>
+    </a>
+  </div>
+  <!-- Lab — southern edge -->
+  <div class="branch-marker branch-marker--south" style="left: 18%; top: 92%;">
+    <a
+      href="https://mp0549.github.io/lab/"
+      class="branch-body"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="The Lab"
+    >
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <circle cx="14" cy="14" r="10" fill="none" stroke="#8B6914" stroke-width="1" opacity="0.7"/>
+        <circle cx="14" cy="14" r="4.5" fill="#A01E1E" opacity="0.85"/>
+      </svg>
+      <span class="branch-label">THE LAB ↓</span>
+      <span class="branch-subtitle">Into the experimental deep</span>
+    </a>
+  </div>
+</div>}
+
+<!-- Mobile: vertical destination list -->
+<nav
+  class="md:hidden absolute left-0 right-0 flex flex-col items-center gap-3 px-8"
+  style="top: 48%;"
+  aria-label="Navigation"
+>
+  {destinations.map(({ label, desc, href, external }) => (
+    <a
+      href={href}
+      class="map-mobile-link w-full max-w-xs text-center"
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+    >
+      {label}
+      <small>{desc}</small>
+    </a>
+  ))}
+</nav>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&display=swap');
+
+  /* ── Sticky notes ──────────────────────────────────────────────────────── */
+  .sticky-note {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) rotate(var(--base-rotation, -2deg));
+    width: 140px;
+    background: #FFF8E7;
+    border: 1px solid rgba(139, 105, 20, 0.15);
+    box-shadow:
+      2px 3px 8px rgba(28, 18, 8, 0.22),
+      -1px -1px 0px rgba(28, 18, 8, 0.04);
+    text-decoration: none;
+    display: block;
+    z-index: 16;
+    transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: pointer;
+  }
+
+  .sticky-tape {
+    height: 8px;
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .sticky-content {
+    padding: 0.45rem 0.6rem 0.55rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .sticky-label {
+    font-family: 'Caveat', cursive;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #3D2B1F;
+    line-height: 1.5;
+    display: block;
+  }
+
+  .sticky-desc {
+    font-family: 'Caveat', cursive;
+    font-weight: 400;
+    font-size: 0.78rem;
+    color: #3D2B1F;
+    line-height: 1.5;
+    display: block;
+  }
+
+  /* Transparent bridge fills the gap between marker and sticky note,
+     preventing hover from breaking as the cursor crosses it */
+  .map-marker[data-card-side="right"] .sticky-note::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 0;
+    width: 22px;
+    height: 100%;
+    background: transparent;
+  }
+
+  .map-marker[data-card-side="left"] .sticky-note::after {
+    content: '';
+    position: absolute;
+    right: -22px;
+    top: 0;
+    width: 22px;
+    height: 100%;
+    background: transparent;
+  }
+
+  /* Hover: pin brightens, note lifts and rotates */
+  .map-marker:hover .marker-pin,
+  .map-marker:focus-within .marker-pin {
+    filter: brightness(1.1);
+    transition: filter 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .map-marker:hover .sticky-note,
+  .map-marker:focus-within .sticky-note {
+    transform: translateY(calc(-50% - 3px)) rotate(-3deg);
+  }
+
+  /* ── Existing marker-card (keep as-is in component scope) ─────────────── */
+  .marker-card {
+    display: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: calc(100% + 10px);
+    background: rgba(245, 236, 215, 0.96);
+    border: 1px solid rgba(139, 105, 20, 0.25);
+    padding: 0.6rem 0.85rem;
+    min-width: 160px;
+    max-width: 200px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(28,18,8,0.18);
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  .map-marker:hover .marker-card { display: block; }
+
+  .map-marker[data-card-side="left"] .marker-card {
+    right: 0;
+    left: auto;
+    transform: none;
+  }
+
+  .map-marker[data-card-side="right"] .marker-card {
+    left: 0;
+    transform: none;
+  }
+
+  .marker-card-title {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1C1208;
+    margin-bottom: 0.2rem;
+  }
+
+  .marker-card-desc {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 0.78rem;
+    color: #7C6A4E;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .branch-subtitle {
+    display: block;
+    font-family: 'Crimson Text', Georgia, serif;
+    font-style: italic;
+    font-size: 0.6rem;
+    color: var(--color-ink);
+    opacity: 0.55;
+    letter-spacing: 0.04em;
+    margin-top: 1px;
+    white-space: nowrap;
+  }
+
+  .branch-marker--south .branch-body {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+</style>

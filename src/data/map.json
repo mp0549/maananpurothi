@@ -1,0 +1,51 @@
+[
+  {
+    "id": "about",
+    "name": "The Common Room",
+    "desc": "Where I may be found. Background, character, ambitions.",
+    "href": "/about/",
+    "external": false
+  },
+  {
+    "id": "codex",
+    "name": "The Library",
+    "desc": "Records of past expeditions: projects, research, and employment.",
+    "href": "/codex/",
+    "external": false
+  },
+  {
+    "id": "garden",
+    "name": "The Greenhouses",
+    "desc": "Where ideas are grown. Notes and half-finished thoughts, currently just seeds.",
+    "href": "/garden/",
+    "external": false
+  },
+  {
+    "id": "now",
+    "name": "The Workshop",
+    "desc": "Current experiments. Mind the sparks.",
+    "href": "/now/",
+    "external": false
+  },
+  {
+    "id": "owlery",
+    "name": "The Owlery",
+    "desc": "Send an owl...or connect on LinkedIn, which is marginally faster.",
+    "href": "https://linkedin.com/in/maananpurothi",
+    "external": true
+  },
+  {
+    "id": "lab",
+    "name": "The Folly",
+    "desc": "Odd little inventions, built for the joy of it.",
+    "href": "https://mp0549.github.io/lab/",
+    "external": true
+  },
+  {
+    "id": "portfolio",
+    "name": "The Portfolio",
+    "desc": "Far beyond these grounds- a curated record of finished work.",
+    "href": "https://mp0549.github.io/my-portfolio/",
+    "external": true
+  }
+]

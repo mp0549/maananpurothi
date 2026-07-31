@@ -1,0 +1,623 @@
+---
+interface Destination {
+  label: string;
+  desc: string;
+  href: string;
+  x: string;
+  y: string;
+  cardSide: string;
+  external: boolean;
+}
+interface Props {
+  destinations: Destination[];
+}
+const { destinations } = Astro.props;
+
+const internalDests = destinations.filter((d) => !d.external);
+const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+
+const externalBranches = [
+  { label: "The Portfolio", desc: "Curated record of work",      href: "https://mp0549.github.io/my-portfolio/" },
+  { label: "The Lab",       desc: "Prototypes & explorations",   href: "https://mp0549.github.io/lab/" },
+  ...destinations.filter((d) => d.external).map((d) => ({ label: d.label, desc: d.desc, href: d.href })),
+];
+
+const islandPositions = [
+  { top: '7%',  left: '5%'  },
+  { top: '24%', right: '3%' },
+  { top: '50%', left: '5%'  },
+  { top: '65%', right: '3%' },
+];
+
+const islandShapes = [
+  {
+    // centroid ≈ (110, 82)
+    fill: "#F5ECD7",
+    main:  "M 115,18 C 155,8 198,28 205,68 C 212,108 182,148 130,150 C 78,152 32,130 16,96 C 0,62 18,28 54,18 C 76,10 78,26 115,18 Z",
+    hover: "M 115,17 C 156,7 199,27 206,68 C 214,108 183,149 130,151 C 77,153 31,131 15,96 C -2,62 17,27 53,17 C 76,9 78,25 115,17 Z",
+    c1:    "M 114,26 C 149,18 186,35 193,70 C 199,105 173,139 127,141 C 82,143 42,124 28,94 C 14,65 30,35 61,26 C 80,19 82,33 114,26 Z",
+    c2:    "M 114,35 C 143,27 175,42 180,72 C 185,101 163,131 125,132 C 86,134 52,118 40,92 C 29,67 42,42 69,35 C 85,29 86,41 114,35 Z",
+  },
+  {
+    // centroid ≈ (110, 82)
+    fill: "#F2E8D1",
+    main:  "M 105,14 C 148,4 208,26 216,68 C 224,110 190,148 138,150 C 86,152 28,132 12,96 C -4,60 16,26 52,16 C 76,8 66,22 105,14 Z",
+    hover: "M 105,13 C 149,3 210,25 218,68 C 226,110 191,149 138,151 C 86,153 27,133 11,96 C -6,60 15,25 51,15 C 76,7 65,21 105,13 Z",
+    c1:    "M 106,23 C 143,14 195,33 202,70 C 209,106 180,139 134,141 C 89,143 39,126 25,94 C 11,63 28,33 60,25 C 80,18 72,30 106,23 Z",
+    c2:    "M 106,32 C 138,24 183,41 188,72 C 194,103 169,131 131,132 C 92,134 49,119 37,92 C 25,66 40,41 67,33 C 85,27 77,38 106,32 Z",
+  },
+  {
+    // centroid ≈ (111, 83)
+    fill: "#F8F0E2",
+    main:  "M 120,16 C 160,8 202,36 204,78 C 206,120 172,152 122,152 C 72,152 34,124 18,88 C 2,52 22,22 58,14 C 82,6 82,22 120,16 Z",
+    hover: "M 120,15 C 161,7 203,35 205,78 C 207,121 173,153 122,153 C 71,153 33,125 17,88 C 0,52 21,21 57,13 C 82,5 82,21 120,15 Z",
+    c1:    "M 119,24 C 154,18 190,42 192,79 C 194,115 164,143 121,143 C 77,143 44,119 30,87 C 16,56 34,30 65,23 C 86,16 86,30 119,24 Z",
+    c2:    "M 118,33 C 147,27 178,48 180,79 C 181,110 156,134 119,134 C 82,134 54,113 42,87 C 30,60 45,38 72,32 C 90,26 90,38 118,33 Z",
+  },
+  {
+    // centroid ≈ (108, 83)
+    fill: "#EFE4CC",
+    main:  "M 98,14 C 144,4 206,28 214,72 C 222,116 184,152 130,152 C 76,152 22,130 8,92 C -6,54 16,22 54,14 C 76,6 56,22 98,14 Z",
+    hover: "M 98,13 C 145,3 208,27 216,72 C 224,117 185,153 130,153 C 76,153 21,131 7,92 C -8,54 15,21 53,13 C 76,5 55,21 98,13 Z",
+    c1:    "M 99,23 C 139,14 193,35 200,73 C 207,112 174,143 127,143 C 80,143 33,124 21,91 C 9,58 28,30 61,23 C 80,16 63,30 99,23 Z",
+    c2:    "M 101,32 C 135,24 181,42 186,75 C 192,107 164,134 124,134 C 84,134 44,118 34,90 C 24,62 40,38 68,32 C 84,26 70,38 101,32 Z",
+  },
+];
+
+// Template A ≈ w64:  M 32,7 C 48,3 60,12 61,22 C 62,32 52,38 34,39 C 16,40 4,33 3,22 C 2,11 14,5 32,7 Z
+// Template B ≈ w56:  M 28,6 C 42,2 54,10 55,20 C 56,30 46,37 28,37 C 10,37 2,29 3,20 C 4,10 14,10 28,6 Z
+// Two atolls per main island, clustered as satellite islets
+const atollData = [
+  // — cluster near Island 0 (top:7%, left:5%) —
+  { path: "M 32,7 C 48,3 60,12 61,22 C 62,32 52,38 34,39 C 16,40 4,33 3,22 C 2,11 14,5 32,7 Z",  rot:   0, x: "26%", y: "10%", w: 44, op: 0.90 },
+  { path: "M 28,6 C 42,2 54,10 55,20 C 56,30 46,37 28,37 C 10,37 2,29 3,20 C 4,10 14,10 28,6 Z", rot:  45, x: "34%", y: "4%",  w: 36, op: 0.82 },
+  // — cluster near Island 1 (top:24%, right:3%) —
+  { path: "M 32,7 C 48,3 60,12 61,22 C 62,32 52,38 34,39 C 16,40 4,33 3,22 C 2,11 14,5 32,7 Z",  rot:  90, x: "62%", y: "17%", w: 46, op: 0.88 },
+  { path: "M 28,6 C 42,2 54,10 55,20 C 56,30 46,37 28,37 C 10,37 2,29 3,20 C 4,10 14,10 28,6 Z", rot: 120, x: "54%", y: "28%", w: 36, op: 0.80 },
+  // — cluster near Island 2 (top:50%, left:5%) —
+  { path: "M 32,7 C 48,3 60,12 61,22 C 62,32 52,38 34,39 C 16,40 4,33 3,22 C 2,11 14,5 32,7 Z",  rot: 180, x: "25%", y: "46%", w: 42, op: 0.88 },
+  { path: "M 28,6 C 42,2 54,10 55,20 C 56,30 46,37 28,37 C 10,37 2,29 3,20 C 4,10 14,10 28,6 Z", rot: 220, x: "32%", y: "54%", w: 34, op: 0.82 },
+  // — cluster near Island 3 (top:65%, right:3%) —
+  { path: "M 32,7 C 48,3 60,12 61,22 C 62,32 52,38 34,39 C 16,40 4,33 3,22 C 2,11 14,5 32,7 Z",  rot: 270, x: "60%", y: "60%", w: 46, op: 0.88 },
+  { path: "M 28,6 C 42,2 54,10 55,20 C 56,30 46,37 28,37 C 10,37 2,29 3,20 C 4,10 14,10 28,6 Z", rot: 310, x: "52%", y: "70%", w: 36, op: 0.82 },
+];
+
+function posStyle(p: { top?: string; bottom?: string; left?: string; right?: string }): string {
+  return Object.entries(p).map(([k, v]) => `${k}:${v}`).join(';');
+}
+---
+
+<!-- Right panel — Topographic Archipelago -->
+<div class="sv-index-panel">
+  <div class="sv-bg-map"      aria-hidden="true"></div>
+  <div class="sv-bg-texture"  aria-hidden="true"></div>
+  <div class="sv-bg-vignette" aria-hidden="true"></div>
+
+  <nav class="sv-nav" aria-label="Site navigation">
+
+    <!-- S-curve trade route -->
+    <svg class="sv-route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path
+        class="sv-route-path"
+        d="M 20,-8 C 21,2 22,8 22,15 C 42,14 70,29 78,33 C 84,40 26,48 22,57 C 20,65 58,70 78,75 C 92,78 106,80 114,82"
+        fill="none"
+        stroke="rgba(245,236,215,0.75)"
+        stroke-width="2.2"
+        stroke-dasharray="3 10"
+        stroke-linecap="round"
+        vector-effect="non-scaling-stroke"
+      />
+    </svg>
+
+    <!-- Decorative atolls -->
+    {atollData.map(({ path, rot, x, y, w, op }) => (
+      <svg
+        class="sv-atoll"
+        viewBox="0 0 64 46"
+        aria-hidden="true"
+        style={`left:${x};top:${y};width:${w}px;`}
+        opacity={op}
+      >
+        <path d={path} transform={`rotate(${rot},32,23)`} fill="#D4B87A" stroke="rgba(101,74,10,0.22)" stroke-width="0.7" />
+      </svg>
+    ))}
+
+    <!-- 4 main island waypoints — each island IS the card -->
+    {internalDests.map(({ label, desc, href }, i) => (
+      <a
+        href={href}
+        class="sv-island sv-reveal"
+        style={`${posStyle(islandPositions[i])};--i:${i + 1}`}
+        data-idx={i}
+        aria-label={label}
+      >
+        <!-- Desktop: SVG-as-card with topographic rings + foreignObject text -->
+        <svg
+          class="sv-island-svg"
+          viewBox="-10 -10 260 180"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <!-- Outer landmass shape -->
+          <path
+            class="sv-island-land"
+            d={islandShapes[i].main}
+            fill={islandShapes[i].fill}
+            stroke="rgba(101,74,10,0.28)"
+            stroke-width="1.2"
+            data-hover={islandShapes[i].hover}
+            data-rest={islandShapes[i].main}
+          />
+          <!-- Inner contour rings (topographic) -->
+          <path d={islandShapes[i].c1} fill="none" stroke="rgba(139,105,20,0.22)" stroke-width="0.9"/>
+          <path d={islandShapes[i].c2} fill="none" stroke="rgba(139,105,20,0.13)" stroke-width="0.6"/>
+          <!-- Text content via foreignObject, centered at visual centroid (~110, 80) -->
+          <foreignObject x="30" y="20" width="160" height="120">
+            <div class="sv-fo-inner">
+              <span class="sv-card-numeral">{numerals[i]}</span>
+              <strong class="sv-card-label">{label}</strong>
+              <div class="sv-island-rule"></div>
+              <span class="sv-card-desc">{desc}</span>
+            </div>
+          </foreignObject>
+        </svg>
+
+        <!-- Mobile fallback card (shown only on small screens) -->
+        <div class="sv-island-mobile-card" aria-hidden="true">
+          <div class="sv-island-title-block">
+            <span class="sv-card-numeral">{numerals[i]}</span>
+            <strong class="sv-card-label">{label}</strong>
+          </div>
+          <span class="sv-card-desc">{desc}</span>
+        </div>
+      </a>
+    ))}
+
+    <!-- Map legend — external links -->
+    <div class="sv-legend sv-reveal" style={`--i:${internalDests.length + 1}`}>
+      <p class="sv-legend-title" aria-hidden="true">Beyond the Map</p>
+      {externalBranches.map(({ label, desc, href }) => (
+        <a
+          href={href}
+          class="sv-legend-item"
+          target="_blank"
+          rel="noopener noreferrer"
+          title={desc}
+        >
+          <span class="sv-legend-sym" aria-hidden="true">◇</span>
+          <span class="sv-legend-label">{label}</span>
+          <span class="sv-legend-arrow" aria-hidden="true">↗</span>
+        </a>
+      ))}
+    </div>
+
+    <p class="sv-territory-hint" aria-hidden="true">Known Territories</p>
+
+  </nav>
+</div>
+
+<style>
+  .sv-index-panel {
+    flex: 1;
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    background: #3D5C52;
+  }
+
+  .sv-bg-map {
+    position: absolute;
+    inset: 0;
+    background-image: url('/maps/old_cool_map.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.42;
+    filter: sepia(0.55) saturate(0.85);
+    pointer-events: none;
+  }
+
+  .sv-bg-texture {
+    position: absolute;
+    inset: 0;
+    background-image: url('/textures/parchment_texture1.jpg');
+    background-size: 420px 420px;
+    background-repeat: repeat;
+    mix-blend-mode: multiply;
+    opacity: 0.16;
+    pointer-events: none;
+  }
+
+  .sv-bg-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 85% 80% at center, transparent 20%, rgba(28, 18, 8, 0.35) 100%);
+    pointer-events: none;
+  }
+
+  .sv-nav {
+    position: absolute;
+    inset: 0;
+  }
+
+  .sv-route-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    clip-path: inset(0 0 100% 0);
+    animation: sv-path-reveal 1.8s cubic-bezier(0.77, 0, 0.175, 1) 0.4s forwards;
+  }
+
+  @keyframes sv-path-reveal {
+    to { clip-path: inset(0 0 0% 0); }
+  }
+
+  @keyframes sv-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .sv-reveal {
+    animation: sv-in 0.55s cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 80ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sv-reveal    { animation: none; opacity: 1; }
+    .sv-route-svg { animation: none; clip-path: none; }
+  }
+
+  .sv-atoll {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    height: auto;
+    filter: drop-shadow(0 1px 3px rgba(28,18,8,0.08));
+  }
+
+  /* ── Island: the SVG blob IS the card ── */
+
+  .sv-island {
+    position: absolute;
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    width: fit-content;
+    height: fit-content;
+    transition:
+      filter 270ms cubic-bezier(0.23, 1, 0.32, 1),
+      transform 270ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .sv-island-svg {
+    display: block;
+    width: clamp(180px, 18vw, 240px);
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 4px 12px rgba(28,18,8,0.35)) drop-shadow(0 2px 4px rgba(28,18,8,0.22));
+  }
+
+  .sv-island-land {
+    transition: d 340ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .sv-island:hover {
+      transform: translateY(-4px);
+    }
+    .sv-island:hover .sv-island-svg {
+      filter: drop-shadow(0 8px 24px rgba(28,18,8,0.5));
+    }
+    .sv-island:hover .sv-card-label {
+      color: #8B6914;
+    }
+  }
+
+  .sv-island:active {
+    transform: scale(0.97) !important;
+    transition-duration: 100ms !important;
+  }
+
+  /* foreignObject inner layout */
+  .sv-fo-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    gap: 0.2rem;
+    padding: 0.25rem;
+    box-sizing: border-box;
+    pointer-events: none;
+    line-height: normal;
+  }
+
+  /* Mobile fallback card — hidden on desktop */
+  .sv-island-mobile-card {
+    display: none;
+  }
+
+  .sv-island-title-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.06rem;
+  }
+
+  .sv-island-rule {
+    width: 44px;
+    height: 1px;
+    background: rgba(139, 105, 20, 0.20);
+    margin: 0.15rem 0;
+    flex-shrink: 0;
+  }
+
+  .sv-card-numeral {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.16em;
+    color: #8B6914;
+    opacity: 0.40;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .sv-card-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1C1208;
+    display: block;
+    line-height: 1.3;
+    white-space: normal;
+    transition: color 150ms ease;
+  }
+
+  .sv-card-desc {
+    font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.67rem;
+    font-weight: 400;
+    color: #7C6A4E;
+    line-height: 1.45;
+    opacity: 0.82;
+    max-width: 130px;
+  }
+
+  .sv-legend {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.75rem;
+    background: rgba(250, 244, 230, 0.93);
+    border: 1px solid rgba(139, 105, 20, 0.18);
+    box-shadow:
+      0 2px 10px rgba(28, 18, 8, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    padding: 0.6rem 0.85rem 0.65rem;
+    min-width: 168px;
+  }
+
+  .sv-legend-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.50rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #8B6914;
+    opacity: 0.55;
+    margin-bottom: 0.45rem;
+    padding-bottom: 0.38rem;
+    border-bottom: 1px solid rgba(139, 105, 20, 0.12);
+  }
+
+  .sv-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.26rem 0;
+    text-decoration: none;
+    border-top: 1px solid rgba(139, 105, 20, 0.07);
+    transition: opacity 150ms ease;
+  }
+
+  .sv-legend-item:first-of-type { border-top: none; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .sv-legend-item:hover { opacity: 0.65; }
+    .sv-legend-item:hover .sv-legend-sym { color: #8B6914; opacity: 1; }
+  }
+
+  .sv-legend-sym {
+    font-size: 0.5rem;
+    color: #8B6914;
+    opacity: 0.45;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: opacity 150ms ease;
+  }
+
+  .sv-legend-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #1C1208;
+    flex: 1;
+    white-space: nowrap;
+  }
+
+  .sv-legend-arrow {
+    font-size: 0.5rem;
+    color: #8B6914;
+    opacity: 0.4;
+    flex-shrink: 0;
+  }
+
+  .sv-territory-hint {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Cinzel', serif;
+    font-size: 0.46rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: #8B6914;
+    opacity: 0.16;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media (max-width: 900px) {
+    .sv-index-panel {
+      height: auto;
+      min-height: 100vw;
+      overflow: visible;
+    }
+
+    .sv-nav {
+      position: static;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1.75rem 1.25rem 2rem;
+    }
+
+    .sv-island {
+      position: static;
+      width: 100%;
+      transform: none !important;
+      filter: none !important;
+    }
+
+    .sv-island-svg {
+      display: none;
+    }
+
+    .sv-island-mobile-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.22rem;
+      padding: 0.9rem 1.1rem;
+      background: rgba(250, 244, 230, 0.97);
+      box-shadow:
+        0 2px 8px rgba(28,18,8,0.08),
+        0 8px 28px rgba(28,18,8,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    .sv-island-title-block {
+      align-items: flex-start;
+    }
+
+    .sv-island-rule { display: none; }
+
+    .sv-card-desc {
+      max-width: none;
+      display: block;
+    }
+
+    .sv-atoll     { display: none; }
+    .sv-route-svg { display: none; }
+
+    .sv-legend {
+      position: static;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .sv-territory-hint { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    .sv-nav { padding: 1.25rem 1rem 1.75rem; }
+  }
+</style>
+
+<script>
+  // ── Path morphing on hover ──
+  document.querySelectorAll<HTMLElement>('.sv-island').forEach((island) => {
+    const land = island.querySelector<SVGPathElement>('.sv-island-land');
+    if (!land) return;
+    const restD  = land.dataset.rest  ?? '';
+    const hoverD = land.dataset.hover ?? '';
+    island.addEventListener('mouseenter', () => { if (hoverD) land.setAttribute('d', hoverD); });
+    island.addEventListener('mouseleave', () => { if (restD)  land.setAttribute('d', restD);  });
+  });
+
+  // ── Pin-to-route: animated line from island center to nearest point on S-curve ──
+  const routeSvg  = document.querySelector<SVGSVGElement>('.sv-route-svg');
+  const routePath = routeSvg?.querySelector<SVGPathElement>('.sv-route-path');
+
+  if (routeSvg && routePath) {
+    const totalLen = routePath.getTotalLength();
+
+    function findNearestPoint(svgX: number, svgY: number): { x: number; y: number } {
+      let minDist = Infinity;
+      let nearest = { x: 0, y: 0 };
+      const samples = 200;
+      for (let i = 0; i <= samples; i++) {
+        const pt = routePath.getPointAtLength((i / samples) * totalLen);
+        const d  = Math.hypot(pt.x - svgX, pt.y - svgY);
+        if (d < minDist) { minDist = d; nearest = { x: pt.x, y: pt.y }; }
+      }
+      return nearest;
+    }
+
+    document.querySelectorAll<HTMLElement>('.sv-island').forEach((island) => {
+      let activeLine: SVGLineElement | null = null;
+
+      island.addEventListener('mouseenter', () => {
+        const rr = routeSvg.getBoundingClientRect();
+        const ir = island.getBoundingClientRect();
+
+        // Island visual center in page coords
+        const cx = ir.left + ir.width  / 2;
+        const cy = ir.top  + ir.height / 2;
+
+        // Convert to route SVG viewBox coords (0-100)
+        const svgX = ((cx - rr.left) / rr.width)  * 100;
+        const svgY = ((cy - rr.top)  / rr.height) * 100;
+
+        const near = findNearestPoint(svgX, svgY);
+
+        // Compute pixel length for dashoffset animation (vector-effect: non-scaling-stroke)
+        const pixelLen = Math.hypot(
+          (near.x - svgX) / 100 * rr.width,
+          (near.y - svgY) / 100 * rr.height
+        );
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', String(svgX));
+        line.setAttribute('y1', String(svgY));
+        line.setAttribute('x2', String(near.x));
+        line.setAttribute('y2', String(near.y));
+        line.setAttribute('stroke', 'rgba(245,236,215,0.6)');
+        line.setAttribute('stroke-width', '1');
+        line.setAttribute('stroke-dasharray', '3 6');
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('vector-effect', 'non-scaling-stroke');
+        line.setAttribute('stroke-dashoffset', String(pixelLen));
+        routeSvg.appendChild(line);
+
+        line.animate(
+          [{ strokeDashoffset: pixelLen }, { strokeDashoffset: 0 }],
+          { duration: 300, easing: 'ease-out', fill: 'forwards' }
+        );
+
+        activeLine = line;
+      });
+
+      island.addEventListener('mouseleave', () => {
+        activeLine?.remove();
+        activeLine = null;
+      });
+    });
+  }
+</script>

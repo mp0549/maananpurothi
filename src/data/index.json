@@ -10,8 +10,8 @@
       "external": false
     },
     {
-      "label": "The Codex",
-      "desc": "An archive of expeditions — projects, research, and experiences.",
+      "label": "Library",
+      "desc": "Projects, research, and experience.",
       "path": "codex/",
       "x": "76%",
       "y": "44%",

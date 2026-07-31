@@ -5,62 +5,20 @@
  * Single-column, open field journal aesthetic.
  */
 import Layout from '@/layouts/Layout.astro';
+import gardenData from '@/data/garden.json';
 
 function slugify(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
 function tagColor(tag: string): string {
-  if (['AI', 'Theory', 'Complexity', 'Systems'].includes(tag)) return '#6B1515';
-  if (['Tools', 'Process', 'Product'].includes(tag)) return '#2C4A2C';
-  if (['Essays', 'Writing'].includes(tag)) return '#8B6914';
+  if (tag === 'Cooking' || ['AI', 'Theory', 'Complexity', 'Systems'].includes(tag)) return '#6B1515';
+  if (tag === 'Outdoors' || ['Tools', 'Process', 'Product'].includes(tag)) return '#2C4A2C';
+  if (tag === 'Reading' || ['Essays', 'Writing'].includes(tag)) return '#8B6914';
   return '#3C2A1A';
 }
 
-const notes = [
-  {
-    title: 'Field Notes, Vol. I — On the Topology of Attention',
-    date: 'March 2025',
-    excerpt:
-      'A loose collection of observations gathered at the edge of focus and distraction — what the landscape looks like when the mind finally stops moving.',
-    tags: ['Cognition', 'Essays'],
-  },
-  {
-    title: 'A Working Theory of Adjacent Possible',
-    date: 'February 2025',
-    excerpt:
-      "Stuart Kauffman's phrase keeps appearing on different maps. I suspect it describes something important about how interesting problems self-select their solvers.",
-    tags: ['Complexity', 'Theory'],
-  },
-  {
-    title: 'Marginalia: Tools That Think With You',
-    date: 'January 2025',
-    excerpt:
-      'Notes toward a typology of tools that extend cognition rather than merely automate it. The distinction matters more than most product teams admit.',
-    tags: ['Tools', 'AI', 'Product'],
-  },
-  {
-    title: 'On Reading Maps That Lie',
-    date: 'December 2024',
-    excerpt:
-      'Every map is an argument. Some arguments are honest about their limitations; most are not. A meditation on epistemics, cartography, and institutional knowledge.',
-    tags: ['Epistemics', 'Writing'],
-  },
-  {
-    title: 'The Shape of a Good Question',
-    date: 'November 2024',
-    excerpt:
-      'Most questions are really conclusions in disguise. The ones worth holding open for years have a particular shape — pointed enough to aim at something, loose enough to surprise you.',
-    tags: ['Epistemics', 'Process'],
-  },
-  {
-    title: 'Notes on Legibility and Scale',
-    date: 'October 2024',
-    excerpt:
-      'What it means for a system to remain understandable as it grows — and why most systems fail at this not through malice but through accumulation.',
-    tags: ['Systems', 'AI'],
-  },
-];
+const notes = gardenData.notes;
 
 // SSR mode: look up note by slug at request time
 const { slug } = Astro.params;
@@ -160,15 +118,10 @@ if (!note) {
           </div>
 
           <p class="dispatch-placeholder-text">
-            The full dispatch has not yet been transcribed.
-            My notes are still being assembled —
-            cross-referenced against the field record and set
-            in order before committing to ink.
+            This note hasn't been written yet.
+            I'm still organizing my thoughts and will share them here soon.
           </p>
         </div>
-
-        <!-- Word count placeholder -->
-        <p class="dispatch-wordcount">~ 800 words &middot; est. 4 min read</p>
 
       </article>
 

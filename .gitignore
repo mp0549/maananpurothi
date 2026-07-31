@@ -91,3 +91,6 @@ Thumbs.db
 *.temp
 .vercel
 .env*.local
+
+# Local writing scratch — old copy drafts, notes to self
+*.drafts.md

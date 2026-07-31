@@ -1,0 +1,378 @@
+---
+import MapBackground from './MapBackground.astro';
+import MapDecorations from './MapDecorations.astro';
+import MapRoute from './MapRoute.astro';
+import MapMarkers from './MapMarkers.astro';
+
+interface Destination {
+  label: string;
+  desc: string;
+  href: string;
+  x: string;
+  y: string;
+  cardSide: string;
+  external: boolean;
+}
+interface Props {
+  destinations: Destination[];
+}
+const { destinations } = Astro.props;
+
+const credentialsHref = destinations.find((d) => d.external && d.label === "Credentials")?.href ?? "/codex";
+
+const externalLinks = [
+  { label: "The Portfolio", href: "https://mp0549.github.io/my-portfolio/", external: true },
+  { label: "The Lab",       href: "https://mp0549.github.io/lab/",          external: true },
+  { label: "Credentials",   href: credentialsHref,                          external: true },
+];
+---
+
+<div class="pv-root">
+  <!-- Left panel — dark identity masthead -->
+  <aside class="pv-panel" id="pv-panel">
+    <div class="pv-panel-texture" aria-hidden="true"></div>
+    <div class="pv-panel-glow"    aria-hidden="true"></div>
+
+    <div class="pv-compass-wrap" aria-hidden="true">
+      <svg
+        class="pv-compass-rose"
+        id="pv-compass-rose"
+        viewBox="0 0 96 96"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="48" cy="48" r="46" stroke="#C4A96A" stroke-width="0.5"/>
+        <circle cx="48" cy="48" r="38" stroke="#C4A96A" stroke-width="0.3"/>
+        <circle cx="48" cy="48" r="28" stroke="#C4A96A" stroke-width="0.2"/>
+        <polygon points="48,5 52,44 48,48 44,44" fill="#C4A96A"/>
+        <polygon points="48,91 52,52 48,48 44,52" fill="#8B6914" opacity="0.55"/>
+        <polygon points="91,48 52,44 48,48 52,52" fill="#8B6914" opacity="0.55"/>
+        <polygon points="5,48 44,44 48,48 44,52"  fill="#8B6914" opacity="0.55"/>
+        <polygon points="79,17 52,46 48,48 52,44"  fill="#8B6914" opacity="0.28"/>
+        <polygon points="17,17 44,46 48,48 44,44"  fill="#8B6914" opacity="0.28"/>
+        <polygon points="79,79 52,50 48,48 52,52"  fill="#8B6914" opacity="0.28"/>
+        <polygon points="17,79 44,50 48,48 44,52"  fill="#8B6914" opacity="0.28"/>
+        <circle cx="48" cy="48" r="6.5" fill="#8B6914"/>
+        <circle cx="48" cy="48" r="4"   fill="#1C1208"/>
+        <circle cx="48" cy="48" r="1.8" fill="#C4A96A"/>
+        <text x="48" y="19" text-anchor="middle" dominant-baseline="middle"
+              font-family="Cinzel,serif" font-size="7.5" fill="#C4A96A" font-weight="700">N</text>
+        <text x="48" y="78" text-anchor="middle" dominant-baseline="middle"
+              font-family="Cinzel,serif" font-size="6.5" fill="#8B6914" opacity="0.7">S</text>
+        <text x="82" y="49" text-anchor="middle" dominant-baseline="middle"
+              font-family="Cinzel,serif" font-size="6.5" fill="#8B6914" opacity="0.7">E</text>
+        <text x="14" y="49" text-anchor="middle" dominant-baseline="middle"
+              font-family="Cinzel,serif" font-size="6.5" fill="#8B6914" opacity="0.7">W</text>
+      </svg>
+    </div>
+
+    <div class="pv-panel-inner">
+      <header class="pv-panel-header">
+        <p class="pv-eyebrow">The Archives</p>
+        <h1 class="pv-name">Maanan<br />Purothi</h1>
+        <div class="pv-ornament-rule" aria-hidden="true">
+          <span class="pv-rule-line"></span>
+          <span class="pv-rule-glyph">✦</span>
+          <span class="pv-rule-line"></span>
+        </div>
+        <p class="pv-tagline">Mapping the<br />intellectual frontier</p>
+      </header>
+
+      <footer class="pv-panel-footer">
+        <div class="pv-footer-rule" aria-hidden="true"></div>
+        <div class="pv-legend">
+          <p class="pv-legend-title">Beyond the Map</p>
+          {externalLinks.map(({ label, href, external }) => (
+            <a
+              href={href}
+              class="pv-legend-item"
+              {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            >
+              <span class="pv-legend-sym" aria-hidden="true">◇</span>
+              <span class="pv-legend-label">{label}</span>
+              <span class="pv-legend-arrow" aria-hidden="true">↗</span>
+            </a>
+          ))}
+        </div>
+      </footer>
+    </div>
+  </aside>
+
+  <!-- Map fills the rest -->
+  <div class="pv-map-area" id="pv-map-world">
+    <MapBackground />
+    <MapDecorations showCartouche={false} />
+    <MapRoute />
+    <MapMarkers destinations={destinations} showBranches={false} />
+  </div>
+</div>
+
+<style>
+  .pv-root {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Panel ─────────────────────────────────────────────────────────── */
+
+  .pv-panel {
+    position: relative;
+    width: 300px;
+    flex-shrink: 0;
+    height: 100vh;
+    background: #1C1208;
+    border-right: 1px solid rgba(196, 169, 106, 0.1);
+    box-shadow: 8px 0 40px rgba(28, 18, 8, 0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+  }
+
+  .pv-panel-texture {
+    position: absolute;
+    inset: 0;
+    background-image: url('/textures/parchment_texture1.jpg');
+    background-size: 420px 420px;
+    background-repeat: repeat;
+    mix-blend-mode: overlay;
+    opacity: 0.065;
+    pointer-events: none;
+  }
+
+  .pv-panel-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 50% 35%, rgba(196,169,106,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .pv-compass-wrap {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    height: 280px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .pv-compass-rose {
+    width: 100%;
+    height: 100%;
+    opacity: 0.20;
+    will-change: transform;
+  }
+
+  .pv-panel-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 2.75rem 2.25rem 2.25rem;
+  }
+
+  .pv-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.47rem;
+    letter-spacing: 0.44em;
+    text-transform: uppercase;
+    color: #C4A96A;
+    opacity: 0.72;
+    margin-bottom: 1.1rem;
+  }
+
+  .pv-name {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    font-size: clamp(2rem, 2.6vw, 2.8rem);
+    font-weight: 700;
+    color: #FAF4E6;
+    letter-spacing: 0.02em;
+    line-height: 1.12;
+    margin-bottom: 1.3rem;
+  }
+
+  .pv-ornament-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.1rem;
+    max-width: 160px;
+  }
+
+  .pv-rule-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(196, 169, 106, 0.4));
+  }
+
+  .pv-ornament-rule .pv-rule-line:last-child {
+    background: linear-gradient(to left, transparent, rgba(196, 169, 106, 0.4));
+  }
+
+  .pv-rule-glyph {
+    font-size: 0.48rem;
+    color: #C4A96A;
+    opacity: 0.72;
+    line-height: 1;
+  }
+
+  .pv-tagline {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: #C4A96A;
+    opacity: 0.82;
+    line-height: 1.65;
+    letter-spacing: 0.02em;
+  }
+
+  .pv-footer-rule {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(196, 169, 106, 0.18), transparent);
+    margin-bottom: 0.9rem;
+  }
+
+  /* ── Panel legend (replaces dispatch/coords/stamp footer) ───────────── */
+
+  .pv-legend {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pv-legend-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.38rem;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: #C4A96A;
+    opacity: 0.55;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.38rem;
+    border-bottom: 1px solid rgba(196, 169, 106, 0.12);
+  }
+
+  .pv-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.28rem 0;
+    text-decoration: none;
+    border-top: 1px solid rgba(196, 169, 106, 0.07);
+    transition: opacity 150ms ease;
+  }
+
+  .pv-legend-item:first-of-type { border-top: none; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pv-legend-item:hover { opacity: 0.65; }
+    .pv-legend-item:hover .pv-legend-sym { opacity: 1; }
+  }
+
+  .pv-legend-sym {
+    font-size: 0.5rem;
+    color: #C4A96A;
+    opacity: 0.45;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: opacity 150ms ease;
+  }
+
+  .pv-legend-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #FAF4E6;
+    opacity: 0.75;
+    flex: 1;
+    white-space: nowrap;
+  }
+
+  .pv-legend-arrow {
+    font-size: 0.5rem;
+    color: #C4A96A;
+    opacity: 0.4;
+    flex-shrink: 0;
+  }
+
+  /* ── Map area ────────────────────────────────────────────────────────── */
+
+  .pv-map-area {
+    flex: 1;
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    background: #F5ECD7;
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────────────── */
+
+  @media (max-width: 900px) {
+    .pv-root {
+      flex-direction: column;
+      height: auto;
+    }
+
+    .pv-panel {
+      width: 100%;
+      height: auto;
+      flex-shrink: 0;
+      box-shadow: 0 4px 24px rgba(28, 18, 8, 0.2);
+    }
+
+    .pv-panel-inner {
+      padding: 2.25rem 1.5rem 2rem;
+      justify-content: flex-start;
+    }
+
+    .pv-compass-wrap { display: none; }
+    .pv-panel-footer { display: none; }
+    .pv-name { font-size: clamp(1.7rem, 7vw, 2.4rem); }
+
+    .pv-map-area {
+      height: 100vw;
+    }
+  }
+</style>
+
+<script>
+  const panel = document.getElementById('pv-panel');
+  const compassRose = document.getElementById('pv-compass-rose') as SVGSVGElement | null;
+
+  if (panel && compassRose) {
+    let current = 0;
+    let target  = 0;
+    let running = false;
+
+    function tick() {
+      current += (target - current) * 0.07;
+      compassRose.style.transform = `rotate(${current}deg)`;
+      if (Math.abs(target - current) > 0.08) {
+        requestAnimationFrame(tick);
+      } else {
+        running = false;
+      }
+    }
+
+    function start() {
+      if (!running) { running = true; requestAnimationFrame(tick); }
+    }
+
+    panel.addEventListener('mousemove', (e: MouseEvent) => {
+      const rect = panel.getBoundingClientRect();
+      target = Math.atan2(
+        e.clientY - (rect.top + rect.height / 2),
+        e.clientX - (rect.left + rect.width / 2)
+      ) * (180 / Math.PI) + 90;
+      start();
+    });
+
+    panel.addEventListener('mouseleave', () => { target = 0; start(); });
+  }
+</script>

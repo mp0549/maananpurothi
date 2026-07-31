@@ -1,25 +1,41 @@
 ---
 /**
- * InteriorNav.astro — navigation for all non-map pages
- * Left: ← Back to the Map
+ * InteriorNav.astro — navigation for all non-map (interior) pages.
+ * Left:   ← Back to the Map / Menu (target follows the hub you came from)
  * Center: page title in Cinzel Decorative
+ * Right:  "Navigate" dropdown — jump to the menu, the map, or any interior page
  */
 interface Props {
   pageTitle: string;
 }
 
 const { pageTitle } = Astro.props;
+
+const navItems = [
+  { href: '/', label: 'Menu' },
+  { href: '/map', label: 'The Map' },
+  { href: '/about', label: 'About' },
+  { href: '/codex', label: 'Library' },
+  { href: '/garden', label: 'The Garden' },
+  { href: '/now', label: 'The Workshop' },
+];
+
+const norm = (p: string) => p.replace(/\/+$/, '') || '/';
+const current = norm(Astro.url.pathname);
 ---
 
 <header class="interior-nav fixed top-0 left-0 right-0 z-50 h-14 flex items-center px-6 md:px-10">
-  <!-- Back link -->
+  <!-- Back link — target follows the hub you arrived from (the map at /map, or
+       the hero menu at /). Server-renders the menu default; a script upgrades it
+       to the map when sessionStorage says that was the last hub. -->
   <a
-    href= {import.meta.env.BASE_URL}
+    id="interior-back"
+    href={import.meta.env.BASE_URL}
     class="font-display text-xs uppercase tracking-widest text-ink-muted hover:text-gold transition-colors duration-200 flex items-center gap-2 shrink-0"
   >
     <span aria-hidden="true" class="text-gold-pale">←</span>
-    <span class="hidden sm:inline">Back to the Map</span>
-    <span class="sm:hidden">Map</span>
+    <span class="hidden sm:inline" data-back-full>Back to the Menu</span>
+    <span class="sm:hidden" data-back-short>Menu</span>
   </a>
 
   <!-- Page title, centered absolutely so it doesn't depend on siblings -->
@@ -31,4 +47,244 @@ const { pageTitle } = Astro.props;
       {pageTitle}
     </h1>
   )}
+
+  <!-- Right: Navigate dropdown -->
+  <div class="nav-menu">
+    <button
+      id="nav-menu-btn"
+      type="button"
+      class="nav-menu-btn"
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="nav-menu-panel"
+    >
+      <span>Navigate</span>
+      <span class="nav-menu-caret" aria-hidden="true">▾</span>
+    </button>
+
+    <ul id="nav-menu-panel" class="nav-menu-panel" role="menu" aria-label="Site navigation">
+      {navItems.map((item, i) => (
+        <li role="none">
+          <a
+            role="menuitem"
+            href={item.href}
+            class="nav-menu-item"
+            style={`--i: ${i}`}
+            aria-current={current === norm(item.href) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
 </header>
+
+<style>
+  .nav-menu {
+    position: relative;
+    margin-left: auto; /* push to the right edge of the bar */
+    flex-shrink: 0;
+  }
+
+  .nav-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.2rem;
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-muted, #7c6a4e);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    transition: color 200ms var(--ease-hover, ease);
+  }
+
+  .nav-menu-btn:hover,
+  .nav-menu-btn:focus-visible {
+    color: var(--color-gold, #8b6914);
+  }
+
+  .nav-menu-btn:focus-visible {
+    outline: var(--focus-ring, 2px solid #8b6914);
+    outline-offset: 3px;
+  }
+
+  .nav-menu-caret {
+    font-size: 0.6rem;
+    transition: transform 220ms var(--ease-hover, ease);
+  }
+
+  .nav-menu-btn[aria-expanded='true'] .nav-menu-caret {
+    transform: rotate(180deg);
+  }
+
+  .nav-menu-panel {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    min-width: 12rem;
+    margin: 0;
+    padding: 0.4rem;
+    list-style: none;
+    background: var(--color-parchment-light, #faf4e6);
+    border: 1px solid var(--color-gold-pale, #c4a96a);
+    box-shadow: 0 8px 24px rgba(28, 18, 8, 0.22);
+    z-index: 60;
+    transform-origin: top right;
+    /* closed state — visibility:hidden also drops the items from the tab order.
+       Exit is quick and uniform (no blur, no delay) while the open transition
+       below is slower and carries the blur + spring-like ease, so the panel
+       reads as unfurling from the trigger corner rather than just popping in. */
+    opacity: 0;
+    visibility: hidden;
+    filter: blur(4px);
+    transform: translateY(-6px) scale(0.97);
+    transition: opacity 140ms var(--ease-hover, ease),
+      transform 140ms var(--ease-hover, ease),
+      filter 140ms var(--ease-hover, ease), visibility 140ms;
+  }
+
+  .nav-menu.open .nav-menu-panel {
+    opacity: 1;
+    visibility: visible;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+    transition: opacity 240ms var(--ease-entrance, ease),
+      transform 240ms var(--ease-entrance, ease),
+      filter 240ms var(--ease-entrance, ease), visibility 240ms;
+  }
+
+  .nav-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.7rem;
+    font-family: 'Cinzel', serif;
+    font-variant-caps: small-caps;
+    font-size: 0.92rem;
+    letter-spacing: 0.03em;
+    color: var(--color-ink, #1c1208);
+    text-decoration: none;
+    /* closed/exit state — items fade out together, fast and undelayed */
+    opacity: 0;
+    transform: translateY(6px);
+    transition: background-color 150ms var(--ease-hover, ease),
+      color 150ms var(--ease-hover, ease), opacity 120ms var(--ease-hover, ease),
+      transform 120ms var(--ease-hover, ease);
+  }
+
+  /* open — each item eases in on its own delay via --i (set inline per item),
+     a beat behind the previous one, so the list assembles rather than appears */
+  .nav-menu.open .nav-menu-item {
+    opacity: 1;
+    transform: translateY(0);
+    transition: background-color 150ms var(--ease-hover, ease),
+      color 150ms var(--ease-hover, ease),
+      opacity 220ms var(--ease-entrance, ease) calc(var(--i, 0) * 45ms),
+      transform 220ms var(--ease-entrance, ease) calc(var(--i, 0) * 45ms);
+  }
+
+  .nav-menu-item:hover,
+  .nav-menu-item:focus-visible {
+    background: rgba(196, 169, 106, 0.16);
+    color: var(--color-gold, #8b6914);
+    outline: none;
+  }
+
+  /* current page — gold, with a fleuron marker echoing the hero list */
+  .nav-menu-item[aria-current='page'] {
+    color: var(--color-gold, #8b6914);
+  }
+
+  .nav-menu-item[aria-current='page']::after {
+    content: '❧';
+    font-size: 0.8rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-menu-panel,
+    .nav-menu.open .nav-menu-panel {
+      transition: opacity 160ms ease, visibility 160ms;
+      transform: none;
+      filter: none;
+    }
+    /* keep the fade (aids comprehension of open/close) but drop movement
+       and the stagger delay entirely */
+    .nav-menu-item,
+    .nav-menu.open .nav-menu-item {
+      transition: background-color 150ms var(--ease-hover, ease),
+        color 150ms var(--ease-hover, ease), opacity 160ms ease;
+      transform: none;
+    }
+    .nav-menu-caret {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Point the back-link at whichever hub the visitor last came from. Persisted
+  // in sessionStorage by the hub pages (/ clears → menu default, /map sets 'map'
+  // at destination-click time), so it survives interior→interior hops too.
+  (function () {
+    try {
+      const a = document.getElementById('interior-back');
+      if (!a) return;
+      const full = a.querySelector('[data-back-full]');
+      const short = a.querySelector('[data-back-short]');
+      if (sessionStorage.getItem('archives-hub') === 'map') {
+        a.setAttribute('href', '/map');
+        if (full) full.textContent = 'Back to the Map';
+        if (short) short.textContent = 'Map';
+      } else {
+        a.setAttribute('href', '/');
+        if (full) full.textContent = 'Back to the Menu';
+        if (short) short.textContent = 'Menu';
+      }
+      // Reset the hub whenever the nav button is used, so it never persists
+      // stale — the next interior visit defaults back to the menu.
+      a.addEventListener('click', () => {
+        try {
+          sessionStorage.removeItem('archives-hub');
+        } catch (_) {}
+      });
+    } catch (_) {}
+  })();
+
+  // "Navigate" dropdown: toggle, close on outside-click / Escape.
+  (function () {
+    const menu = document.querySelector('.nav-menu');
+    const btn = document.getElementById('nav-menu-btn');
+    if (!menu || !btn) return;
+
+    function open() {
+      menu.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+    function close() {
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.contains('open') ? close() : open();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target instanceof Node && !menu.contains(e.target)) close();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.classList.contains('open')) {
+        close();
+        btn.focus();
+      }
+    });
+  })();
+</script>

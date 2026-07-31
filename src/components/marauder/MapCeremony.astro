@@ -1,0 +1,671 @@
+---
+/**
+ * MapCeremony.astro — Phase 2 "the ceremony" (GATELESS, simple-first pivot)
+ *
+ * The simple→map transition, choreographed: a dark backdrop fades in over the
+ * LIVE simple page; only once the screen is fully covered does the state flip
+ * to 'intro' (so the undrawn map is never seen). A folded parchment rig then
+ * unfolds to fill the viewport, a quill writes the intro lines in ink-bleed,
+ * and the map inks itself in beneath as the rig fades away. Skippable anytime.
+ *
+ * Triggered by index.astro dispatching `archives:ceremony` (detail.firstVisit)
+ * from the simple view's swear CTA. This component runs the whole timeline —
+ * including flipping the state to 'intro' and locking body scroll — then
+ * dispatches `archives:ceremony-done`; index.astro sets state 'map' + locks.
+ *
+ * Overlay visibility is a JS-toggled `cer-active` class on #ceremony (NOT a
+ * state selector) — the overlay must be up while the state is still 'simple'.
+ *
+ * The map draw-on classes (is-undrawn / is-drawing / cer-fade) live on
+ * MarauderMap's `.marauder` wrapper — the styling is defined there; the JS
+ * that applies the per-element delays lives in this controller.
+ */
+---
+
+<div id="ceremony" aria-hidden="true">
+  <!-- dark backdrop — fades in over the live simple page -->
+  <div class="cer-dark"></div>
+
+  <!-- 3D unfold stage: perspective lives here so the flaps inside pick it up -->
+  <div class="cer-stage">
+    <!-- the parchment sheet: a 2×2 quadrant rig, folded down to bottom-left -->
+    <div class="cer-rig">
+      <!-- bottom half (static row): bottom-left quad + right flap (fold 1) -->
+      <div class="cer-row cer-row-bottom">
+        <div class="cer-quad cer-quad-bl">
+          <div class="cer-face cer-face-front"></div>
+        </div>
+        <div class="cer-flap cer-flap-br">
+          <div class="cer-face cer-face-front"></div>
+          <div class="cer-face cer-face-back"></div>
+        </div>
+      </div>
+
+      <!-- top half (fold 2 — folds down over the bottom): top-left quad + right flap -->
+      <div class="cer-row cer-row-top">
+        <div class="cer-quad cer-quad-tl">
+          <div class="cer-face cer-face-front"></div>
+          <div class="cer-face cer-face-back"></div>
+        </div>
+        <div class="cer-flap cer-flap-tr">
+          <div class="cer-face cer-face-front"></div>
+          <div class="cer-face cer-face-back"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- quill-written intro lines (first visit only), centred on the sheet -->
+    <div class="cer-text" aria-hidden="true">
+      <p class="cer-line cer-line-1">Maanan Purothi</p>
+      <p class="cer-line cer-line-2">Purveyor of Aids to the Insatiably Curious</p>
+      <p class="cer-line cer-line-3">is proud to present</p>
+      <p class="cer-line cer-line-4">THE ARCHIVES</p>
+    </div>
+  </div>
+
+  <!-- skip hint -->
+  <div class="cer-skip">&mdash; tap anywhere to skip &mdash;</div>
+
+  <!-- hidden ink-bleed filter (thresholds the alpha of the blurred text edges) -->
+  <svg class="cer-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <filter id="cer-bleed" x="-20%" y="-20%" width="140%" height="140%">
+      <feComponentTransfer>
+        <feFuncA type="discrete" tableValues="0 1 1 1"></feFuncA>
+      </feComponentTransfer>
+    </filter>
+  </svg>
+</div>
+
+<style>
+  /* ── overlay shell ─────────────────────────────────────────────────── */
+  /* Hidden by default; shown via a JS-toggled `cer-active` class (NOT a state
+     selector — the overlay must be up while the state is still 'simple', as
+     the dark backdrop fades in over the live simple page before the flip). */
+  #ceremony {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: none;
+    overflow: hidden;
+  }
+
+  #ceremony.cer-active {
+    display: block;
+  }
+
+  .cer-dark {
+    position: absolute;
+    inset: 0;
+    background: #1c1208;
+    opacity: 0;
+    transition: opacity 450ms ease; /* dark-in */
+    z-index: 0;
+  }
+  #ceremony.dark-in .cer-dark {
+    opacity: 1;
+  }
+  #ceremony.dark-out .cer-dark {
+    opacity: 0;
+    transition: opacity 600ms ease; /* dark-out */
+  }
+
+  .cer-stage {
+    position: absolute;
+    inset: 0;
+    perspective: 1400px;
+    z-index: 1;
+  }
+
+  /* ── the folded-parchment rig ──────────────────────────────────────── */
+  .cer-rig {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%) scale(0.55);
+    transform-style: preserve-3d;
+    opacity: 0;
+    transition:
+      transform 900ms cubic-bezier(0.33, 0, 0.15, 1),
+      opacity 600ms ease;
+  }
+  #ceremony.rig-in .cer-rig {
+    opacity: 1;
+  }
+  #ceremony.fold-2-open .cer-rig {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  /* rig-out declared last so it wins on opacity while fold-2-open holds scale */
+  #ceremony.rig-out .cer-rig {
+    opacity: 0;
+    transition:
+      transform 900ms cubic-bezier(0.33, 0, 0.15, 1),
+      opacity 500ms ease;
+  }
+
+  /* soft "weight" shadow over the folded stack — fades as it unfurls */
+  .cer-rig::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transform: translateZ(1px);
+    background: radial-gradient(
+      ellipse 70% 70% at 30% 72%,
+      rgba(28, 18, 8, 0.34),
+      rgba(28, 18, 8, 0) 62%
+    );
+    opacity: 0.85;
+    transition: opacity 900ms ease;
+  }
+  #ceremony.fold-2-open .cer-rig::before {
+    opacity: 0;
+  }
+
+  .cer-row {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    transform-style: preserve-3d;
+  }
+  .cer-row-bottom {
+    bottom: 0;
+  }
+  /* top half hinges down over the bottom half about the horizontal midline */
+  .cer-row-top {
+    top: 0;
+    transform-origin: 50% 100%;
+    transform: rotateX(180deg) skewX(-2deg);
+    transition: transform var(--fold-dur, 650ms) cubic-bezier(0.33, 0, 0.15, 1);
+  }
+  #ceremony.fold-2-open .cer-row-top {
+    transform: rotateX(0deg) skewX(0deg);
+  }
+
+  .cer-quad,
+  .cer-flap {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    transform-style: preserve-3d;
+  }
+  .cer-quad-bl,
+  .cer-quad-tl {
+    left: 0;
+  }
+  /* right flaps hinge left over their sibling quad about the vertical midline */
+  .cer-flap-br,
+  .cer-flap-tr {
+    left: 50%;
+    transform-origin: 0% 50%;
+    transform: rotateY(180deg) skewY(2deg);
+    transition: transform var(--fold-dur, 650ms) cubic-bezier(0.33, 0, 0.15, 1);
+  }
+  #ceremony.fold-1-open .cer-flap-br,
+  #ceremony.fold-1-open .cer-flap-tr {
+    transform: rotateY(0deg) skewY(0deg);
+  }
+
+  /* ── panel faces ───────────────────────────────────────────────────── */
+  .cer-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    overflow: hidden;
+    background: var(--color-parchment, #f5ecd7);
+  }
+  /* parchment texture — mirrors MarauderMap's .marauder-tex so the reveal
+     under the fading rig is seamless */
+  .cer-face::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/textures/parchment_texture1.jpg');
+    background-size: 520px 520px;
+    background-repeat: repeat;
+    mix-blend-mode: multiply;
+    opacity: 0.26;
+    pointer-events: none;
+  }
+  /* back faces read slightly darker (the underside of the sheet) */
+  .cer-face-back {
+    background: #e7d8ba;
+  }
+  .cer-flap-br .cer-face-back,
+  .cer-flap-tr .cer-face-back {
+    transform: rotateY(180deg);
+  }
+  .cer-quad-tl .cer-face-back {
+    transform: rotateX(180deg);
+  }
+
+  /* fold crease shadows on the front faces — soft edge weight, fades open */
+  .cer-flap .cer-face-front::before,
+  .cer-quad-tl .cer-face-front::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity var(--fold-dur, 650ms) ease;
+  }
+  .cer-flap .cer-face-front::before {
+    background: linear-gradient(to left, rgba(28, 18, 8, 0.28), rgba(28, 18, 8, 0) 55%);
+  }
+  .cer-quad-tl .cer-face-front::before {
+    background: linear-gradient(to bottom, rgba(28, 18, 8, 0.24), rgba(28, 18, 8, 0) 55%);
+  }
+  #ceremony.fold-1-open .cer-flap .cer-face-front::before {
+    opacity: 0;
+  }
+  #ceremony.fold-2-open .cer-quad-tl .cer-face-front::before {
+    opacity: 0;
+  }
+
+  /* ── intro text ────────────────────────────────────────────────────── */
+  .cer-text {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 2rem;
+    text-align: center;
+    pointer-events: none;
+  }
+  .cer-line {
+    margin: 0;
+    opacity: 0;
+    color: #1c1208;
+    font-family: 'IM Fell English', serif;
+    line-height: 1.3;
+    --cer-ls: 0px;
+    letter-spacing: var(--cer-ls);
+    will-change: opacity, filter;
+  }
+  .cer-line-1 {
+    font-size: clamp(1.55rem, 4.2vw, 2.7rem);
+  }
+  .cer-line-2 {
+    font-style: italic;
+    font-size: clamp(0.95rem, 2.3vw, 1.35rem);
+  }
+  .cer-line-3 {
+    font-style: italic;
+    font-size: clamp(0.78rem, 1.6vw, 1rem);
+    opacity: 0;
+    color: #33260f;
+  }
+  .cer-line-4 {
+    margin-top: 0.5em;
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: clamp(1.9rem, 6.4vw, 4.2rem);
+    --cer-ls: 0.16em;
+    letter-spacing: var(--cer-ls);
+  }
+
+  /* ink-bleed reveal — SVG discrete-alpha filter kept on these small lines
+     only (the scoped exception to the no-filters-on-animated-elements rule) */
+  .cer-line.bleed-in {
+    animation: cer-bleed-in 450ms ease forwards;
+  }
+  .cer-line-4.bleed-in {
+    animation-duration: 550ms;
+  }
+  @keyframes cer-bleed-in {
+    from {
+      opacity: 0;
+      filter: url(#cer-bleed) blur(8px);
+      letter-spacing: calc(var(--cer-ls, 0px) + 0.06em);
+    }
+    to {
+      opacity: 1;
+      filter: url(#cer-bleed) blur(0);
+      letter-spacing: var(--cer-ls, 0px);
+    }
+  }
+
+  /* the text soaks into the parchment (blur + fade) before the map draws */
+  .cer-text.soak .cer-line {
+    animation: cer-soak 500ms ease forwards;
+  }
+  @keyframes cer-soak {
+    from {
+      opacity: 1;
+      filter: blur(0);
+    }
+    to {
+      opacity: 0;
+      filter: blur(4px);
+    }
+  }
+
+  /* ── skip hint ─────────────────────────────────────────────────────── */
+  .cer-skip {
+    position: absolute;
+    left: 50%;
+    bottom: 1.5rem;
+    transform: translateX(-50%);
+    z-index: 3;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    color: var(--color-gold-pale, #c4a96a);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 500ms ease;
+  }
+  #ceremony .cer-skip.show {
+    opacity: 0.45;
+  }
+
+  /* ── repeat-visit compression ──────────────────────────────────────── */
+  #ceremony.cer-repeat .cer-flap,
+  #ceremony.cer-repeat .cer-row-top {
+    --fold-dur: 450ms;
+  }
+  #ceremony.cer-repeat .cer-rig {
+    transition:
+      transform 550ms cubic-bezier(0.33, 0, 0.15, 1),
+      opacity 300ms ease;
+  }
+  #ceremony.cer-repeat.rig-out .cer-rig {
+    transition:
+      transform 550ms cubic-bezier(0.33, 0, 0.15, 1),
+      opacity 400ms ease;
+  }
+  #ceremony.cer-repeat .cer-dark {
+    transition: opacity 350ms ease; /* dark-in (repeat) */
+  }
+  #ceremony.cer-repeat.dark-out .cer-dark {
+    transition: opacity 400ms ease; /* dark-out (repeat) */
+  }
+
+  /* ── reduced motion: no ceremony at all (index keeps its fast path) ─── */
+  @media (prefers-reduced-motion: reduce) {
+    :global(#ceremony) {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  // ── Ceremony controller (gateless) ───────────────────────────────────
+  //
+  // Listens for `archives:ceremony` (detail.firstVisit) dispatched by
+  // index.astro's swear(). Runs the timeline as a chain of setTimeout calls
+  // (all ids kept in `timeouts` so a skip can cancel them): fades the dark
+  // backdrop in over the simple page, flips the state to 'intro' + locks body
+  // scroll, unfolds the rig, writes the quill lines (first visit), inks the
+  // map beneath, then dispatches `archives:ceremony-done` and cleans up every
+  // class/style it added.
+
+  const ceremony = document.getElementById('ceremony');
+  const cerText = ceremony?.querySelector<HTMLElement>('.cer-text') ?? null;
+  const skipHint = ceremony?.querySelector<HTMLElement>('.cer-skip') ?? null;
+
+  let timeouts: number[] = [];
+  let finished = true; // not running until a ceremony starts
+  let touched: HTMLElement[] = []; // map elements we tagged, for cleanup
+  let marauder: HTMLElement | null = null;
+  // recorded by prepareDraw() so finish is computed, not hardcoded — the red
+  // bucket draws last and would otherwise be truncated mid-stroke.
+  let maxDrawDelay = 0;
+  let drawDdur = 650;
+
+  function at(ms: number, fn: () => void): void {
+    timeouts.push(window.setTimeout(fn, ms));
+  }
+  function clearTimeouts(): void {
+    timeouts.forEach((id) => window.clearTimeout(id));
+    timeouts = [];
+  }
+  function lineEl(n: number): HTMLElement | null {
+    return ceremony?.querySelector<HTMLElement>('.cer-line-' + n) ?? null;
+  }
+
+  const RED_SEL = '.red, .red *, .dot.red, .red-fill, .red-spatter *';
+  const EXEMPT_SEL = '.trail, .smoke, .swing, .rug';
+
+  /**
+   * One synchronous pass over the map SVG: dash-drawables (path/line/polyline
+   * with a pathLength, not inside a decorative-dash group) draw on via
+   * stroke-dashoffset; everything else fades in (class `cer-fade`). Each
+   * element gets a --dd delay = bucketBase + indexInBucket × stagger (stagger
+   * shrunk so no bucket spans > ~450ms). Red elements form their own late
+   * bucket — the red pen draws last. Adds `is-undrawn` at the end so the map
+   * is hidden before the rig could ever reveal it.
+   */
+  function prepareDraw(firstVisit: boolean): void {
+    maxDrawDelay = 0;
+    drawDdur = firstVisit ? 650 : 450;
+    marauder = document.querySelector<HTMLElement>('[data-marauder]');
+    if (!marauder) return;
+    const svg = marauder.querySelector('svg');
+    if (!svg) {
+      marauder.classList.add('is-undrawn');
+      return;
+    }
+
+    const layerBase: Record<string, number> = firstVisit
+      ? { '1': 0, '2': 350, '3': 1000, '4': 1350, '5': 1350 }
+      : { '1': 0, '2': 150, '3': 450, '4': 600, '5': 600 };
+    const redBase = firstVisit ? 1900 : 800;
+    const ddur = firstVisit ? 650 : 450;
+    const baseStagger = firstVisit ? 14 : 6;
+
+    type Info = { el: HTMLElement; dash: boolean; bucket: string; base: number; op: number };
+    const infos: Info[] = [];
+    const counts: Record<string, number> = {};
+
+    const els = svg.querySelectorAll<SVGElement>(
+      'path, line, polyline, circle, ellipse, rect, text, image'
+    );
+    els.forEach((node) => {
+      const el = node as unknown as HTMLElement;
+      const tag = node.tagName.toLowerCase();
+      const pathish = tag === 'path' || tag === 'line' || tag === 'polyline';
+      const dash = pathish && node.hasAttribute('pathLength') && !node.closest(EXEMPT_SEL);
+      const red = node.matches(RED_SEL);
+
+      const drawAnc = node.closest('[data-draw]');
+      const dd = drawAnc?.getAttribute('data-draw') || '1';
+      const bucket = red ? 'red' : dd;
+      const base = red ? redBase : layerBase[dd] ?? 0;
+
+      // Read natural opacity BEFORE we mutate anything, so cer-fade elements
+      // fade in to their real opacity (not a flat 1 — stains/ghosts are faint).
+      let op = 1;
+      if (!dash) {
+        const raw = parseFloat(getComputedStyle(node).opacity);
+        op = Number.isNaN(raw) ? 1 : raw;
+      }
+
+      infos.push({ el, dash, bucket, base, op });
+      counts[bucket] = (counts[bucket] || 0) + 1;
+    });
+
+    const effStagger: Record<string, number> = {};
+    for (const key in counts) {
+      const n = counts[key];
+      effStagger[key] = n > 1 ? Math.min(baseStagger, 450 / (n - 1)) : baseStagger;
+    }
+
+    const idx: Record<string, number> = {};
+    for (const info of infos) {
+      const i = idx[info.bucket] || 0;
+      idx[info.bucket] = i + 1;
+      const delay = Math.round(info.base + i * effStagger[info.bucket]);
+      if (delay > maxDrawDelay) maxDrawDelay = delay;
+      info.el.style.setProperty('--dd', delay + 'ms');
+      info.el.style.setProperty('--ddur', ddur + 'ms');
+      if (!info.dash) {
+        info.el.classList.add('cer-fade');
+        info.el.style.setProperty('--cer-op', String(info.op));
+      }
+      touched.push(info.el);
+    }
+
+    marauder.classList.add('is-undrawn');
+  }
+
+  function startDraw(): void {
+    marauder?.classList.add('is-drawing');
+  }
+
+  function cleanupMap(): void {
+    if (marauder) marauder.classList.remove('is-undrawn', 'is-drawing');
+    for (const el of touched) {
+      el.classList.remove('cer-fade');
+      el.style.removeProperty('--dd');
+      el.style.removeProperty('--ddur');
+      el.style.removeProperty('--cer-op');
+    }
+    touched = [];
+  }
+
+  function resetCeremonyClasses(): void {
+    ceremony?.classList.remove(
+      'cer-active',
+      'cer-repeat',
+      'dark-in',
+      'dark-out',
+      'rig-in',
+      'rig-out',
+      'fold-1-open',
+      'fold-2-open'
+    );
+    cerText?.classList.remove('soak');
+    ceremony?.querySelectorAll('.cer-line').forEach((l) => l.classList.remove('bleed-in'));
+    skipHint?.classList.remove('show');
+  }
+
+  function onSkipClick(): void {
+    finishCeremony();
+  }
+  function onSkipKey(e: KeyboardEvent): void {
+    if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      finishCeremony();
+    }
+  }
+  function addSkipListeners(): void {
+    ceremony?.addEventListener('click', onSkipClick);
+    document.addEventListener('keydown', onSkipKey);
+  }
+  function removeSkipListeners(): void {
+    ceremony?.removeEventListener('click', onSkipClick);
+    document.removeEventListener('keydown', onSkipKey);
+  }
+
+  /** Flip the state to 'intro' and lock body scroll (the simple page scrolls;
+      the map must not). Called once the dark backdrop is fully opaque. */
+  function activateIntro(): void {
+    document.documentElement.setAttribute('data-archives-state', 'intro');
+    document.body.classList.add('h-screen', 'overflow-hidden');
+    document.body.style.minHeight = '';
+  }
+
+  /** Idempotent: cancel everything, jump to the finished state, dispatch once.
+      Lands safely even if skipped during the initial dark-in while the state
+      is still 'simple' — index's ceremony-done handler flips it to 'map'. */
+  function finishCeremony(): void {
+    if (finished) return;
+    finished = true;
+    clearTimeouts();
+    resetCeremonyClasses(); // also removes cer-active → overlay hidden
+    cleanupMap(); // map = fully drawn (all draw classes/styles gone)
+    removeSkipListeners();
+    document.dispatchEvent(new CustomEvent('archives:ceremony-done'));
+  }
+
+  function runCeremony(firstVisit: boolean): void {
+    // belt-and-braces: index guards reduced motion, but if the event fires
+    // anyway, hide the map's undrawn state and finish immediately.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      finished = false;
+      prepareDraw(firstVisit);
+      finishCeremony();
+      return;
+    }
+
+    // fresh start (also clears any stale state from an interrupted replay)
+    finished = false;
+    clearTimeouts();
+    touched = [];
+    resetCeremonyClasses();
+
+    // Map hidden underneath, synchronously. Map is still display:none here
+    // (state === 'simple'); only computed opacity is read, which is safe.
+    prepareDraw(firstVisit);
+
+    // Show the overlay (still transparent), then fade the dark backdrop in
+    // over the live simple page. The double-rAF guarantees a paint at
+    // opacity 0 first so the fade actually transitions (rather than snapping).
+    if (!firstVisit) ceremony?.classList.add('cer-repeat');
+    ceremony?.classList.add('cer-active');
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => ceremony?.classList.add('dark-in'))
+    );
+
+    addSkipListeners();
+
+    if (firstVisit) {
+      // t=500 — screen fully dark → flip state (simple hides, undrawn map
+      // ready beneath) + lock scroll; folded rig fades in at center
+      at(500, () => {
+        activateIntro();
+        ceremony?.classList.add('rig-in');
+      });
+      at(900, () => ceremony?.classList.add('fold-1-open')); // fold 1
+      at(1200, () => skipHint?.classList.add('show')); // skip hint
+      at(1450, () => ceremony?.classList.add('fold-2-open')); // fold 2 + scale→1
+      at(1750, () => ceremony?.classList.add('dark-out'));
+      // quill lines bleed in (line 4 slower)
+      at(2350, () => lineEl(1)?.classList.add('bleed-in'));
+      at(2850, () => lineEl(2)?.classList.add('bleed-in'));
+      at(3350, () => lineEl(3)?.classList.add('bleed-in'));
+      at(3900, () => lineEl(4)?.classList.add('bleed-in'));
+      at(4950, () => cerText?.classList.add('soak')); // text soaks away
+      at(5250, () => ceremony?.classList.add('rig-out')); // rig parchment fades
+      scheduleDraw(5350); // draw t0 + computed finish
+    } else {
+      // repeat visit (≈3s): staggered folds, dark clears BEFORE the rig fades,
+      // draw waits until the dark cover is gone so it happens on stage.
+      skipHint?.classList.add('show'); // immediate
+      at(400, () => {
+        activateIntro();
+        ceremony?.classList.add('rig-in');
+      });
+      at(550, () => ceremony?.classList.add('fold-1-open')); // fold 1
+      at(800, () => ceremony?.classList.add('fold-2-open')); // fold 2 (staggered)
+      at(900, () => ceremony?.classList.add('dark-out')); // dark clears first
+      at(1450, () => ceremony?.classList.add('rig-out')); // then parchment fades
+      scheduleDraw(1500); // draw t0 + computed finish
+    }
+  }
+
+  /**
+   * Kick the map draw at drawT0 and schedule the finish for when the LAST
+   * element (the red pen) actually completes — drawT0 + maxDelay + ddur +
+   * buffer — so nothing snaps to its final state mid-stroke.
+   */
+  function scheduleDraw(drawT0: number): void {
+    at(drawT0, startDraw);
+    const finishAt = drawT0 + maxDrawDelay + drawDdur + 200;
+    at(finishAt, finishCeremony);
+  }
+
+  document.addEventListener('archives:ceremony', (e) => {
+    const detail = (e as CustomEvent<{ firstVisit?: boolean }>).detail;
+    runCeremony(!!detail?.firstVisit);
+  });
+</script>

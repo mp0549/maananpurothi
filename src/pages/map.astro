@@ -1,0 +1,183 @@
+---
+/**
+ * map.astro — the interactive Marauder's Map, now its OWN route (/map).
+ *
+ * Split out of index.astro (2026-07-30). The hero/simple landing lives at `/`;
+ * its "I solemnly swear" CTA links here. The ceremony (parchment-unfold intro)
+ * plays ONLY when arrived-at with `?ceremony=1` and motion is allowed — a
+ * pre-paint script picks the initial state so the undrawn map never flashes:
+ *
+ *   /map?ceremony=1  → start 'simple' (blank), run MapCeremony, then reveal map
+ *   /map             → start 'map', show the drawn map immediately
+ *   (reduced motion) → always the instant path, ceremony skipped
+ *
+ * "Mischief Managed." and the map's own "THE ARCHIVES" title both navigate
+ * home to `/`. State is still carried on <html data-archives-state> because
+ * MapCeremony/MarauderMap key their draw-on classes off it.
+ */
+import Layout from '@/layouts/Layout.astro';
+import MapCeremony from '@/components/marauder/MapCeremony.astro';
+import MarauderMap from '@/components/marauder/MarauderMap.astro';
+import CursorFootprints from '@/components/marauder/CursorFootprints.astro';
+---
+
+<!-- Pre-paint: choose the initial state before first render so the undrawn map
+     is never visible. Ceremony path starts 'simple' (blank) so MapCeremony can
+     fade its dark cover in and flip to 'intro' itself, exactly as before. -->
+<script is:inline>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var doCeremony = params.get('ceremony') === '1' && !reduce;
+    document.documentElement.setAttribute(
+      'data-archives-state',
+      doCeremony ? 'simple' : 'map'
+    );
+    document.documentElement.dataset.mapCeremony = doCeremony ? '1' : '0';
+  })();
+</script>
+
+<Layout
+  title="The Archives — The Map"
+  description="An interactive map of The Archives"
+  variant="map"
+>
+  <MapCeremony />
+
+  <div id="view-map">
+    <MarauderMap />
+    <button
+      id="map-close-ribbon"
+      class="mischief-ribbon"
+      type="button"
+      aria-label="Mischief managed — return to the landing page"
+    >
+      Mischief Managed.
+    </button>
+  </div>
+
+  <CursorFootprints />
+</Layout>
+
+<style>
+  /* #view-map is hidden while the state is 'simple' (the brief blank moment
+     before the ceremony flips to 'intro'); shown for 'intro' and 'map'. The
+     :global() wrap is required — see the Astro state-selector scoping trap. */
+  #view-map {
+    display: none;
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  :global(html[data-archives-state='map']) #view-map,
+  :global(html[data-archives-state='intro']) #view-map {
+    display: block;
+  }
+
+  /* ── "Mischief Managed." ribbon — bottom-center, map state only ─── */
+  :global(html:not([data-archives-state='map']) .mischief-ribbon) {
+    display: none;
+  }
+
+  .mischief-ribbon {
+    position: fixed;
+    left: 50%;
+    bottom: 1.5rem;
+    transform: translateX(-50%);
+    z-index: 50;
+    background: var(--color-parchment-light, #faf4e6);
+    border: 1.5px solid var(--color-gold, #8b6914);
+    color: var(--color-ink, #1c1208);
+    font-family: 'Cinzel', serif;
+    font-variant-caps: small-caps;
+    font-size: 0.84rem;
+    letter-spacing: 0.16em;
+    padding: 0.62rem 2.2rem;
+    cursor: pointer;
+    opacity: 0.96;
+    box-shadow: 0 3px 14px rgba(28, 18, 8, 0.3);
+    transition: opacity 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+    clip-path: polygon(0% 0%, 6% 50%, 0% 100%, 100% 100%, 94% 50%, 100% 0%);
+  }
+
+  .mischief-ribbon:hover,
+  .mischief-ribbon:focus-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 18px rgba(28, 18, 8, 0.34);
+  }
+</style>
+
+<script>
+  const html = document.documentElement;
+  const closeRibbon = document.getElementById('map-close-ribbon');
+  const homeLink = document.getElementById('map-home-link'); // SVG title in MarauderMap
+
+  function lockScroll() {
+    document.body.classList.add('h-screen', 'overflow-hidden');
+    document.body.style.minHeight = '';
+  }
+
+  function goHome(e) {
+    // Prefer the click/pointer origin so the ink bleeds outward from where
+    // the user actually clicked; keyboard activation (Enter/Space) has no
+    // clientX/clientY, so fall back to the viewport center.
+    const x = e && typeof e.clientX === 'number' ? e.clientX : window.innerWidth / 2;
+    const y = e && typeof e.clientY === 'number' ? e.clientY : window.innerHeight / 2;
+
+    if (typeof window.__inkTo === 'function') {
+      window.__inkTo('/', x, y);
+    } else {
+      window.location.href = '/';
+    }
+  }
+
+  /** Ceremony finished (or was skipped) → reveal the fully-drawn map. */
+  document.addEventListener('archives:ceremony-done', () => {
+    html.setAttribute('data-archives-state', 'map');
+    lockScroll();
+  });
+
+  /* Kick off the ceremony on load when we arrived via the swear CTA. The
+     pre-paint script already set state 'simple' so the map is covered. */
+  if (html.dataset.mapCeremony === '1') {
+    const firstVisit = !localStorage.getItem('archives-visited');
+    localStorage.setItem('archives-visited', '1');
+    // Drop ?ceremony=1 so a reload / share-link shows the map instantly.
+    history.replaceState(null, '', window.location.pathname);
+    // Next frame: MapCeremony's listener is registered by now.
+    requestAnimationFrame(() => {
+      document.dispatchEvent(
+        new CustomEvent('archives:ceremony', { detail: { firstVisit } })
+      );
+    });
+  }
+
+  // Record 'map' as the origin ONLY when a destination is opened FROM the map,
+  // so that interior page's back-link returns here. Any nav-button click clears
+  // it again (see InteriorNav), and the hero clears it on load — so the default
+  // is always the menu.
+  document.addEventListener('click', (e) => {
+    const t = e.target;
+    const link = t instanceof Element ? t.closest('a[href]') : null;
+    if (!link) return;
+    const href = link.getAttribute('href') || '';
+    if (/^(https?:|\/\/|mailto:|tel:|#)/.test(href)) return; // external / in-page
+    if (href === '/' || href === '/map' || href.indexOf('/map?') === 0) return; // hubs
+    try {
+      sessionStorage.setItem('archives-hub', 'map');
+    } catch (_) {}
+  });
+
+  // "Mischief Managed." and the map's "THE ARCHIVES" title both go home.
+  closeRibbon?.addEventListener('click', goHome);
+  homeLink?.addEventListener('click', goHome);
+  homeLink?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      goHome(e);
+    }
+  });
+</script>

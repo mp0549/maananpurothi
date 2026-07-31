@@ -1,0 +1,954 @@
+---
+/**
+ * PlainArchives.astro — the simple-first hero landing (state: "simple").
+ *
+ * Every visit opens here now: a conventional, professional hero (eyebrow,
+ * name, gold rule, roles, bio) over a centered column of destinations on
+ * parchment. The interactive map is opt-in via the "map invitation" — a
+ * pinned parchment note (#simple-swear-btn) that runs the ceremony.
+ *
+ * Reads src/data/map.json directly (same destinations MarauderMap uses) so
+ * the simple route and the map route never drift out of sync. All hero copy
+ * (eyebrow, name, roles, bio, the map-invite text, connect links) lives in
+ * src/data/hero.json.
+ *
+ * NB: #simple-swear-btn lives here (moved out of index.astro); index.astro
+ * still wires its click via getElementById.
+ */
+import destinations from '@/data/map.json';
+import hero from '@/data/hero.json';
+import { parseProseBlocks } from '@/lib/prose';
+
+const connectLinks = hero.connect;
+
+/**
+ * Recruiter shortcut links — the same destinations the map uses, surfaced as a
+ * pinned margin note on the hero. Pulled by id from map.json so they never
+ * drift from the map/destination list. `owlery` is the LinkedIn destination.
+ */
+const portfolio = destinations.find((d) => d.id === 'portfolio');
+const lab = destinations.find((d) => d.id === 'lab');
+const linkedin = destinations.find((d) => d.id === 'owlery');
+
+const bioParagraphs = parseProseBlocks(hero.bio);
+---
+
+<div class="plain">
+  <div class="plain-inner">
+    <header class="plain-header">
+      <p class="plain-eyebrow">{hero.eyebrow}</p>
+      <h1 class="plain-name">{hero.name}</h1>
+      <span class="plain-rule" aria-hidden="true"></span>
+      <p class="plain-roles">{hero.roles}</p>
+      {bioParagraphs.map((parts) => (
+        <p class="plain-bio">
+          {parts.map((part) => {
+            if (part.type === 'text') return part.value;
+            const tip = part.def ? (
+              <span class="hero-term-tip" role="tooltip">{part.def}</span>
+            ) : null;
+            // Hyperlink (optionally also a tooltip term)
+            if (part.href) {
+              return (
+                <a
+                  class={part.def ? 'hero-link hero-term' : 'hero-link'}
+                  href={part.href}
+                  {...(part.external ? { target: '_blank', rel: 'noopener' } : {})}
+                >
+                  {part.text}
+                  {tip}
+                </a>
+              );
+            }
+            // Tooltip-only term
+            return (
+              <span class="hero-term" tabindex="0">
+                {part.text}
+                {tip}
+              </span>
+            );
+          })}
+        </p>
+      ))}
+    </header>
+
+    <!-- The two hero asides. On mid-width screens they share ONE centered,
+         wrapping row directly under the intro (side by side, stacking only
+         when too narrow). At ≥73rem each becomes position:fixed and pins to
+         its own margin (portfolio left, map right), so this wrapper has no
+         in-flow children and collapses to zero height. -->
+    <div class="hero-asides">
+    <!-- Recruiter shortcut — a handwritten margin note (pinned LEFT at ≥73rem),
+         linking straight to the portfolio, with two small chips underneath for
+         the lab and LinkedIn. Hidden once the ceremony/map takes over. -->
+    {portfolio && (
+      <aside class="hire-notes" aria-label="Quick links to portfolio, lab, and LinkedIn">
+        <a class="hire-note" href={portfolio.href} target="_blank" rel="noopener">
+          <span class="hire-note-dot" aria-hidden="true"></span>
+          <span class="hire-note-scribble">psst — here for the portfolio?</span>
+          <span class="hire-note-cta">
+            click me
+            <span class="hire-note-arrow" aria-hidden="true">&rarr;</span>
+          </span>
+        </a>
+        {(lab || linkedin) && (
+          <div class="hire-chips">
+            {lab && <a class="hire-chip" href={lab.href} target="_blank" rel="noopener">the lab</a>}
+            {linkedin && <a class="hire-chip" href={linkedin.href} target="_blank" rel="noopener">LinkedIn</a>}
+          </div>
+        )}
+      </aside>
+    )}
+
+    <!-- Map invitation — a real link to the /map route (carries ?ceremony=1 so
+         the intro plays on arrival; /map itself skips it under reduced motion).
+         data-noink: skip the ink page-transition so the ceremony is the
+         transition. Inline here; repositions to a fixed side note at ≥73rem. -->
+    <a id="simple-swear-btn" class="map-invite" href="/map?ceremony=1" data-noink>
+      <span class="map-invite-dot" aria-hidden="true"></span>
+      <span class="map-invite-content">
+        <span class="map-invite-main">{hero.invite.main}</span>
+        <span class="map-invite-sub">{hero.invite.sub}</span>
+      </span>
+    </a>
+    </div>
+
+    <nav class="plain-list" aria-label="Destinations">
+      {destinations.map((d, i) => (
+        <a
+          class="plain-item"
+          href={d.href}
+          style={`--i: ${i}`}
+          {...(d.external ? { target: '_blank', rel: 'noopener' } : {})}
+        >
+          <span class="plain-item-name">{d.name}</span>
+          <span class="plain-item-desc">{d.desc}</span>
+        </a>
+      ))}
+    </nav>
+
+    <footer class="plain-footer">
+      <div class="plain-seal" aria-hidden="true">
+        <span class="plain-seal-mono">MP</span>
+      </div>
+      {hero.signoff && <p class="plain-signoff">{hero.signoff}</p>}
+      <nav aria-label="Connect links" class="plain-connect">
+        {connectLinks.map(({ href, label, external }, i) => (
+          <>
+            <a
+              href={href}
+              class="plain-connect-link"
+              {...(external ? { target: '_blank', rel: 'noopener' } : {})}
+            >
+              {label}
+            </a>
+            {i < connectLinks.length - 1 && <span class="plain-connect-sep" aria-hidden="true">·</span>}
+          </>
+        ))}
+      </nav>
+      <p class="plain-copyright">&copy; {new Date().getFullYear()} {hero.copyright}</p>
+    </footer>
+  </div>
+</div>
+
+<style>
+  .plain {
+    position: relative; /* for the texture pseudo — NOT a transform, so it does
+                           not become a containing block for the fixed note. */
+    width: 100%;
+    min-height: 100vh;
+    background:
+      radial-gradient(
+        130% 90% at 50% -10%,
+        rgba(250, 244, 230, 0) 55%,
+        rgba(139, 105, 20, 0.09) 100%
+      ),
+      var(--color-parchment-light, #faf4e6);
+  }
+
+  /* Aged-paper grain, layered like the site's .texture-overlay utility.
+     A pseudo-element (its own box), so its filter can't affect the fixed note. */
+  .plain::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/textures/parchment_texture1.jpg');
+    background-size: 460px 460px;
+    background-repeat: repeat;
+    mix-blend-mode: multiply;
+    opacity: 0.26;
+    filter: sepia(0.35);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .plain-inner {
+    position: relative; /* sit above the texture pseudo */
+    z-index: 1;
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 5rem 1.5rem 4rem;
+    /* opacity-only entrance: a transform here would establish a containing
+       block for the ≥1280px fixed .map-invite descendant and pin it to this
+       40rem column instead of the viewport. The header carries the fade-up. */
+    animation: plain-fade 0.5s ease both;
+  }
+
+  @keyframes plain-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes plain-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plain-inner,
+    .plain-header,
+    .plain-eyebrow,
+    .plain-name,
+    .plain-rule,
+    .plain-roles,
+    .plain-bio,
+    .map-invite,
+    .plain-item {
+      animation: none;
+    }
+
+    /* render the ruled line full-width and static */
+    .plain-rule {
+      clip-path: none;
+      opacity: 1;
+    }
+
+    .plain-item {
+      transition: background-color 240ms ease;
+    }
+  }
+
+  /* ── Header ────────────────────────────────────────────────────── */
+  /* Each child animates on its own delay so the header assembles in a
+     readable sequence (eyebrow → name → rule → roles → bio). Transforms live
+     on header CHILDREN — never on .plain/.plain-inner — so the fixed note's
+     containing block is untouched. */
+  .plain-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .plain-eyebrow,
+  .plain-name,
+  .plain-roles,
+  .plain-bio {
+    animation: plain-fade-up 0.6s var(--ease-entrance) both;
+  }
+
+  .plain-eyebrow {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    /* muted gold baked into the color (not opacity) so the fade can end at 1 */
+    color: #a5843a;
+    color: color-mix(in srgb, var(--color-gold) 78%, var(--color-parchment-aged));
+    margin: 0 0 0.9rem;
+    animation-delay: 0.1s;
+  }
+
+  .plain-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 7vw, 3.2rem);
+    letter-spacing: 0.01em;
+    color: var(--color-ink, #1c1208);
+    margin: 0;
+    line-height: 1.1;
+    text-wrap: balance;
+    animation-delay: 0.2s;
+  }
+
+  /* the one sharp wax-red accent on the page's most important word */
+  .plain-name::after {
+    content: '.';
+    color: var(--color-wax);
+  }
+
+  .plain-rule {
+    display: block;
+    width: 100%;
+    height: 1px;
+    margin: 1.1rem 0 1rem;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--color-gold-pale, #c4a96a) 20%,
+      var(--color-gold, #8b6914) 50%,
+      var(--color-gold-pale, #c4a96a) 80%,
+      transparent
+    );
+    /* drawn outward from the center, like a line being ruled under the name */
+    animation: rule-draw 0.7s var(--ease-entrance) 0.32s both;
+  }
+
+  .plain-roles {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted, #7c6a4e);
+    margin: 0.9rem 0 0;
+    animation-delay: 0.44s;
+  }
+
+  .plain-bio {
+    font-family: 'Crimson Text', serif;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--color-ink, #1c1208);
+    max-width: 34rem;
+    margin: 1.4rem auto 0;
+    /* left-aligned "notebook entry" block — intentional break from the
+       centered header above it (idea #6, on trial). */
+    text-align: left;
+    text-wrap: pretty;
+    animation-delay: 0.54s;
+  }
+
+  .plain-bio:nth-of-type(2) {
+    animation-delay: 0.62s;
+  }
+  .plain-bio:nth-of-type(3) {
+    animation-delay: 0.7s;
+  }
+
+  /* illuminated versal on the opening paragraph */
+  .plain-bio:first-of-type::first-letter {
+    float: left;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 3.1em;
+    line-height: 0.72;
+    padding: 0.05em 0.12em 0 0;
+    color: var(--color-gold, #8b6914);
+    text-shadow: 0 1px 0 rgba(250, 244, 230, 0.6);
+  }
+
+  @keyframes rule-draw {
+    from {
+      opacity: 0;
+      clip-path: inset(0 50% 0 50%);
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  /* ── Inline glossary term + tooltip (from `[term|definition]`) ──── */
+  .hero-term {
+    position: relative;
+    cursor: help;
+    font-style: italic;
+    text-decoration: underline dotted;
+    text-decoration-color: var(--color-gold, #8b6914);
+    text-underline-offset: 3px;
+    outline: none;
+  }
+
+  .hero-term-tip {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 9px);
+    /* grow from the pointer (bottom-center), anchored to the term it defines */
+    transform-origin: bottom center;
+    transform: translateX(-50%) translateY(4px) scale(0.96);
+    z-index: 60;
+    width: max-content;
+    max-width: 14rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-parchment-light, #faf4e6);
+    border: 1px solid var(--color-gold-pale, #c4a96a);
+    box-shadow: 0 5px 16px rgba(28, 18, 8, 0.24);
+    color: var(--color-ink, #1c1208);
+    font-family: 'Crimson Text', serif;
+    font-style: normal;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-align: center;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 160ms var(--ease-hover), transform 160ms var(--ease-hover);
+  }
+
+  /* little pointer triangle beneath the tooltip */
+  .hero-term-tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--color-parchment-light, #faf4e6);
+  }
+
+  .hero-term:hover .hero-term-tip,
+  .hero-term:focus .hero-term-tip,
+  .hero-term:focus-visible .hero-term-tip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+  /* Inline hyperlink (from `[text](url)`) — themed to match the page. */
+  .hero-link {
+    position: relative;
+    color: var(--color-gold, #8b6914);
+    font-style: normal;
+    text-decoration: underline;
+    text-decoration-color: var(--color-gold-pale, #c4a96a);
+    text-underline-offset: 3px;
+    cursor: pointer;
+    transition: color 150ms ease, text-decoration-color 150ms ease;
+  }
+
+  .hero-link:hover,
+  .hero-link:focus-visible {
+    color: var(--color-ink, #1c1208);
+    text-decoration-color: var(--color-gold, #8b6914);
+  }
+
+  .hero-link:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* A link that is ALSO a defined term: dashed underline hints "more info". */
+  .hero-link.hero-term {
+    text-decoration-style: dashed;
+    cursor: pointer;
+  }
+
+  /* ── Hero asides row (recruiter note + map invite) ─────────────── */
+  /* Mid-width screens: both notes share one centered, wrapping row directly
+     under the intro. They shrink a little before the row wraps to a stack.
+     At ≥73rem each note is position:fixed (pinned to its own margin), so this
+     wrapper has no in-flow children and its spacing is dropped. */
+  .hero-asides {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.1rem 1.25rem;
+    margin: 0 auto 2.6rem;
+  }
+
+  /* flex-basis + shrink = "resize a little, then wrap" (map note the wider) */
+  .hero-asides .hire-notes {
+    flex: 0 1 14rem;
+  }
+
+  .hero-asides .map-invite {
+    flex: 0 1 20rem;
+  }
+
+  @media (min-width: 73rem) {
+    .hero-asides {
+      margin: 0;
+    }
+  }
+
+  /* ── Map invitation (the swear CTA / doorway to the map) ────────── */
+  /* Inline between the hero and the list on narrow viewports; a pinned
+     parchment note. Hidden entirely once the ceremony/map takes over —
+     fully-:global state selectors (the Astro scoping trap applies). */
+  :global(html[data-archives-state='intro'] .map-invite),
+  :global(html[data-archives-state='map'] .map-invite) {
+    display: none;
+  }
+
+  .map-invite {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    width: fit-content;
+    max-width: 22rem;
+    margin: 0;
+    padding: 1rem 1.45rem;
+    background: var(--color-parchment-light, #faf4e6);
+    border: 1px solid var(--color-gold-pale, #c4a96a);
+    box-shadow: 2px 5px 16px rgba(28, 18, 8, 0.16);
+    color: var(--color-ink, #1c1208);
+    cursor: pointer;
+    transform: rotate(-1deg);
+    transition: transform 220ms var(--ease-hover), box-shadow 220ms var(--ease-hover);
+    /* fades in last, after the header sequence — opacity only, so it never
+       fights the resting rotate() transform (or the fixed-note containing block) */
+    animation: plain-fade 0.5s var(--ease-entrance) 0.66s both;
+  }
+
+  .map-invite:hover,
+  .map-invite:focus-visible {
+    transform: rotate(0deg) translateY(-3px);
+    box-shadow: 3px 8px 22px rgba(28, 18, 8, 0.22);
+  }
+
+  .map-invite:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 4px;
+  }
+
+  /* press feedback — scale an INNER wrapper, never the button (it already
+     carries rotate()/translate transforms we must not clobber). */
+  .map-invite-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    transition: transform 120ms var(--ease-hover);
+  }
+
+  .map-invite:active .map-invite-content {
+    transform: scale(0.97);
+  }
+
+  /* small red wax dot pinning the note */
+  .map-invite-dot {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-wax);
+    box-shadow: 0 1px 3px rgba(28, 18, 8, 0.4);
+  }
+
+  .map-invite-main {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.98rem;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .map-invite-sub {
+    font-family: 'Cinzel', serif;
+    font-variant-caps: small-caps;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-muted, #7c6a4e);
+  }
+
+  /* Wide viewports: the SAME element repositions to a fixed side note. */
+  @media (min-width: 73rem) {
+    .map-invite {
+      position: fixed;
+      top: 50%;
+      right: 2rem;
+      width: 200px;
+      max-width: 200px;
+      margin: 0;
+      z-index: 40;
+      transform: translateY(-50%) rotate(2deg);
+    }
+
+    .map-invite:hover,
+    .map-invite:focus-visible {
+      transform: translateY(calc(-50% - 4px)) rotate(0deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .map-invite {
+      transition: none;
+    }
+
+    .hero-term-tip {
+      transition: opacity 160ms ease;
+      transform: translateX(-50%);
+    }
+
+    .hero-term:hover .hero-term-tip,
+    .hero-term:focus .hero-term-tip,
+    .hero-term:focus-visible .hero-term-tip {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ── Recruiter shortcut (left margin note → portfolio / lab / LinkedIn) ── */
+  /* Symmetry with .map-invite: hidden once the ceremony/map takes over. */
+  :global(html[data-archives-state='intro'] .hire-notes),
+  :global(html[data-archives-state='map'] .hire-notes) {
+    display: none;
+  }
+
+  .hire-notes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    width: fit-content;
+    margin: 0;
+    /* opacity-only entrance (like .map-invite) so it never fights the fixed
+       containing block or the note's resting rotate() at ≥73rem */
+    animation: plain-fade 0.5s var(--ease-entrance) 0.82s both;
+  }
+
+  .hire-note {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    max-width: 15rem;
+    padding: 0.85rem 1.35rem 0.8rem;
+    background: var(--color-parchment-light, #faf4e6);
+    border: 1px solid var(--color-gold-pale, #c4a96a);
+    /* shadow cast toward the page centre (note leans off the left edge) */
+    box-shadow: -2px 5px 16px rgba(28, 18, 8, 0.16);
+    color: var(--color-ink, #1c1208);
+    text-decoration: none;
+    cursor: pointer;
+    transform: rotate(-1.5deg);
+    transition: transform 220ms var(--ease-hover), box-shadow 220ms var(--ease-hover);
+  }
+
+  .hire-note:hover,
+  .hire-note:focus-visible {
+    transform: rotate(0deg) translateY(-3px);
+    box-shadow: -3px 8px 22px rgba(28, 18, 8, 0.22);
+  }
+
+  .hire-note:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 4px;
+  }
+
+  /* red wax dot pinning the note (matches .map-invite-dot) */
+  .hire-note-dot {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-wax);
+    box-shadow: 0 1px 3px rgba(28, 18, 8, 0.4);
+  }
+
+  .hire-note-scribble {
+    font-family: var(--font-hand);
+    font-size: 1.4rem;
+    line-height: 1.15;
+    text-align: center;
+    color: var(--color-ink, #1c1208);
+  }
+
+  .hire-note-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: 'Cinzel', serif;
+    font-variant-caps: small-caps;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    color: var(--color-wax);
+  }
+
+  /* the arrow gently nudges to say "click" — a non-interactive span, so the
+     idle animation never fights the note's hover transform (the trap that
+     .map-invite documents just above). */
+  .hire-note-arrow {
+    display: inline-block;
+    animation: hire-arrow-nudge 1.8s ease-in-out infinite;
+  }
+
+  @keyframes hire-arrow-nudge {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(4px);
+    }
+  }
+
+  .hire-note:hover .hire-note-arrow,
+  .hire-note:focus-visible .hire-note-arrow {
+    transform: translateX(4px);
+    animation: none;
+  }
+
+  .hire-chips {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .hire-chip {
+    font-family: 'Cinzel', serif;
+    font-variant-caps: small-caps;
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-muted, #7c6a4e);
+    text-decoration: none;
+    padding: 0.28rem 0.65rem;
+    border: 1px solid var(--color-gold-pale, #c4a96a);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-parchment-light, #faf4e6) 86%, transparent);
+    transition: color 180ms var(--ease-hover), border-color 180ms var(--ease-hover),
+      background-color 180ms var(--ease-hover);
+  }
+
+  .hire-chip:hover,
+  .hire-chip:focus-visible {
+    color: var(--color-gold, #8b6914);
+    border-color: var(--color-gold, #8b6914);
+    background-color: rgba(196, 169, 106, 0.12);
+  }
+
+  .hire-chip:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  /* Wide viewports: pin to the LEFT margin, mirroring the fixed .map-invite. */
+  @media (min-width: 73rem) {
+    .hire-notes {
+      position: fixed;
+      top: 50%;
+      left: 2rem;
+      width: 190px;
+      margin: 0;
+      z-index: 40;
+      transform: translateY(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hire-notes {
+      animation: none;
+    }
+
+    .hire-note {
+      transition: none;
+    }
+
+    .hire-note-arrow {
+      animation: none;
+    }
+  }
+
+  /* ── Destination list ─────────────────────────────────────────── */
+  .plain-list {
+    display: block;
+    border-top: 1px solid rgba(28, 18, 8, 0.12);
+  }
+
+  .plain-item {
+    position: relative;
+    display: block;
+    /* permanent left gutter so the fleuron HANGS in the margin and the title
+       never shifts on hover (idea #12) — only the mark + wash animate. */
+    padding: 1.3rem 0.25rem 1.3rem 1.85rem;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(28, 18, 8, 0.12);
+    transition: background-color 240ms var(--ease-hover);
+    /* staggered entrance — follows the header/invite sequence */
+    animation: plain-fade-up 0.5s var(--ease-entrance) both;
+    animation-delay: calc(0.75s + var(--i, 0) * 0.06s);
+  }
+
+  /* hand-drawn fleuron that slides in on hover, like a margin mark */
+  .plain-item::before {
+    content: '❧';
+    position: absolute;
+    left: 0.1rem;
+    top: 1.25rem;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--color-gold, #8b6914);
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 220ms ease, transform 220ms ease;
+    pointer-events: none;
+  }
+
+  .plain-item:hover,
+  .plain-item:focus-visible {
+    background-color: rgba(196, 169, 106, 0.09);
+  }
+
+  .plain-item:hover::before,
+  .plain-item:focus-visible::before {
+    opacity: 0.85;
+    transform: translateX(0);
+  }
+
+  .plain-item-name {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-variant-caps: small-caps;
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+    color: var(--color-ink, #1c1208);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 4px;
+    transition: color 200ms ease, text-decoration-color 200ms ease;
+  }
+
+  .plain-item-desc {
+    display: block;
+    font-family: 'Crimson Text', serif;
+    font-size: 0.95rem;
+    color: var(--color-ink-muted, #7c6a4e);
+    margin-top: 0.3rem;
+    line-height: 1.6;
+  }
+
+  .plain-item:hover .plain-item-name,
+  .plain-item:focus-visible .plain-item-name {
+    color: var(--color-gold, #8b6914);
+    text-decoration-color: currentColor;
+  }
+
+  .plain-item:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  /* ── Footer ────────────────────────────────────────────────────── */
+  .plain-footer {
+    margin-top: 4rem;
+    text-align: center;
+  }
+
+  /* wax seal — the page's one personal mark; "sealing" the letter above the
+     links. Blobby circle, wax sheen, embossed monogram, slightly rotated. */
+  .plain-seal {
+    width: 3.4rem;
+    height: 3.4rem;
+    margin: 0 auto 1.1rem;
+    display: grid;
+    place-items: center;
+    border-radius: 47% 53% 50% 50% / 52% 48% 52% 48%;
+    background:
+      radial-gradient(
+        60% 60% at 38% 32%,
+        rgba(255, 255, 255, 0.28),
+        rgba(255, 255, 255, 0) 60%
+      ),
+      radial-gradient(120% 120% at 70% 78%, var(--color-wax-deep), var(--color-wax));
+    box-shadow:
+      inset 0 1px 2px rgba(255, 255, 255, 0.25),
+      inset 0 -3px 6px rgba(0, 0, 0, 0.35),
+      0 3px 7px rgba(28, 18, 8, 0.32);
+    transform: rotate(-7deg);
+  }
+
+  .plain-seal-mono {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 1.02rem;
+    letter-spacing: 0.02em;
+    color: rgba(255, 240, 232, 0.92);
+    text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.45);
+  }
+
+  /* handwritten sign-off — a personal margin note above the links */
+  .plain-signoff {
+    font-family: var(--font-hand);
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--color-gold, #8b6914);
+    opacity: 0.85;
+    transform: rotate(-2deg);
+    margin: 0 0 1.4rem;
+  }
+
+  .plain-connect {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .plain-connect-link {
+    position: relative;
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-muted, #7c6a4e);
+    text-decoration: none;
+    padding-bottom: 3px;
+    transition: color 200ms var(--ease-hover);
+  }
+
+  /* drawing underline — the same gesture the site's .nav-link uses elsewhere */
+  .plain-connect-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 1px;
+    background: var(--color-gold, #8b6914);
+    transition: width 240ms var(--ease-hover);
+  }
+
+  .plain-connect-link:hover,
+  .plain-connect-link:focus-visible {
+    color: var(--color-gold, #8b6914);
+  }
+
+  .plain-connect-link:hover::after,
+  .plain-connect-link:focus-visible::after {
+    width: 100%;
+  }
+
+  .plain-connect-link:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  .plain-connect-sep {
+    color: var(--color-gold-pale, #c4a96a);
+    font-size: 0.7rem;
+  }
+
+  .plain-copyright {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-muted, #7c6a4e);
+    opacity: 0.7;
+    margin: 1rem 0 0;
+  }
+
+  @media (max-width: 480px) {
+    .plain-inner {
+      padding: 3.5rem 1.25rem 3rem;
+    }
+  }
+</style>

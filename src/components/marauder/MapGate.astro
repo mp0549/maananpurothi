@@ -1,0 +1,615 @@
+---
+/**
+ * MapGate.astro — folded-parchment landing (state: "gate")
+ *
+ * A full-viewport dark scene (ink #1C1208) with a hand-inked folded letter
+ * resting slightly askew at centre. The parchment is a genuine SVG
+ * illustration drawn in the same language as MarauderMap.astro — wobbly
+ * cubic béziers, double-stroked outlines, graded ink opacities (ink1/ink2/
+ * ink3), sparse hatching for occlusion, round caps, a wax-seal ink monogram.
+ *
+ * Primary CTA (the "swear" phrase) unlocks the map; a quiet secondary link
+ * drops straight to the plain archives (SimpleView).
+ *
+ * No props — purely presentational. index.astro owns the state machine and
+ * wires up #gate-swear / #gate-plain click handlers. Element ids
+ * (#gate, #gate-swear, #gate-plain) are load-bearing — do not rename.
+ */
+---
+
+<div id="gate" class="gate">
+  <!-- ── Dark-surround scene: quiet hand-inked details in parchment-light ──
+       strokes at low opacity, behind the letter. Purely decorative.        -->
+  <svg
+    class="gate-bg"
+    viewBox="0 0 1440 900"
+    fill="none"
+    preserveAspectRatio="xMidYMid slice"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <!-- constellation: a dog, loping across the lower-left dark -->
+    <g class="gate-con">
+      <path class="gate-con-line" d="M 232,596 L 262,584 L 292,592 L 330,584 L 372,590 L 404,568" />
+      <path class="gate-con-line" d="M 292,592 L 288,648" />
+      <path class="gate-con-line" d="M 372,590 L 378,650" />
+      <circle class="gate-star" cx="232" cy="596" r="1.8" />
+      <circle class="gate-star" cx="262" cy="584" r="1.5" />
+      <circle class="gate-star" cx="292" cy="592" r="2.1" />
+      <circle class="gate-star" cx="330" cy="584" r="1.5" />
+      <circle class="gate-star" cx="372" cy="590" r="1.9" />
+      <circle class="gate-star" cx="404" cy="568" r="1.5" />
+      <circle class="gate-star" cx="288" cy="648" r="1.6" />
+      <circle class="gate-star" cx="378" cy="650" r="1.6" />
+    </g>
+
+    <!-- constellation: a stag, poised in the upper-right dark -->
+    <g class="gate-con">
+      <path class="gate-con-line" d="M 992,320 L 1040,300 L 1092,308 L 1128,278 L 1150,250 L 1172,256" />
+      <path class="gate-con-line" d="M 1150,250 L 1138,216" />
+      <path class="gate-con-line" d="M 1150,250 L 1160,208" />
+      <path class="gate-con-line" d="M 1092,308 L 1096,352" />
+      <path class="gate-con-line" d="M 992,320 L 994,354" />
+      <circle class="gate-star" cx="992" cy="320" r="1.8" />
+      <circle class="gate-star" cx="1040" cy="300" r="1.5" />
+      <circle class="gate-star" cx="1092" cy="308" r="2.0" />
+      <circle class="gate-star" cx="1128" cy="278" r="1.5" />
+      <circle class="gate-star" cx="1150" cy="250" r="1.9" />
+      <circle class="gate-star" cx="1172" cy="256" r="1.5" />
+      <circle class="gate-star" cx="1138" cy="216" r="1.4" />
+      <circle class="gate-star" cx="1160" cy="208" r="1.4" />
+      <circle class="gate-star" cx="1096" cy="352" r="1.5" />
+      <circle class="gate-star" cx="994" cy="354" r="1.5" />
+    </g>
+
+    <!-- scattered specks / stars (a few twinkle very slowly) -->
+    <g class="gate-scatter">
+      <circle class="gate-star" cx="140" cy="176" r="2.0" />
+      <circle class="gate-star gate-twinkle-a" cx="300" cy="120" r="1.5" />
+      <circle class="gate-star" cx="520" cy="92" r="1.1" />
+      <circle class="gate-star gate-twinkle-b" cx="880" cy="138" r="2.0" />
+      <circle class="gate-star" cx="1122" cy="120" r="1.5" />
+      <circle class="gate-star" cx="1320" cy="214" r="2.0" />
+      <circle class="gate-star gate-twinkle-c" cx="1362" cy="520" r="1.6" />
+      <circle class="gate-star" cx="118" cy="470" r="1.5" />
+      <circle class="gate-star" cx="196" cy="762" r="2.0" />
+      <circle class="gate-star" cx="1286" cy="768" r="1.5" />
+      <circle class="gate-star" cx="762" cy="812" r="1.1" />
+    </g>
+
+    <!-- a trail of small footprints wandering, fading out -->
+    <g class="gate-paws">
+      <g transform="translate(356,802) rotate(-10)" opacity="0.22">
+        <ellipse class="gate-bg-paw" cx="-4" cy="0" rx="2.6" ry="5" />
+        <ellipse class="gate-bg-paw" cx="4" cy="9" rx="2.6" ry="5" />
+      </g>
+      <g transform="translate(408,782) rotate(-3)" opacity="0.19">
+        <ellipse class="gate-bg-paw" cx="-4" cy="0" rx="2.6" ry="5" />
+        <ellipse class="gate-bg-paw" cx="4" cy="9" rx="2.6" ry="5" />
+      </g>
+      <g transform="translate(462,766) rotate(4)" opacity="0.16">
+        <ellipse class="gate-bg-paw" cx="-4" cy="0" rx="2.6" ry="5" />
+        <ellipse class="gate-bg-paw" cx="4" cy="9" rx="2.6" ry="5" />
+      </g>
+      <g transform="translate(518,752) rotate(10)" opacity="0.13">
+        <ellipse class="gate-bg-paw" cx="-4" cy="0" rx="2.6" ry="5" />
+        <ellipse class="gate-bg-paw" cx="4" cy="9" rx="2.6" ry="5" />
+      </g>
+      <g transform="translate(572,742) rotate(15)" opacity="0.1">
+        <ellipse class="gate-bg-paw" cx="-4" cy="0" rx="2.6" ry="5" />
+        <ellipse class="gate-bg-paw" cx="4" cy="9" rx="2.6" ry="5" />
+      </g>
+      <g transform="translate(622,738) rotate(20)" opacity="0.08">
+        <ellipse class="gate-bg-paw" cx="-4" cy="0" rx="2.6" ry="5" />
+        <ellipse class="gate-bg-paw" cx="4" cy="9" rx="2.6" ry="5" />
+      </g>
+    </g>
+
+    <!-- a broken ring stain (a cup left on the desk) -->
+    <ellipse class="gate-ring" cx="1168" cy="632" rx="46" ry="42" pathLength="1" />
+
+    <!-- a wisp or two of curling smoke/mist -->
+    <path class="gate-smoke" d="M 118,344 C 100,322 140,304 120,282 C 104,262 140,242 122,220" pathLength="1" />
+    <path class="gate-smoke" d="M 1322,656 C 1340,634 1302,614 1320,594 C 1334,576 1302,558 1318,540" pathLength="1" />
+  </svg>
+
+  <!-- corner curl, top-left (mirrored from MarauderMap's corner ornament) -->
+  <svg class="gate-flourish gate-corner gate-corner-tl" viewBox="0 0 80 80" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <path d="M 0,0 C 48,2 78,22 70,66 C 66,36 46,20 22,22 C 40,30 46,48 34,66 C 32,44 16,34 0,38" pathLength="1" />
+    <path d="M 4,4 C 32,8 48,22 48,44" pathLength="1" />
+    <circle cx="0" cy="0" r="2.2" />
+  </svg>
+
+  <!-- corner curl, bottom-right (rotated 180°) -->
+  <svg class="gate-flourish gate-corner gate-corner-br" viewBox="0 0 80 80" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <g transform="rotate(180 40 40)">
+      <path d="M 0,0 C 48,2 78,22 70,66 C 66,36 46,20 22,22 C 40,30 46,48 34,66 C 32,44 16,34 0,38" pathLength="1" />
+      <path d="M 4,4 C 32,8 48,22 48,44" pathLength="1" />
+      <circle cx="0" cy="0" r="2.2" />
+    </g>
+  </svg>
+
+  <!-- a faint compass rose in the top-right corner (strokes only) -->
+  <svg class="gate-flourish gate-compass-rose" viewBox="-48 -48 96 96" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <path d="M -40,1 C -41,-21 -21,-41 0,-40 C 22,-41 41,-21 40,1 C 41,22 21,41 0,40 C -21,41 -41,21 -40,1 Z" pathLength="1" />
+    <line x1="0" y1="0" x2="34" y2="0" pathLength="1" />
+    <line x1="0" y1="0" x2="-34" y2="0" pathLength="1" />
+    <line x1="0" y1="0" x2="0" y2="34" pathLength="1" />
+    <line x1="0" y1="0" x2="22" y2="-22" pathLength="1" />
+    <line x1="0" y1="0" x2="-22" y2="-22" pathLength="1" />
+    <line x1="0" y1="0" x2="22" y2="22" pathLength="1" />
+    <line x1="0" y1="0" x2="-22" y2="22" pathLength="1" />
+    <path class="gate-compass-n" d="M 0,0 L -6,-24 L 0,-42 L 6,-24 Z" pathLength="1" />
+    <circle cx="0" cy="0" r="3.5" pathLength="1" />
+  </svg>
+
+  <!-- faint ink specks in the dark surround -->
+  <span class="gate-speck gate-speck-1" aria-hidden="true"></span>
+  <span class="gate-speck gate-speck-2" aria-hidden="true"></span>
+  <span class="gate-speck gate-speck-3" aria-hidden="true"></span>
+
+  <!-- ── The folded letter (hand-inked SVG) ─────────────────────────── -->
+  <div class="gate-letter" aria-hidden="true">
+    <svg
+      class="gate-letter-svg"
+      viewBox="0 0 440 320"
+      fill="none"
+      preserveAspectRatio="xMidYMid meet"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <clipPath id="gate-body-clip">
+          <path d="M 70,70 C 150,64 250,60 370,55 C 375,120 376,190 378,250 C 280,256 160,258 62,262 C 66,190 68,130 70,70 Z" />
+        </clipPath>
+      </defs>
+
+      <!-- parchment body fill -->
+      <path
+        class="gate-fill"
+        d="M 70,70 C 150,64 250,60 370,55 C 375,120 376,190 378,250 C 280,256 160,258 62,262 C 66,190 68,130 70,70 Z"
+      ></path>
+
+      <!-- texture over the fill, clipped to the body silhouette -->
+      <image
+        class="gate-tex"
+        href="/textures/parchment_texture1.jpg"
+        x="40" y="40" width="360" height="240"
+        preserveAspectRatio="xMidYMid slice"
+        clip-path="url(#gate-body-clip)"
+      ></image>
+
+      <!-- soft interior occlusion: sparse hatching in the shadowed valleys -->
+      <g class="gate-ink3 gate-hatch" clip-path="url(#gate-body-clip)">
+        <!-- beside vertical fold 1 -->
+        <path d="M 178,84 L 190,92" pathLength="1"></path>
+        <path d="M 177,118 L 189,126" pathLength="1"></path>
+        <path d="M 178,206 L 190,214" pathLength="1"></path>
+        <path d="M 177,236 L 189,244" pathLength="1"></path>
+        <!-- beside vertical fold 2 -->
+        <path d="M 276,90 L 288,98" pathLength="1"></path>
+        <path d="M 275,150 L 287,158" pathLength="1"></path>
+        <path d="M 276,214 L 288,222" pathLength="1"></path>
+        <!-- under the horizontal fold -->
+        <path d="M 96,170 L 104,182" pathLength="1"></path>
+        <path d="M 130,170 L 138,182" pathLength="1"></path>
+        <path d="M 320,168 L 328,180" pathLength="1"></path>
+        <path d="M 352,167 L 360,179" pathLength="1"></path>
+      </g>
+
+      <!-- double-stroked outline (outer bold, inner faint) -->
+      <path
+        class="gate-ink1 gate-draw"
+        pathLength="1"
+        d="M 70,70 C 150,64 250,60 370,55 C 375,120 376,190 378,250 C 280,256 160,258 62,262 C 66,190 68,130 70,70 Z"
+      ></path>
+      <path
+        class="gate-ink3 gate-draw"
+        pathLength="1"
+        d="M 78,78 C 152,73 250,69 362,64 C 367,122 368,186 370,242 C 278,247 162,249 72,252 C 75,188 76,134 78,78 Z"
+      ></path>
+
+      <!-- fold creases -->
+      <path class="gate-ink2 gate-draw" pathLength="1" d="M 172,66 C 170,130 174,196 173,256"></path>
+      <path class="gate-ink3 gate-draw" pathLength="1" d="M 175,70 C 173,132 177,194 176,252"></path>
+      <path class="gate-ink2 gate-draw" pathLength="1" d="M 270,60 C 272,130 268,196 270,250"></path>
+      <path class="gate-ink2 gate-draw" pathLength="1" d="M 66,162 C 170,158 270,160 376,158"></path>
+      <path class="gate-ink3 gate-draw" pathLength="1" d="M 70,166 C 170,162 270,164 372,162"></path>
+
+      <!-- lifted dog-ear corner (top-right), showing the paper's back -->
+      <path class="gate-flap-fill" d="M 324,56 L 370,55 L 372,102 Z"></path>
+      <g class="gate-ink3 gate-hatch">
+        <path d="M 340,64 L 356,72" pathLength="1"></path>
+        <path d="M 348,70 L 364,78" pathLength="1"></path>
+        <path d="M 352,82 L 368,90" pathLength="1"></path>
+      </g>
+      <path class="gate-ink1 gate-draw" pathLength="1" d="M 324,56 C 340,74 356,88 372,102"></path>
+      <path class="gate-ink2 gate-draw" pathLength="1" d="M 324,56 L 370,55 L 372,102"></path>
+      <!-- occlusion cast by the lifted corner -->
+      <g class="gate-ink3 gate-hatch">
+        <path d="M 316,64 L 326,74" pathLength="1"></path>
+        <path d="M 310,74 L 320,84" pathLength="1"></path>
+        <path d="M 306,86 L 316,96" pathLength="1"></path>
+      </g>
+
+      <!-- deep-red wax seal — the letter's one spot of colour and its focal point -->
+      <g class="gate-seal">
+        <!-- a bead or two of wax dripped off the ring's lower edge -->
+        <path class="gate-seal-wax gate-seal-drip" d="M 205,242 C 200,250 202,264 208,264 C 214,264 215,250 210,242 Z"></path>
+        <path class="gate-seal-wax gate-seal-drip" d="M 234,244 C 230,250 231,259 236,259 C 240,259 241,250 238,244 Z"></path>
+        <!-- the wax body -->
+        <path class="gate-seal-wax"
+          d="M 220,176 C 246,174 262,192 260,214 C 258,236 238,246 218,244 C 196,242 182,222 186,200 C 189,184 204,177 220,176 Z"></path>
+        <!-- hand-drawn wobbly double-ring outline (dark oxblood) -->
+        <path class="gate-seal-ring gate-seal-ring1 gate-draw" pathLength="1"
+          d="M 220,176 C 246,174 262,192 260,214 C 258,236 238,246 218,244 C 196,242 182,222 186,200 C 189,184 204,177 220,176 Z"></path>
+        <path class="gate-seal-ring gate-seal-ring2 gate-draw" pathLength="1"
+          d="M 220,182 C 240,181 254,196 252,213 C 250,231 234,239 219,238 C 201,237 189,221 192,204 C 195,190 207,183 220,182 Z"></path>
+        <!-- tiny binding flourish beneath the seal -->
+        <path class="gate-seal-ring gate-seal-ring2 gate-draw" pathLength="1"
+          d="M 196,250 C 210,246 230,246 244,250 C 232,256 208,256 196,250 Z"></path>
+        <text class="gate-seal-text" x="221" y="218" text-anchor="middle">MP</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ── Primary CTA ─────────────────────────────────────────────────── -->
+  <div class="gate-cta-wrap">
+    <button id="gate-swear" class="gate-cta" type="button">
+      <span class="gate-cta-text">I solemnly swear that I am up to something good.</span>
+    </button>
+    <span class="gate-note gate-note-swear" aria-hidden="true">— unfolds the map —</span>
+  </div>
+
+  <!-- ── Quiet secondary link ────────────────────────────────────────── -->
+  <div class="gate-plain-wrap">
+    <button id="gate-plain" class="gate-plain" type="button">
+      prefer the quiet route? — the plain archives
+    </button>
+    <span class="gate-note gate-note-plain" aria-hidden="true">a plain, text-only edition</span>
+  </div>
+</div>
+
+<style>
+  .gate {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    background:
+      radial-gradient(
+        ellipse 120% 90% at 50% 44%,
+        #241706 0%,
+        #1c1208 55%,
+        #150d05 100%
+      );
+    overflow: hidden;
+  }
+
+  /* faint ink specks in the surround */
+  .gate-speck {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #f5ecd7;
+    opacity: 0.16;
+    pointer-events: none;
+  }
+  .gate-speck-1 { top: 20%; left: 24%; }
+  .gate-speck-2 { top: 68%; left: 78%; width: 1.5px; height: 1.5px; opacity: 0.12; }
+  .gate-speck-3 { top: 30%; left: 72%; width: 3px; height: 3px; opacity: 0.1; }
+
+  /* ── Dark-surround scene (behind the letter) ───────────────────────── */
+  .gate-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .gate-bg path,
+  .gate-bg line,
+  .gate-bg circle,
+  .gate-bg ellipse {
+    fill: none;
+    stroke: #f5ecd7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  /* constellations: hairline joins, brighter dots */
+  .gate-con { opacity: 0.85; }
+  .gate-bg .gate-con-line { stroke-width: 0.8; opacity: 0.14; }
+  .gate-bg .gate-star { fill: #f5ecd7; stroke: none; opacity: 0.2; }
+  .gate-scatter .gate-star { opacity: 0.16; }
+  /* wandering footprints */
+  .gate-bg .gate-bg-paw { fill: #f5ecd7; stroke: none; }
+  /* broken cup-ring stain */
+  .gate-bg .gate-ring {
+    stroke-width: 3;
+    opacity: 0.1;
+    stroke-dasharray: 30 9 46 12 26 10;
+  }
+  /* curling smoke / mist */
+  .gate-bg .gate-smoke {
+    stroke-width: 1.4;
+    opacity: 0.13;
+    stroke-dasharray: 3 8;
+  }
+
+  /* corner curls + compass rose (small, corner-anchored) */
+  .gate-flourish {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .gate-flourish path,
+  .gate-flourish line,
+  .gate-flourish circle {
+    fill: none;
+    stroke: #f5ecd7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .gate-flourish circle { fill: #f5ecd7; stroke: none; }
+  .gate-corner {
+    width: clamp(48px, 7vw, 72px);
+    height: clamp(48px, 7vw, 72px);
+    opacity: 0.15;
+  }
+  .gate-corner-tl { top: clamp(16px, 3vw, 34px); left: clamp(18px, 3vw, 36px); }
+  .gate-corner-br { bottom: clamp(16px, 3vw, 34px); right: clamp(18px, 3vw, 36px); }
+  .gate-compass-rose {
+    top: clamp(20px, 3.5vw, 40px);
+    right: clamp(20px, 3.5vw, 42px);
+    width: clamp(56px, 8vw, 80px);
+    height: clamp(56px, 8vw, 80px);
+    opacity: 0.16;
+  }
+  .gate-compass-rose .gate-compass-n { opacity: 0.4; }
+
+  @keyframes gate-twinkle {
+    0%, 100% { opacity: 0.1; }
+    50%      { opacity: 0.25; }
+  }
+  .gate-bg .gate-twinkle-a { animation: gate-twinkle 5s ease-in-out infinite; }
+  .gate-bg .gate-twinkle-b { animation: gate-twinkle 6.5s ease-in-out 0.8s infinite; }
+  .gate-bg .gate-twinkle-c { animation: gate-twinkle 7s ease-in-out 2s infinite; }
+
+  /* ── Folded letter ─────────────────────────────────────────────────── */
+  .gate-letter {
+    position: relative;
+    z-index: 2;
+    width: min(74vw, 500px);
+    aspect-ratio: 440 / 320;
+    transform: rotate(-2deg);
+    filter: drop-shadow(0 20px 46px rgba(0, 0, 0, 0.55))
+      drop-shadow(0 5px 14px rgba(0, 0, 0, 0.4));
+    animation: gate-breathe 6s ease-in-out infinite;
+  }
+
+  .gate-letter-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* ── ink stroke language (mirrors MarauderMap) ─────────────────────── */
+  .gate-letter-svg path,
+  .gate-letter-svg line {
+    fill: none;
+    stroke: #1c1208;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .gate-ink1,
+  .gate-ink1 * { stroke-width: 2.2; opacity: 0.85; }
+  .gate-ink2,
+  .gate-ink2 * { stroke-width: 1.4; opacity: 0.6; }
+  .gate-ink3,
+  .gate-ink3 * { stroke-width: 1; opacity: 0.4; }
+  .gate-hatch path { stroke-width: 1; opacity: 0.32; }
+
+  .gate-fill { fill: #f5ecd7; stroke: none; }
+  .gate-flap-fill {
+    fill: #faf4e6;
+    stroke: #1c1208;
+    stroke-width: 0;
+  }
+  .gate-tex {
+    mix-blend-mode: multiply;
+    opacity: 0.2;
+  }
+
+  /* ── Red wax seal (the one spot of colour) ─────────────────────────── */
+  .gate-seal .gate-seal-wax {
+    fill: #8b1a1a;
+    stroke: none;
+    opacity: 0.85;
+  }
+  .gate-seal .gate-seal-drip { opacity: 0.78; }
+  .gate-seal .gate-seal-ring {
+    fill: none;
+    stroke: #4e0f0f;
+  }
+  .gate-seal .gate-seal-ring1 { stroke-width: 2.2; opacity: 0.9; }
+  .gate-seal .gate-seal-ring2 { stroke-width: 1.3; opacity: 0.5; }
+
+  .gate-seal-text {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-variant-caps: small-caps;
+    font-size: 22px;
+    letter-spacing: 1px;
+    fill: #f5ecd7;
+    opacity: 0.92;
+    stroke: none;
+  }
+
+  @keyframes gate-breathe {
+    0%, 100% { transform: rotate(-2deg) scale(1); }
+    50%      { transform: rotate(-2deg) scale(1.012); }
+  }
+
+  /* ── Primary CTA ───────────────────────────────────────────────────── */
+  .gate-cta-wrap {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .gate-cta {
+    background: none;
+    border: none;
+    padding: 0.85rem 1.4rem;
+    cursor: pointer;
+    max-width: min(90vw, 480px);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .gate-cta-text {
+    display: inline;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.55;
+    color: #f5ecd7;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1.5px;
+    transition: background-size 380ms cubic-bezier(0.22, 1, 0.36, 1);
+    padding-bottom: 3px;
+  }
+
+  .gate-cta:hover .gate-cta-text,
+  .gate-cta:focus-visible .gate-cta-text {
+    background-size: 100% 1.5px;
+  }
+
+  .gate-cta:focus-visible {
+    outline: 1px solid rgba(245, 236, 215, 0.5);
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+
+  /* ── Explanatory notes under each control ──────────────────────────── */
+  .gate-note {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.72rem;
+    letter-spacing: 0.01em;
+    color: #f5ecd7;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 200ms ease, transform 200ms ease;
+  }
+
+  /* Desktop / hover-capable: notes fade in on hover or keyboard focus. */
+  @media (hover: hover) {
+    .gate-cta-wrap:hover .gate-note-swear,
+    .gate-cta-wrap:focus-within .gate-note-swear,
+    .gate-plain-wrap:hover .gate-note-plain,
+    .gate-plain-wrap:focus-within .gate-note-plain {
+      opacity: 0.55;
+      transform: translateY(0);
+    }
+  }
+
+  /* Touch / no-hover: notes are simply always visible. */
+  @media (hover: none) {
+    .gate-note {
+      opacity: 0.55;
+      transform: none;
+    }
+  }
+
+  /* ── Quiet secondary link ─────────────────────────────────────────── */
+  .gate-plain-wrap {
+    position: absolute;
+    left: 50%;
+    bottom: 2.25rem;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .gate-plain {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    color: var(--color-gold-pale, #c4a96a);
+    opacity: 0.68;
+    text-decoration: none;
+    padding: 0.5rem 0.7rem;
+    transition: opacity 220ms ease;
+  }
+
+  .gate-plain:hover,
+  .gate-plain:focus-visible {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ── State transition helpers (index.astro toggles .gate-leaving) ──── */
+  .gate.gate-leaving .gate-letter {
+    animation: none;
+    transform: rotate(-2deg) scale(1.06);
+    opacity: 0;
+    transition: transform 600ms ease, opacity 600ms ease;
+  }
+
+  .gate.gate-leaving .gate-cta,
+  .gate.gate-leaving .gate-plain,
+  .gate.gate-leaving .gate-note,
+  .gate.gate-leaving .gate-bg,
+  .gate.gate-leaving .gate-flourish {
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gate-letter { animation: none; }
+
+    /* all idle animation off */
+    .gate-bg .gate-twinkle-a,
+    .gate-bg .gate-twinkle-b,
+    .gate-bg .gate-twinkle-c {
+      animation: none;
+      opacity: 0.16;
+    }
+
+    .gate.gate-leaving .gate-letter {
+      transform: rotate(-2deg) scale(1);
+      transition: opacity 150ms ease;
+    }
+
+    .gate.gate-leaving .gate-cta,
+    .gate.gate-leaving .gate-plain {
+      transition: opacity 150ms ease;
+    }
+
+    .gate-cta-text { transition: background-size 120ms ease; }
+  }
+</style>

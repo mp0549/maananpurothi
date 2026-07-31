@@ -1,0 +1,76 @@
+/* ── about.css — Biographical Notes page styles ─────────────────────────── */
+
+/* ── Pinned note cards (with tape decoration) ────────────────────────────── */
+
+.pinned-note {
+  position: relative;
+  background: var(--color-parchment-light);
+  border: 1px solid var(--color-gold-pale);
+  padding: 1.5rem;
+  box-shadow: 2px 4px 12px rgba(28, 18, 8, 0.1);
+}
+
+.pinned-note::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 1.5rem;
+  width: 40px;
+  height: 10px;
+  background: rgba(196, 169, 106, 0.3);
+  border: 1px solid rgba(196, 169, 106, 0.45);
+  border-radius: 1px;
+}
+
+/* ── Margin notes (Marginalia section) ───────────────────────────────────────
+   Short handwritten asides under the last note. Each is dashed off next to a
+   gold em-dash rather than a bullet, so they read as scribbles in the margin
+   and not as another list of claims. */
+
+.margin-notes {
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
+  border-top: 1px dashed var(--color-gold-pale);
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.margin-notes li {
+  position: relative;
+  padding-left: 1.35rem;
+  font-family: var(--font-hand);
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--color-ink-muted);
+  /* The hand font sits small and upright; a touch of tilt and letter-spacing
+     keeps it from looking like a font choice and more like handwriting. */
+  letter-spacing: 0.01em;
+  transform: rotate(-0.4deg);
+  transform-origin: left center;
+}
+
+.margin-notes li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--color-gold-pale);
+}
+
+/* Slight variation so the lines don't stack too evenly. */
+.margin-notes li:nth-child(even) {
+  transform: rotate(0.3deg);
+}
+
+/* ── Portrait frame ───────────────────────────────────────────────────────── */
+
+.portrait-frame {
+  border: 2px solid var(--color-gold);
+  box-shadow:
+    inset 0 0 0 4px var(--color-parchment-light),
+    inset 0 0 0 6px var(--color-gold-pale),
+    4px 4px 24px rgba(28, 18, 8, 0.22);
+  padding: 6px;
+  background: var(--color-parchment-aged);
+}

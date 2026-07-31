@@ -1,0 +1,289 @@
+<!-- Left panel — dark identity masthead -->
+<aside class="sv-panel" id="sv-panel">
+  <div class="sv-panel-texture" aria-hidden="true"></div>
+  <div class="sv-panel-glow" aria-hidden="true"></div>
+
+  <div class="sv-compass-wrap" aria-hidden="true">
+    <svg
+      class="sv-compass-rose"
+      id="sv-compass-rose"
+      viewBox="0 0 96 96"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="48" cy="48" r="46" stroke="#C4A96A" stroke-width="0.5"/>
+      <circle cx="48" cy="48" r="38" stroke="#C4A96A" stroke-width="0.3"/>
+      <circle cx="48" cy="48" r="28" stroke="#C4A96A" stroke-width="0.2"/>
+      <polygon points="48,5 52,44 48,48 44,44" fill="#C4A96A"/>
+      <polygon points="48,91 52,52 48,48 44,52" fill="#8B6914" opacity="0.55"/>
+      <polygon points="91,48 52,44 48,48 52,52" fill="#8B6914" opacity="0.55"/>
+      <polygon points="5,48 44,44 48,48 44,52"  fill="#8B6914" opacity="0.55"/>
+      <polygon points="79,17 52,46 48,48 52,44"  fill="#8B6914" opacity="0.28"/>
+      <polygon points="17,17 44,46 48,48 44,44"  fill="#8B6914" opacity="0.28"/>
+      <polygon points="79,79 52,50 48,48 52,52"  fill="#8B6914" opacity="0.28"/>
+      <polygon points="17,79 44,50 48,48 44,52"  fill="#8B6914" opacity="0.28"/>
+      <circle cx="48" cy="48" r="6.5" fill="#8B6914"/>
+      <circle cx="48" cy="48" r="4"   fill="#1C1208"/>
+      <circle cx="48" cy="48" r="1.8" fill="#C4A96A"/>
+      <text x="48" y="19" text-anchor="middle" dominant-baseline="middle"
+            font-family="Cinzel,serif" font-size="7.5" fill="#C4A96A" font-weight="700">N</text>
+      <text x="48" y="78" text-anchor="middle" dominant-baseline="middle"
+            font-family="Cinzel,serif" font-size="6.5" fill="#8B6914" opacity="0.7">S</text>
+      <text x="82" y="49" text-anchor="middle" dominant-baseline="middle"
+            font-family="Cinzel,serif" font-size="6.5" fill="#8B6914" opacity="0.7">E</text>
+      <text x="14" y="49" text-anchor="middle" dominant-baseline="middle"
+            font-family="Cinzel,serif" font-size="6.5" fill="#8B6914" opacity="0.7">W</text>
+    </svg>
+  </div>
+
+  <div class="sv-panel-inner">
+    <header class="sv-panel-header">
+      <p class="sv-eyebrow">The Archives</p>
+      <h1 class="sv-name">Maanan<br />Purothi</h1>
+      <div class="sv-ornament-rule" aria-hidden="true">
+        <span class="sv-rule-line"></span>
+        <span class="sv-rule-glyph">✦</span>
+        <span class="sv-rule-line"></span>
+      </div>
+      <p class="sv-tagline">Mapping the<br />intellectual frontier</p>
+    </header>
+
+    <footer class="sv-panel-footer">
+      <div class="sv-beyond">
+        <div class="sv-beyond-rule"></div>
+        <p class="sv-beyond-title">Beyond the Map</p>
+        <a href="https://mp0549.github.io/my-portfolio/" class="sv-beyond-link" target="_blank" rel="noopener noreferrer">
+          <span class="sv-beyond-sym">◇</span>
+          <span class="sv-beyond-label">The Portfolio</span>
+          <span class="sv-beyond-arrow">↗</span>
+        </a>
+        <a href="https://mp0549.github.io/lab/" class="sv-beyond-link" target="_blank" rel="noopener noreferrer">
+          <span class="sv-beyond-sym">◇</span>
+          <span class="sv-beyond-label">The Lab</span>
+          <span class="sv-beyond-arrow">↗</span>
+        </a>
+        <a href="#" class="sv-beyond-link" target="_blank" rel="noopener noreferrer">
+          <span class="sv-beyond-sym">◇</span>
+          <span class="sv-beyond-label">Credentials</span>
+          <span class="sv-beyond-arrow">↗</span>
+        </a>
+      </div>
+    </footer>
+  </div>
+</aside>
+
+<style>
+  .sv-panel {
+    position: relative;
+    height: 100vh;
+    width: 320px;
+    flex-shrink: 0;
+    background: #1C1208;
+    border-right: 1px solid rgba(196, 169, 106, 0.1);
+    box-shadow: 8px 0 40px rgba(28, 18, 8, 0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+  }
+
+  .sv-panel-texture {
+    position: absolute;
+    inset: 0;
+    background-image: url('/textures/parchment_texture1.jpg');
+    background-size: 420px 420px;
+    background-repeat: repeat;
+    mix-blend-mode: overlay;
+    opacity: 0.065;
+    pointer-events: none;
+  }
+
+  .sv-panel-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 50% 35%, rgba(196,169,106,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .sv-compass-wrap {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 310px;
+    height: 310px;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+
+  .sv-compass-rose {
+    width: 100%;
+    height: 100%;
+    opacity: 0.10;
+    will-change: transform;
+  }
+
+  .sv-panel-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 2.75rem 2.25rem 2.25rem;
+  }
+
+  .sv-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.47rem;
+    letter-spacing: 0.44em;
+    text-transform: uppercase;
+    color: #C4A96A;
+    opacity: 0.72;
+    margin-bottom: 1.1rem;
+  }
+
+  .sv-name {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    font-size: clamp(2.2rem, 3vw, 3.1rem);
+    font-weight: 700;
+    color: #FAF4E6;
+    letter-spacing: 0.02em;
+    line-height: 1.12;
+    margin-bottom: 1.3rem;
+  }
+
+  .sv-ornament-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.1rem;
+    max-width: 160px;
+  }
+
+  .sv-rule-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(196, 169, 106, 0.4));
+  }
+
+  .sv-ornament-rule .sv-rule-line:last-child {
+    background: linear-gradient(to left, transparent, rgba(196, 169, 106, 0.4));
+  }
+
+  .sv-rule-glyph {
+    font-size: 0.48rem;
+    color: #C4A96A;
+    opacity: 0.72;
+    line-height: 1;
+  }
+
+  .sv-tagline {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: #C4A96A;
+    opacity: 0.82;
+    line-height: 1.65;
+    letter-spacing: 0.02em;
+  }
+
+  .sv-beyond { padding-top: 1rem; margin-top: auto; }
+  .sv-beyond-rule {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(196,169,106,0.28), transparent);
+    margin-bottom: 0.9rem;
+  }
+  .sv-beyond-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: #C4A96A;
+    opacity: 0.62;
+    margin-bottom: 0.7rem;
+  }
+  .sv-beyond-link {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0;
+    text-decoration: none;
+    border-top: 1px solid rgba(196,169,106,0.08);
+    transition: opacity 150ms ease;
+  }
+  .sv-beyond-link:first-of-type { border-top: none; }
+  .sv-beyond-link:hover { opacity: 0.65; }
+  .sv-beyond-link:hover .sv-beyond-label {
+    text-decoration: underline;
+    text-decoration-color: rgba(196, 169, 106, 0.4);
+    text-underline-offset: 3px;
+  }
+  .sv-beyond-sym { font-size: 0.5rem; color: #C4A96A; opacity: 0.5; }
+  .sv-beyond-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #FAF4E6;
+    flex: 1;
+  }
+  .sv-beyond-arrow { font-size: 0.5rem; color: #C4A96A; opacity: 0.45; }
+
+  @media (max-width: 900px) {
+    .sv-panel {
+      position: static;
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      box-shadow: 0 4px 24px rgba(28, 18, 8, 0.2);
+    }
+
+    .sv-panel-inner {
+      padding: 2.25rem 1.5rem 2rem;
+      justify-content: flex-start;
+    }
+
+    .sv-compass-wrap { display: none; }
+    .sv-panel-footer { display: none; }
+
+    .sv-name { font-size: clamp(1.7rem, 7vw, 2.4rem); }
+  }
+</style>
+
+<script>
+  const panel = document.getElementById('sv-panel');
+  const compassRose = document.getElementById('sv-compass-rose') as SVGSVGElement | null;
+
+  if (panel && compassRose) {
+    let current = 0;
+    let target  = 0;
+    let running = false;
+
+    function tick() {
+      current += (target - current) * 0.07;
+      compassRose.style.transform = `rotate(${current}deg)`;
+      if (Math.abs(target - current) > 0.08) {
+        requestAnimationFrame(tick);
+      } else {
+        running = false;
+      }
+    }
+
+    function start() {
+      if (!running) { running = true; requestAnimationFrame(tick); }
+    }
+
+    panel.addEventListener('mousemove', (e: MouseEvent) => {
+      const rect = panel.getBoundingClientRect();
+      target = Math.atan2(
+        e.clientY - (rect.top + rect.height / 2),
+        e.clientX - (rect.left + rect.width / 2)
+      ) * (180 / Math.PI) + 90;
+      start();
+    });
+
+    panel.addEventListener('mouseleave', () => { target = 0; start(); });
+  }
+</script>

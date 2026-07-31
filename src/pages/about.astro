@@ -6,6 +6,7 @@
  */
 import Layout from '@/layouts/Layout.astro';
 import SectionDivider from '@/components/SectionDivider.astro';
+import ProseText from '@/components/ProseText.astro';
 import aboutData from '@/data/about.json';
 
 const { caption, sections } = aboutData;
@@ -13,6 +14,7 @@ const whoIAm       = sections.find((s) => s.id === "who-i-am")!;
 const whatICare    = sections.find((s) => s.id === "what-i-care-about")!;
 const howIGot      = sections.find((s) => s.id === "how-i-got-here")!;
 const whereImGoing = sections.find((s) => s.id === "where-im-going")!;
+const marginalia   = sections.find((s) => s.id === "marginalia")!;
 ---
 
 <Layout
@@ -72,7 +74,7 @@ const whereImGoing = sections.find((s) => s.id === "where-im-going")!;
           <section class="pinned-note scroll-reveal">
             <h2 class="font-display text-lg text-ink mb-3">{whoIAm.heading}</h2>
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
-              {(whoIAm.paragraphs ?? []).map((p) => <p set:html={p.replace(/\n/g, "<br/>")} />)}
+              {(whoIAm.paragraphs ?? []).map((p) => <p><ProseText text={p} /></p>)}
             </div>
           </section>
 
@@ -85,7 +87,7 @@ const whereImGoing = sections.find((s) => s.id === "where-im-going")!;
               {(whatICare.items ?? []).map(({ glyph, text }) => (
                 <div class="flex gap-3 items-baseline">
                   <span class="text-gold font-decorative text-xs shrink-0 mt-0.5">{glyph}</span>
-                  <p class="text-ink-muted leading-relaxed">{text}</p>
+                  <p class="text-ink-muted leading-relaxed"><ProseText text={text} /></p>
                 </div>
               ))}
             </div>
@@ -97,7 +99,7 @@ const whereImGoing = sections.find((s) => s.id === "where-im-going")!;
           <section class="pinned-note scroll-reveal">
             <h2 class="font-display text-lg text-ink mb-3">{howIGot.heading}</h2>
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
-              {(howIGot.paragraphs ?? []).map((p) => <p set:html={p.replace(/\n/g, "<br/>")} />)}
+              {(howIGot.paragraphs ?? []).map((p) => <p><ProseText text={p} /></p>)}
             </div>
           </section>
 
@@ -107,13 +109,32 @@ const whereImGoing = sections.find((s) => s.id === "where-im-going")!;
           <section class="pinned-note scroll-reveal">
             <h2 class="font-display text-lg text-ink mb-3">{whereImGoing.heading}</h2>
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
-              {(whereImGoing.paragraphs ?? []).map((p) => <p set:html={p.replace(/\n/g, "<br/>")} />)}
+              {(whereImGoing.paragraphs ?? []).map((p) => <p><ProseText text={p} /></p>)}
               {whereImGoing.quote && (
                 <p class="font-fell italic text-ink" style="font-size: 1rem;">
                   "{whereImGoing.quote}"
                 </p>
               )}
             </div>
+          </section>
+
+          <SectionDivider glyph="✦" />
+
+          <!-- Note 5: Marginalia — the non-professional half, kept deliberately
+               lighter than the notes above. The scribbled asides use --font-hand
+               so they read as margin notes rather than more body copy. -->
+          <section class="pinned-note scroll-reveal">
+            <h2 class="font-display text-lg text-ink mb-3">{marginalia.heading}</h2>
+            <div class="text-ink-muted leading-relaxed space-y-3 font-body">
+              {(marginalia.paragraphs ?? []).map((p) => <p><ProseText text={p} /></p>)}
+            </div>
+            {(marginalia.notes ?? []).length > 0 && (
+              <ul class="margin-notes">
+                {(marginalia.notes ?? []).map((n) => (
+                  <li><ProseText text={n} /></li>
+                ))}
+              </ul>
+            )}
           </section>
 
         </div>

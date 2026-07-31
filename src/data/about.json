@@ -8,33 +8,54 @@
       "id": "who-i-am",
       "heading": "Who I Am",
       "paragraphs": [
-        "I enjoy building things and figuring out how they work. I'm studying Computer Science and Statistics, which gives a broad toolkit and lets me approach problems from different angles.\nI'm drawn to both sides of the spectrum- the quick satisfaction of building something people can use right away, and the slower, methodological process of research. Most of the time, I end up somewhere in between, using a mix of skills to break down complex problems and turn them into something tangible.",
-        "My background spans [your actual background here]. I care most about building things that matter, understanding systems that are too complex to understand fully, and finding the right framing for hard problems."
+        "I study Computer Science and Statistics at [UW–Madison|University of Wisconsin–Madison, B.S. in both. Class of 2027.](https://wisc.edu). The statistics half is there because I want to do research, and statistics carries more weight in research than I appreciated going in. Two degrees is slower than one, but I'd rather learn both properly than rush either.",
+        "My time splits a few ways right now. I'm a research engineer at Equistamp(https://equistamp.com), working with METR(https://metr.org) and [Redwood Research](https://redwoodresearch.org) on the infrastructure people use to evaluate AI systems: building it, then trying to break it before someone else does. I do a directed study with the [UW Graphics Group](https://graphics.cs.wisc.edu/) on how visualization design guidelines get written, which is a slower and very different kind of careful. And I run [GDG Madison|Google Developer Groups- a developer community!](https://gdg.community.dev/gdg-madison/) as President and lead a technical cohort at [WAISI|Wisconsin AI Safety Initiative](https://waisi.org), where I get to lead a discussion on the technical side of AI safety and help people get their P(Doom) up.",
+        "None of that was a plan. I'd rather be confused about something interesting than fluent in something settled, and most of my decisions have followed from that, which is also why the list keeps changing."
       ]
     },
     {
       "id": "what-i-care-about",
       "heading": "What I Care About",
       "items": [
-        { "glyph": "❧", "text": "Algorithmic Transparency: Turning black-box ML models into auditable, legible systems, ensuring we understand exactly how and why a model behaves the way it does." },
-        { "glyph": "❧", "text": "The Craft of Toolmaking: Building end-to-end, full-stack infrastructure—from serverless GPU pipelines to intuitive dashboards—that empowers other researchers and users." },
-        { "glyph": "❧", "text": "Community & Mentorship: Designing accessible platforms and leading cohorts that make technical learning collaborative and equitable." }
+        { "glyph": "❧", "text": "Exploring. Learning things, trying things, following a question well past the point where it's obviously useful. From cooking to games to what I'm working on, I'm constantly looking around for new ideas." },
+        { "glyph": "❧", "text": "Impact. I want to leave something behind. Even if nobody remembers it was me, I'd like there to be some lasting effect from what I did; whether that comes from something I built, something I found, or the people I knew." },
+        { "glyph": "❧", "text": "Knowing why. I want to understand how something actually works, not just how to use it. That goes for systems and, honestly, for people too, I like knowing what makes things tick." },
+        { "glyph": "❧", "text": "Not sitting on it. Knowledge is worth close to nothing held still; we're all here because some caveman told another cavman you could hit things with rocks. Teaching is also the fastest way I've found to check whether I actually understand something." }
       ]
     },
     {
       "id": "how-i-got-here",
       "heading": "How I Got Here",
       "paragraphs": [
-        "The route hasn't been direct, and I consider that an asset. I initially set my sights strictly on pure NLP research and a traditional PhD track. However, a stint building full-stack ML pipelines at Meta shifted my trajectory; I discovered the dopamine that comes with shipping products that solve immediate, real-world problems.\nToday, my work spans both territories. Whether I am analyzing visualization guidelines in a university research lab, fine-tuning LLMs on tight compute constraints, developing computer vision for autonomous vehicles, or studying AI Safety, I carry the instruments of both the software engineer and the data scientist."
+        "I came into college wanting to study how machines understand and generate language, and assumed I'd end up on a PhD track working on NLP and LLMs. Software engineering was something I was good at and enjoyed but hadn't quite fallen for yet.",
+        "Meta is where that changed, and it was less about the work than about how it felt to finish things. I was on the infrastructure side of deployment, and I kept picking up small projects alongside my main internship project, from something like a like/dislike button on agent responses, right up to a front-facing dashboard that a bunch of teams used to find bottlenecks in company-wide deployments. Finishing something and then watching people use it felt better than any good result I'd gotten on a benchmark. I came out of that summer wanting a lot more of it, and I still do.",
+        "AI safety came out of the same instinct, which surprised me. I took the impact-maximizing habit I'd picked up over the summer and started pointing it at everything, and this kept coming back as a place where the gap between how much it matters and how many people work on it is enormous. It was also just interesting, a whole school of thought I'd previously met only through scifi books and movies. An [EAG|EA Global — a conference series for people working on high-impact problems, AI safety among them.] conference is where it went from being a curiosity to a path I wanted to go down."
       ]
     },
     {
       "id": "where-im-going",
-      "heading": "Where I'm Going",
+      "heading": "Open Questions",
       "paragraphs": [
-        "Right now, I am focused on deconstructing how artificial intelligence actually functions under the hood. I am actively upskilling in technical AI safety through rigorous programs like ARENA, studying interpretability, and constantly prototyping new ideas in my experimental playground.\nBecause I find deep value in both the laboratory and engineering sprints, I am keeping my compass calibrated for both domains, looking for the next frontier where my generalist background can make the highest impact."
+        "Thoughts in draft."
       ],
       "quote": "Not all those who wander are lost — but most of them are making maps."
+    },
+    {
+      "id": "marginalia",
+      "heading": "Marginalia",
+      "paragraphs": [
+        "I have been cooking a lot over the past year, when I moved into an apartment. I default to fried rice in a rush, but love trying out new things. I also enjoy going on hikes whenever I get the chance, and same goes for reading- fiction or otherwise. Planning on turning these into their own corners in the [the Greehouses](/garden/), where I'll talk a bit more about what I'm up to.",
+        "[Harry Potter|Click here to read Death of the Author](https://writing.upenn.edu/~taransky/Barthes.pdf) obviously, if you picked up on what I was going for with the theme lol.",
+        "I'm also mildly obsessed with oreos, and always have a pack of them in reach around my working area. Same for coffee, though I've been trying to control the caffeine intake off finals season.",
+        "I fought karate nationally, play basketball, and have spent most of this summer in the gym. Guitar and piano too, though not well. Games tend to come and go; right now I'm playing Minecraft and Assassin's Creed Odyssey.",
+        "Chess is the one I keep coming back to. I used to compete when I was young, but got back into it in middle school after a few years of hiatus. The higher my elo gets, the more I realize how much room there is to grow above me, which is both annoying and the reason I haven't put it down.",
+        " "
+      ],
+      "notes": [
+        "coffee coffee coffee",
+        "oreos are a problem. not currently fixing it.",
+        "always taking music recs"
+      ]
     }
   ]
 }

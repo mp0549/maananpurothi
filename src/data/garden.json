@@ -1,52 +1,28 @@
 {
   "notes": [
     {
-      "title": "Field Notes, Vol. I — On the Topology of Attention",
-      "date": "March 2025",
-      "excerpt": "A loose collection of observations gathered at the edge of focus and distraction — what the landscape looks like when the mind finally stops moving.",
-      "summary": "A field observation cross-referencing Simone Weil's writings on attention with modern cognitive science. The territory between focus and distraction turns out to be inhabited. Conclusions provisional but pointing somewhere interesting.",
+      "title": "Reading",
+      "date": "July 2026",
+      "excerpt": "Right now: The Shining, Shutter Island, and a rotating stack of AI safety books. Fiction to fall into, the rest to argue with.",
+      "summary": "A running list of what I'm reading and what actually stuck. Currently working through The Shining, Shutter Island, and various AI safety books. The full shelf, with notes, is coming soon.",
       "href": "#",
-      "tags": ["Thinking", "Writing"]
+      "tags": ["Reading"]
     },
     {
-      "title": "A Working Theory of Adjacent Possible",
-      "date": "February 2025",
-      "excerpt": "Stuart Kauffman's phrase keeps appearing on different maps. I suspect it describes something important about how interesting problems self-select their solvers.",
-      "summary": "An attempt to map how Kauffman's adjacent possible functions as a predictive tool for intellectual adjacency. The model wants refinement. Still being cross-referenced against the primary literature.",
+      "title": "Recipes",
+      "date": "July 2026",
+      "excerpt": "The things I actually cook, written down properly for once.",
+      "summary": "Coming soon.",
       "href": "#",
-      "tags": ["Thinking", "Theory"]
+      "tags": ["Cooking"]
     },
     {
-      "title": "Marginalia: Tools That Think With You",
-      "date": "January 2025",
-      "excerpt": "Notes toward a typology of tools that extend cognition rather than merely automate it. The distinction matters more than most product teams admit.",
-      "summary": "Toward a typology of cognitive-extension tools versus automation tools. The distinction carries real design implications — implications most teams have not yet reckoned with. More specimen examples needed before the taxonomy holds.",
+      "title": "Trails",
+      "date": "July 2026",
+      "excerpt": "A few hikes worth the drive out of Madison.",
+      "summary": "Coming soon.",
       "href": "#",
-      "tags": ["AI", "Craft"]
-    },
-    {
-      "title": "On Reading Maps That Lie",
-      "date": "December 2024",
-      "excerpt": "Every map is an argument. Some arguments are honest about their limitations; most are not. A meditation on epistemics, cartography, and institutional knowledge.",
-      "summary": "Every map is an argument — this dispatch traces what it means when the argument is dishonest by design. Draws from cartographic history and the politics of institutional knowledge-making. Still unresolved at its core.",
-      "href": "#",
-      "tags": ["Thinking", "Writing"]
-    },
-    {
-      "title": "The Shape of a Good Question",
-      "date": "November 2024",
-      "excerpt": "Most questions are really conclusions in disguise. The ones worth holding open for years have a particular shape — pointed enough to aim at something, loose enough to surprise you.",
-      "summary": "A taxonomy of question-shapes and what makes certain questions worth holding open for years. Still resolving the line between productive ambiguity and productive specificity. The shape is becoming clearer.",
-      "href": "#",
-      "tags": ["Thinking", "Craft"]
-    },
-    {
-      "title": "Notes on Legibility and Scale",
-      "date": "October 2024",
-      "excerpt": "What it means for a system to remain understandable as it grows — and why most systems fail at this not through malice but through accumulation.",
-      "summary": "What it means for a system to remain understandable under growth pressure. Most legibility failures are failures of accumulation, not design intent. Patterns are emerging but not yet codified into a usable model.",
-      "href": "#",
-      "tags": ["AI", "Systems"]
+      "tags": ["Outdoors"]
     }
   ]
 }

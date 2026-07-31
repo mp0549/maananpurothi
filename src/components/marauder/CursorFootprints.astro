@@ -1,0 +1,246 @@
+---
+/**
+ * CursorFootprints.astro — cursor-trailing ink footprints (map + simple states).
+ *
+ * A fixed, full-viewport, pointer-events:none overlay stacked above the map.
+ * On `mousemove`, while the map is showing, the pointer is a mouse (not
+ * touch), and the user hasn't asked for reduced motion, a tiny red-ink shoe
+ * print spawns just behind the live cursor position, alternating feet, then
+ * fades. The effect should read as "someone invisible is walking a half
+ * step behind you" — understated, never distracting.
+ *
+ * Original art + algorithm, written from scratch for this project (see
+ * docs/marauder-map/DESIGN.md Phase 3 — "cursor-trailing footprints").
+ *
+ * Everything lives in this component's own script block — module-local state,
+ * (nb: never write a literal script tag in this comment — Vite's dep-scanner
+ * regexes .astro files for script tags and would try to parse what follows)
+ * no globals, no rAF loop (a mousemove listener is cheap enough on its own;
+ * spawns are throttled by distance + time before any DOM work happens).
+ */
+---
+
+<div class="footprints-layer" id="footprints-layer" aria-hidden="true">
+  <template id="footprint-template">
+    <div class="footprint">
+      <svg viewBox="0 0 14 20" width="8" height="12" focusable="false" aria-hidden="true">
+        <!-- sole: elongated pad, tapering slightly from ball (top) to arch (bottom) -->
+        <path
+          d="M7,0.8 C9.8,0.8 11.3,3.2 11,6 C10.7,8.6 9.6,10.8 7,11.4
+             C4.4,10.8 3.3,8.6 3,6 C2.7,3.2 4.2,0.8 7,0.8 Z"
+        />
+        <!-- heel pad: separate smaller pad below the sole, so it reads as a print -->
+        <path
+          d="M7,12.6 C9,12.6 10.4,14.3 10.2,16.4 C10,18.4 8.7,19.7 7,19.7
+             C5.3,19.7 4,18.4 3.8,16.4 C3.6,14.3 5,12.6 7,12.6 Z"
+        />
+      </svg>
+    </div>
+  </template>
+</div>
+
+<style>
+  .footprints-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 30;
+  }
+
+  .footprint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 12px;
+    opacity: 0;
+    transform-origin: 50% 50%;
+    animation: footprint-fade 1470ms forwards;
+    will-change: transform, opacity;
+  }
+
+  .footprint svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .footprint path {
+    fill: rgba(139, 26, 26, 0.85);
+  }
+
+  /* Fade in fast (~120ms) to half opacity, hold (~450ms), fade out (~900ms). */
+  @keyframes footprint-fade {
+    0% {
+      opacity: 0;
+      animation-timing-function: ease-out;
+    }
+    8.16% {
+      opacity: 0.5;
+      animation-timing-function: linear;
+    }
+    38.78% {
+      opacity: 0.5;
+      animation-timing-function: ease-in;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footprints-layer {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // ── Cursor-trailing footprints — original implementation ─────────────
+  //
+  // Algorithm:
+  //  - A `mousemove` listener bails immediately unless the map state is
+  //    active, the pointer is fine (mouse, not touch), and reduced motion
+  //    isn't requested.
+  //  - We track the *previous* raw mouse point (one event behind the live
+  //    cursor) and the point where the *last footprint spawned*. Once the
+  //    live cursor has moved far enough from the last spawn point (>=55px)
+  //    and enough time has passed (>=40ms), we spawn a new footprint — but
+  //    AT the previous point, not the live cursor. That one-event lag is
+  //    what makes the trail feel like it's following a half-step behind.
+  //  - Feet alternate left/right each spawn (mirrored art + an opposite
+  //    perpendicular stagger), so the trail zig-zags naturally like a gait.
+  //  - Each print is a single CSS keyframe animation (fade in/hold/fade
+  //    out) with a matching removal timeout as a fallback to `animationend`.
+  //  - At most 16 prints live at once; spawning a 17th force-removes the
+  //    oldest immediately.
+
+  const MIN_SPAWN_DIST = 55;
+  const MIN_SPAWN_DIST_SQ = MIN_SPAWN_DIST * MIN_SPAWN_DIST;
+  const MIN_SPAWN_INTERVAL_MS = 40;
+  const PERP_OFFSET = 5;
+  const MAX_LIVE_PRINTS = 16;
+  const FADE_IN_MS = 120;
+  const HOLD_MS = 450;
+  const FADE_OUT_MS = 900;
+  const TOTAL_LIFE_MS = FADE_IN_MS + HOLD_MS + FADE_OUT_MS;
+  const REMOVE_FALLBACK_MS = TOTAL_LIFE_MS + 80;
+
+  const container = document.getElementById('footprints-layer');
+  const template = document.getElementById('footprint-template') as HTMLTemplateElement | null;
+
+  if (container && template) {
+    // Evaluated once — a fine pointer doesn't change without a reload.
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    // Evaluated once, kept live via a change listener (OS setting can flip
+    // mid-session).
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let reducedMotion = reducedMotionQuery.matches;
+    reducedMotionQuery.addEventListener('change', (event) => {
+      reducedMotion = event.matches;
+    });
+
+    type PrintEntry = { el: HTMLElement; timeoutId: number };
+    const liveQueue: PrintEntry[] = [];
+
+    let hasPrevPoint = false;
+    let prevX = 0;
+    let prevY = 0;
+    let lastSpawnX = 0;
+    let lastSpawnY = 0;
+    let lastSpawnTime = 0;
+    let nextFootIsLeft = false;
+
+    function removePrint(entry: PrintEntry): void {
+      const idx = liveQueue.indexOf(entry);
+      if (idx !== -1) liveQueue.splice(idx, 1);
+      window.clearTimeout(entry.timeoutId);
+      entry.el.remove();
+    }
+
+    function spawnFootprint(x: number, y: number, rotationDeg: number, mirror: boolean): void {
+      const source = template!.content.firstElementChild;
+      if (!source) return;
+
+      const el = source.cloneNode(true) as HTMLElement;
+      const scaleX = mirror ? -1 : 1;
+      // Position via translate3d (centers the 8x12 print on the spawn
+      // point), then rotate to face the direction of travel, then mirror
+      // for the left foot. Order matters: with the default center
+      // transform-origin, rotate/scale pivot around the print's own
+      // center regardless of the translate.
+      el.style.transform =
+        `translate3d(${x - 4}px, ${y - 6}px, 0) rotate(${rotationDeg}deg) scaleX(${scaleX})`;
+
+      const entry: PrintEntry = { el, timeoutId: 0 };
+      const onDone = () => removePrint(entry);
+      el.addEventListener('animationend', onDone, { once: true });
+      entry.timeoutId = window.setTimeout(onDone, REMOVE_FALLBACK_MS);
+
+      container!.appendChild(el);
+      liveQueue.push(entry);
+
+      if (liveQueue.length > MAX_LIVE_PRINTS) {
+        removePrint(liveQueue[0]);
+      }
+    }
+
+    function onMouseMove(event: MouseEvent): void {
+      if (!finePointer || reducedMotion) return;
+
+      const state = document.documentElement.getAttribute('data-archives-state');
+      if (state !== 'map' && state !== 'simple') {
+        // Mid-ceremony (intro) — drop the trail so re-entering doesn't spawn
+        // a print across a huge, teleported distance.
+        hasPrevPoint = false;
+        return;
+      }
+
+      const x = event.clientX;
+      const y = event.clientY;
+
+      if (!hasPrevPoint) {
+        prevX = x;
+        prevY = y;
+        lastSpawnX = x;
+        lastSpawnY = y;
+        hasPrevPoint = true;
+        return;
+      }
+
+      const distDx = x - lastSpawnX;
+      const distDy = y - lastSpawnY;
+
+      if (distDx * distDx + distDy * distDy >= MIN_SPAWN_DIST_SQ) {
+        const now = performance.now();
+
+        if (now - lastSpawnTime >= MIN_SPAWN_INTERVAL_MS) {
+          const travelDx = x - prevX;
+          const travelDy = y - prevY;
+          const travelAngle = Math.atan2(travelDy, travelDx);
+          const rotationDeg = (travelAngle * 180) / Math.PI + 90;
+          const perpAngle = travelAngle + Math.PI / 2;
+          const side = nextFootIsLeft ? -1 : 1;
+
+          const spawnX = prevX + Math.cos(perpAngle) * side * PERP_OFFSET;
+          const spawnY = prevY + Math.sin(perpAngle) * side * PERP_OFFSET;
+
+          spawnFootprint(spawnX, spawnY, rotationDeg, nextFootIsLeft);
+
+          nextFootIsLeft = !nextFootIsLeft;
+          lastSpawnX = x;
+          lastSpawnY = y;
+          lastSpawnTime = now;
+        }
+      }
+
+      prevX = x;
+      prevY = y;
+    }
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+  }
+</script>

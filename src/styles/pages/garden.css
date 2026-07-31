@@ -1,0 +1,322 @@
+/* ── garden.css — The Herbarium page styles ──────────────────────────────── */
+
+/* ── Garden room wrapper ────────────────────────────────────────────────── */
+.garden-room {
+  min-height: 100vh;
+}
+
+/* ── Botanical header divider ───────────────────────────────────────────── */
+.botanical-header-divider {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Filter bar ──────────────────────────────────────────────────────────── */
+.garden-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 2.5rem;
+  margin-top: 1.25rem;
+}
+
+/* Filter stamps — pressable, toggle-able */
+.filter-stamp {
+  cursor: pointer;
+  background: transparent;
+  transition:
+    background-color 0.2s ease,
+    color           0.2s ease,
+    box-shadow      0.2s ease,
+    transform       0.15s ease;
+}
+
+.filter-stamp:hover:not(.is-active) {
+  background-color: color-mix(in srgb, var(--stamp-color, #3C2A1A) 12%, transparent);
+}
+
+/* Active stamp — filled like a pressed wax seal */
+.filter-stamp.is-active {
+  background-color: var(--stamp-color, #3C2A1A);
+  color: #F5ECD7 !important;
+  border-color: var(--stamp-color, #3C2A1A) !important;
+  box-shadow:
+    0 0 0 2px var(--stamp-color, #3C2A1A),
+    0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Ink-stamp press keyframe */
+@keyframes stamp-press {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(0.82); }
+  65%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.filter-stamp.is-pressing {
+  animation: stamp-press 0.24s ease-out forwards;
+}
+
+/* ── Notes grid ──────────────────────────────────────────────────────────── */
+.garden-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  padding-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .garden-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .garden-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Note wrapper — handles rotation & pin positioning ──────────────────── */
+.garden-note-wrapper {
+  position: relative;
+  margin-top: 18px; /* clearance for pin */
+  cursor: default;
+  --rot: 0deg;
+  transform: rotate(var(--rot));
+  transition:
+    transform  0.3s ease,
+    opacity    0.35s ease,
+    filter     0.35s ease;
+}
+
+/* Alternating rotations via custom property */
+.garden-note-wrapper:nth-child(3n+1) { --rot: -1.2deg; }
+.garden-note-wrapper:nth-child(3n+2) { --rot:  0.8deg; }
+.garden-note-wrapper:nth-child(3n+3) { --rot: -0.5deg; }
+
+.garden-note-wrapper:hover,
+.garden-note-wrapper.is-expanded {
+  transform: rotate(0deg) translateY(-3px);
+}
+
+/* Filtered-out: fade, desaturate, push back — rotation preserved */
+.garden-note-wrapper.is-filtered-out {
+  opacity: 0.1;
+  transform: rotate(var(--rot)) scale(0.93);
+  filter: grayscale(0.55) sepia(0.2);
+  pointer-events: none;
+}
+
+/* Cards re-appearing — springy lift */
+@keyframes card-appear {
+  0%   { opacity: 0.1; transform: rotate(var(--rot)) scale(0.92); }
+  60%  { opacity: 1;   transform: rotate(var(--rot)) scale(1.025); }
+  100% { opacity: 1;   transform: rotate(var(--rot)); }
+}
+
+.garden-note-wrapper.is-appearing {
+  animation: card-appear 0.4s ease-out forwards;
+}
+
+/* ── Pushpin ─────────────────────────────────────────────────────────────── */
+.garden-pin {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #ecd06a 0%, #d4a843 35%, #8b6914 100%);
+  box-shadow: 0 2px 4px rgba(28, 18, 8, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+  z-index: 20;
+}
+
+/* Highlight dot on pin */
+.garden-pin::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.75) 0%, transparent 70%);
+}
+
+/* ── Card — torn journal page ────────────────────────────────────────────── */
+.garden-note {
+  position: relative;
+  background: #FAF3E4;
+  padding: 1.25rem 1.25rem 4rem; /* generous bottom for torn edge */
+  box-shadow:
+    1px 2px 6px rgba(28, 18, 8, 0.12),
+    0 0 0 1px rgba(139, 105, 20, 0.08);
+  transition: box-shadow 0.2s ease;
+  overflow: hidden; /* clip the botanical marginalia SVG */
+}
+
+.garden-note-wrapper:hover .garden-note,
+.garden-note-wrapper.is-expanded .garden-note {
+  box-shadow:
+    3px 6px 18px rgba(28, 18, 8, 0.22),
+    0 0 0 1px rgba(139, 105, 20, 0.14);
+}
+
+/* ── Card content typography ─────────────────────────────────────────────── */
+.garden-note-date {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #7C6A4E;
+  opacity: 0.55;
+  margin-bottom: 0.5rem;
+}
+
+.garden-note-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: #1C1208;
+  line-height: 1.35;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 1px 0 rgba(245, 236, 215, 0.8);
+  transition: color 0.2s ease;
+}
+
+.garden-note-wrapper:hover .garden-note-title {
+  color: #8B6914;
+}
+
+.garden-note-rule {
+  height: 1px;
+  background: linear-gradient(to right, rgba(196, 169, 106, 0.5), transparent);
+  margin-bottom: 0.75rem;
+}
+
+.garden-note-excerpt {
+  font-family: 'Crimson Text', serif;
+  font-size: 0.95rem;
+  color: #7C6A4E;
+  line-height: 1.75;
+}
+
+/* ── READ DISPATCH button ────────────────────────────────────────────────── */
+.dispatch-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: #8B6914;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(139, 105, 20, 0.5);
+  padding: 0 0 1px;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.dispatch-btn:hover {
+  color: #B8922E;
+  border-color: #B8922E;
+}
+
+/* Hide dispatch btn when expanded */
+.garden-note-wrapper.is-expanded .dispatch-btn {
+  display: none;
+}
+
+/* ── Expanded content panel ──────────────────────────────────────────────── */
+.garden-expanded {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.35s ease-out, opacity 0.25s ease-out;
+}
+
+.garden-note-wrapper.is-expanded .garden-expanded {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.garden-expanded-divider {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0 0.75rem;
+}
+
+.garden-summary-label {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  color: #8B6914;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.garden-summary-text {
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #7C6A4E;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.garden-expand-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* ── SEE FULL DISPATCH link ──────────────────────────────────────────────── */
+.see-full-dispatch {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: #8B6914;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(139, 105, 20, 0.5);
+  padding-bottom: 1px;
+  letter-spacing: 0.03em;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.see-full-dispatch:hover {
+  color: #B8922E;
+  border-color: #B8922E;
+}
+
+/* ── CLOSE button ────────────────────────────────────────────────────────── */
+.close-dispatch-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  color: #7C6A4E;
+  opacity: 0.7;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.close-dispatch-btn:hover {
+  opacity: 1;
+}
+
+/* ── Botanical marginalia (corner decoration) ────────────────────────────── */
+.botanical-marginalia {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0.085;
+  pointer-events: none;
+  line-height: 0;
+}

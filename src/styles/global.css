@@ -6,6 +6,17 @@
 /* ── Google Fonts — must be before @tailwind directives ──────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=IM+Fell+English:ital@0;1&display=swap');
 
+/* ── Self-hosted handwritten display face — used ONLY for marginalia /
+   hand-annotation accents (never body or headings). "Before Rainbow" by its
+   respective author (1001fonts FFP license); swap `--font-hand` to change it. */
+@font-face {
+  font-family: 'Before Rainbow';
+  src: url('/fonts/BeforeRainbow.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -20,6 +31,21 @@
   --color-gold:            #8B6914;
   --color-gold-light:      #B8922E;
   --color-gold-pale:       #C4A96A;
+
+  /* wax-red — the site's single rare sharp accent (seals, pins, marks) */
+  --color-wax:             #8B1A1A;
+  --color-wax-deep:        #6E1414;
+
+  /* motion tokens — one elegant entrance curve, one punchy hover/press curve */
+  --ease-entrance: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-hover:    cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* one focus ring for the whole site, so every ring matches */
+  --focus-ring: 2px solid var(--color-gold);
+  --focus-ring-offset: 3px;
+
+  /* handwritten marginalia accent (single swap point) */
+  --font-hand: 'Before Rainbow', 'Segoe Script', cursive;
 }
 
 /* ── Base resets & defaults ───────────────────────────────────────────────── */
@@ -49,6 +75,12 @@
 
   a:hover {
     @apply text-gold-light;
+  }
+
+  /* themed text selection — stays in-world instead of the OS blue */
+  ::selection {
+    background: var(--color-gold-pale);
+    color: var(--color-ink);
   }
 
   /* Remove default list styles in nav contexts */
@@ -104,6 +136,14 @@
     background: var(--color-parchment-aged);
     color: var(--color-ink-muted);
     border: 1px solid var(--color-gold-pale);
+  }
+
+  /* Icon-only pinned marker — tracking zeroed so a lone glyph stays centered */
+  .tag-pill.pinned-pill {
+    @apply px-1.5 tracking-normal;
+    background: rgba(139, 105, 20, 0.15);
+    color: var(--color-gold);
+    border-color: rgba(139, 105, 20, 0.3);
   }
 
   /* ── Specimen stamp — herbarium oval tag ─────────────────────────────────── */

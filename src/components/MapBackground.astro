@@ -1,0 +1,55 @@
+<!-- Layer 1: vintage map image -->
+<div
+  class="absolute inset-0 bg-cover bg-center pointer-events-none"
+  style="background-image: url('/maps/old_cool_map.jpg'); opacity: 0.52; filter: sepia(0.15) saturate(0.85) contrast(1.08);"
+  aria-hidden="true"
+></div>
+
+<!-- Layer 2: second map layer for depth -->
+<div
+  class="absolute inset-0 bg-cover pointer-events-none"
+  style="background-image: url('/maps/fantasymap2.jpg'); background-position: 70% 40%; opacity: 0.15; filter: sepia(0.7) saturate(0.45); mix-blend-mode: multiply;"
+  aria-hidden="true"
+></div>
+
+<!-- Layer 2.5: tertiary map for geographic richness -->
+<div
+  class="absolute inset-0 bg-cover pointer-events-none"
+  style="background-image: url('/maps/fantasymap.jpg'); background-position: 30% 55%; opacity: 0.11; filter: sepia(0.75) saturate(0.35); mix-blend-mode: multiply;"
+  aria-hidden="true"
+></div>
+
+<!-- Layer 3: primary parchment texture -->
+<div
+  class="absolute inset-0 pointer-events-none"
+  style="background-image: url('/textures/parchment_texture1.jpg'); background-size: 420px 420px; background-repeat: repeat; mix-blend-mode: multiply; opacity: 0.34; filter: sepia(0.25) contrast(1.05);"
+  aria-hidden="true"
+></div>
+
+<!-- Layer 3.5: secondary texture at different scale and blend -->
+<div
+  class="absolute inset-0 pointer-events-none"
+  style="background-image: url('/textures/parchment_texture2.jpg'); background-size: 280px 280px; background-repeat: repeat; mix-blend-mode: overlay; opacity: 0.18; filter: sepia(0.15) contrast(1.1);"
+  aria-hidden="true"
+></div>
+
+<!-- Layer 4: radial vignette -->
+<div
+  class="absolute inset-0 pointer-events-none"
+  style="background: radial-gradient(ellipse 75% 70% at center, transparent 25%, rgba(28, 18, 8, 0.34) 100%);"
+  aria-hidden="true"
+></div>
+
+<!-- Western edge vignette (Portfolio direction) -->
+<div
+  class="absolute inset-y-0 left-0 pointer-events-none hidden md:block"
+  style="width: 20%; background: linear-gradient(to right, rgba(28,18,8,0.18), transparent); z-index: 10;"
+  aria-hidden="true"
+></div>
+
+<!-- Southern edge vignette (Lab direction) -->
+<div
+  class="absolute inset-x-0 bottom-0 pointer-events-none hidden md:block"
+  style="height: 22%; background: linear-gradient(to top, rgba(28,18,8,0.18), transparent); z-index: 10;"
+  aria-hidden="true"
+></div>

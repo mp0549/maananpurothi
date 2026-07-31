@@ -1,0 +1,1409 @@
+---
+/**
+ * MarauderMap.astro — The Archives centerpiece (v2: aerial floor-plan).
+ * Hand-inked, Marauder's-Map-inspired plan view of a castle complex on parchment.
+ * Monochrome ink (#1C1208); gold (#8B6914) only on the compass N tip + hover/focus.
+ * Deliberately messy: ink blots, spatter, age stains, wobbly double-stroked walls.
+ *
+ * Layer contract (ids matter — Phase-2 animation hooks):
+ *   #layer-paths · #layer-buildings · #layer-labels · #layer-flourishes · #layer-footprints
+ * Every drawn stroke carries pathLength="1" for uniform draw-on animation.
+ * data-draw="N" buckets set choreography order (1 corridors · 2 buildings · 3 labels · 4 flourishes).
+ */
+import mapData from '../../data/map.json';
+
+type Loc = { id: string; name: string; desc: string; href: string; external: boolean };
+const locs = mapData as Loc[];
+const byId = (id: string) => locs.find((l) => l.id === id)!;
+
+/** Greedy word-wrap for SVG tspan descriptions. */
+function wrap(text: string, max = 26): string[] {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let cur = '';
+  for (const w of words) {
+    if ((cur + ' ' + w).trim().length > max) {
+      if (cur) lines.push(cur);
+      cur = w;
+    } else {
+      cur = (cur + ' ' + w).trim();
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+const owlery = byId('owlery');
+const library = byId('codex');
+const common = byId('about');
+const garden = byId('garden');
+const workshop = byId('now');
+const portfolio = byId('portfolio');
+const lab = byId('lab');
+
+const linkAttrs = (l: Loc) =>
+  l.external ? { href: l.href, target: '_blank', rel: 'noopener noreferrer' } : { href: l.href };
+
+const corners = [
+  { t: 'translate(70,142)' },
+  { t: 'translate(1530,142) scale(-1,1)' },
+  { t: 'translate(70,930) scale(1,-1)' },
+  { t: 'translate(1530,930) scale(-1,-1)' },
+];
+
+/* Footprints walking the west corridor toward the Common Room (decorative). */
+const trailWest = [
+  { x: 676, y: 514, r: 88, o: 0.5 },
+  { x: 640, y: 520, r: 93, o: 0.46 },
+  { x: 604, y: 514, r: 86, o: 0.42 },
+  { x: 568, y: 522, r: 95, o: 0.38 },
+  { x: 500, y: 516, r: 90, o: 0.32 },
+  { x: 464, y: 521, r: 92, o: 0.26 },
+  { x: 428, y: 515, r: 88, o: 0.2 },
+];
+/* Footprints heading up the northeast corridor toward the Library. */
+const trailNE = [
+  { x: 874, y: 412, r: 232, o: 0.46 },
+  { x: 904, y: 395, r: 228, o: 0.4 },
+  { x: 934, y: 378, r: 234, o: 0.34 },
+  { x: 964, y: 362, r: 229, o: 0.27 },
+  { x: 994, y: 347, r: 232, o: 0.2 },
+];
+
+/* Ink spatter clusters — {x, y, red?, dots: [dx, dy, r, o][]}. */
+const spatter = [
+  { x: 985, y: 92, red: true, dots: [[0, 0, 2.2, 0.4], [11, 6, 1.2, 0.32], [-8, 9, 1.5, 0.28], [18, -4, 0.9, 0.22], [6, 16, 1.1, 0.18], [-15, 3, 0.8, 0.16]] },
+  { x: 1372, y: 702, dots: [[0, 0, 2.6, 0.42], [-10, 8, 1.4, 0.3], [12, 4, 1.1, 0.26], [4, -12, 0.9, 0.2], [-6, -8, 0.8, 0.15]] },
+  { x: 250, y: 690, dots: [[0, 0, 1.9, 0.35], [9, 7, 1.2, 0.26], [-7, 11, 1, 0.2], [15, -2, 0.8, 0.15]] },
+] as { x: number; y: number; red?: boolean; dots: number[][] }[];
+
+/* Soft age stains — irregular low-opacity blobs. */
+const stains = [
+  { x: 560, y: 655, rx: 44, ry: 34, rot: -14, o: 0.045 },
+  { x: 1185, y: 178, rx: 36, ry: 28, rot: 22, o: 0.04 },
+  { x: 862, y: 302, rx: 30, ry: 24, rot: -8, o: 0.038 },
+  { x: 392, y: 432, rx: 27, ry: 20, rot: 30, o: 0.042 },
+  { x: 1332, y: 542, rx: 33, ry: 25, rot: -25, o: 0.04 },
+  { x: 700, y: 830, rx: 38, ry: 26, rot: 10, o: 0.035 },
+];
+
+/* Scribbly trees west of the Owlery. */
+const trees = [
+  { x: 152, y: 322, r: 13 }, { x: 196, y: 296, r: 10 }, { x: 236, y: 330, r: 12 },
+  { x: 160, y: 388, r: 11 }, { x: 246, y: 396, r: 10 }, { x: 130, y: 440, r: 9 },
+];
+---
+
+<div class="marauder" data-marauder>
+  <div class="marauder-tex" aria-hidden="true"></div>
+
+  <div class="marauder-stage" data-stage>
+    <div class="marauder-pan" data-pan>
+      <svg
+        viewBox="0 0 1600 1000"
+        role="img"
+        aria-label="A hand-drawn floor plan of The Archives, a castle with seven destinations to explore."
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <!-- ══════════════ AGE STAINS (beneath everything) ══════════════ -->
+        <g aria-hidden="true">
+          {stains.map((s) => (
+            <ellipse class="stain" cx={s.x} cy={s.y} rx={s.rx} ry={s.ry}
+              transform={`rotate(${s.rot} ${s.x} ${s.y})`} opacity={s.o} />
+          ))}
+          <ellipse class="stain" cx="1048" cy="422" rx="52" ry="11" transform="rotate(-18 1048 422)" opacity="0.05" />
+        </g>
+
+        <!-- ══════════════ PATHS: corridors, passages, outdoor trails ══════════════ -->
+        <g id="layer-paths" data-draw="1">
+          <!-- west corridor: great hall → common room -->
+          <path class="ink1 wall" pathLength="1" d="M 700,505 C 610,499 498,506 388,514" />
+          <path class="ink1 wall" pathLength="1" d="M 700,527 C 610,523 500,529 390,536" />
+          <path class="ink3" pathLength="1" d="M 694,516 C 600,511 500,517 398,525" />
+
+          <!-- broom cupboard bulging off the west corridor -->
+          <g class="ink2">
+            <path pathLength="1" d="M 528,504 L 526,482 L 556,480 L 558,503" />
+            <line pathLength="1" x1="534" y1="503" x2="536" y2="497" />
+          </g>
+          <text class="microlabel" x="543" y="470" text-anchor="middle" transform="rotate(-2 543 470)">broom cupboard (do not open)</text>
+
+          <!-- northwest causeway: great hall → owlery (climbs the hill) -->
+          <path class="ink1 wall" pathLength="1" d="M 716,423 C 620,401 482,370 388,336" />
+          <path class="ink1 wall" pathLength="1" d="M 734,423 C 632,383 502,352 398,318" />
+          <g class="ink2 rungs">
+            <line pathLength="1" x1="562" y1="368" x2="556" y2="390" />
+            <line pathLength="1" x1="540" y1="362" x2="534" y2="384" />
+            <line pathLength="1" x1="518" y1="356" x2="512" y2="378" />
+            <line pathLength="1" x1="496" y1="350" x2="490" y2="372" />
+            <line pathLength="1" x1="474" y1="344" x2="468" y2="366" />
+          </g>
+
+          <!-- northeast corridor: great hall → library -->
+          <path class="ink1 wall" pathLength="1" d="M 860,421 C 900,390 958,361 1014,338" />
+          <path class="ink1 wall" pathLength="1" d="M 880,421 C 920,394 974,368 1030,352" />
+
+          <!-- east corridor: great hall → workshop -->
+          <path class="ink1 wall" pathLength="1" d="M 900,528 C 990,540 1080,574 1138,608" />
+          <path class="ink1 wall" pathLength="1" d="M 900,552 C 986,562 1068,592 1128,628" />
+          <path class="ink3" pathLength="1" d="M 906,540 C 992,551 1076,584 1130,618" />
+
+          <!-- south passage: great hall → kitchens -->
+          <path class="ink1 wall" pathLength="1" d="M 788,600 C 787,630 786,660 786,690" />
+          <path class="ink1 wall" pathLength="1" d="M 812,600 C 813,630 814,660 814,690" />
+
+          <!-- outdoor dotted trails -->
+          <g class="trail">
+            <!-- kitchens → greenhouses -->
+            <path pathLength="1" d="M 738,732 C 672,748 596,758 532,764" />
+            <!-- workshop → the lake -->
+            <path pathLength="1" d="M 1266,718 C 1294,772 1322,830 1344,876" />
+            <!-- workshop doors → the folly's door → and on off the map's edge -->
+            <path pathLength="1" d="M 1398,646 C 1414,651 1428,656 1440,660" />
+            <path pathLength="1" d="M 1514,658 C 1524,661 1533,664 1540,667" />
+            <!-- the library's east front → the portfolio signpost → beyond the grounds -->
+            <path pathLength="1" d="M 1296,300 C 1330,302 1364,305 1396,307" />
+            <path pathLength="1" d="M 1444,310 C 1476,313 1508,316 1536,319" />
+          </g>
+        </g>
+
+        <!-- ══════════════ BUILDINGS + location links ══════════════ -->
+        <g id="layer-buildings" data-draw="2">
+
+          <!-- ───────── GHOST ARCHITECTURE (background noise — unnamed, faint) ───────── -->
+          <g class="ghost" data-draw="2" aria-hidden="true">
+            <!-- north range: a row of rooms between the causeway and the library -->
+            <path class="ink2 wall" pathLength="1"
+              d="M 560,206 C 700,201 840,203 980,206 C 979,230 980,254 978,278 C 840,282 700,281 562,278 C 560,254 561,230 560,206 Z" />
+            <line class="ink3" pathLength="1" x1="662" y1="208" x2="660" y2="248" />
+            <line class="ink3" pathLength="1" x1="660" y1="262" x2="660" y2="276" />
+            <line class="ink3" pathLength="1" x1="762" y1="207" x2="761" y2="277" />
+            <line class="ink3" pathLength="1" x1="872" y1="208" x2="870" y2="240" />
+            <line class="ink3" pathLength="1" x1="870" y1="256" x2="870" y2="277" />
+            <path class="ink3 swing" pathLength="1" d="M 660,248 C 666,250 670,256 668,262" />
+            <!-- faint passage dropping from the north range toward the great hall -->
+            <path class="ink2 wall" pathLength="1" d="M 774,280 C 773,328 774,376 775,421" />
+            <path class="ink2 wall" pathLength="1" d="M 794,280 C 795,328 794,376 795,421" />
+            <!-- cloister east of the great hall, with a colonnaded courtyard -->
+            <path class="ink2 wall" pathLength="1"
+              d="M 952,446 C 1000,443 1050,444 1098,446 C 1097,486 1098,526 1096,566 C 1050,569 1000,568 954,566 C 952,526 953,486 952,446 Z" />
+            <path class="ink3 rug" pathLength="1"
+              d="M 990,482 C 1014,480 1038,480 1060,482 C 1059,498 1060,514 1058,530 C 1036,532 1012,531 992,530 C 990,514 991,498 990,482 Z" />
+            <circle class="dot faint" cx="990" cy="482" r="1.2" />
+            <circle class="dot faint" cx="1060" cy="482" r="1.2" />
+            <circle class="dot faint" cx="990" cy="530" r="1.2" />
+            <circle class="dot faint" cx="1058" cy="530" r="1.2" />
+            <circle class="dot faint" cx="1025" cy="480" r="1.2" />
+            <circle class="dot faint" cx="1025" cy="531" r="1.2" />
+            <!-- west range: turret + room south of the common room -->
+            <path class="ink2 wall" pathLength="1"
+              d="M 342,682 C 341,668 352,656 366,657 C 380,656 390,668 389,682 C 390,695 379,706 365,705 C 352,706 341,695 342,682 Z" />
+            <path class="ink2 wall" pathLength="1"
+              d="M 390,700 C 412,698 436,698 458,700 C 459,718 460,738 458,756 C 436,758 412,758 392,756 C 390,738 391,718 390,700 Z" />
+            <line class="ink3" pathLength="1" x1="424" y1="699" x2="424" y2="730" />
+            <path class="ink3" pathLength="1" d="M 352,648 C 342,622 328,600 314,644" />
+            <!-- ruined wing north of the workshop: collapsed walls + rubble -->
+            <path class="ink2 wall" pathLength="1" d="M 1296,462 C 1320,459 1346,460 1368,462" />
+            <path class="ink2 wall" pathLength="1" d="M 1392,464 C 1404,463 1414,464 1422,465" />
+            <path class="ink2 wall" pathLength="1" d="M 1294,464 C 1293,486 1294,506 1293,524" />
+            <path class="ink2 wall" pathLength="1" d="M 1422,468 C 1421,488 1422,504 1421,518" />
+            <path class="ink2 wall" pathLength="1" d="M 1310,556 C 1330,554 1352,555 1370,556" />
+            <circle class="dot faint" cx="1382" cy="540" r="1.6" />
+            <circle class="dot faint" cx="1396" cy="548" r="1.3" />
+            <circle class="dot faint" cx="1300" cy="540" r="1.4" />
+            <circle class="dot faint" cx="1408" cy="530" r="1.2" />
+            <!-- southern wall-walk with crenellation ticks + a gate arch -->
+            <path class="ink2 wall" pathLength="1" d="M 300,896 C 380,892 470,893 486,894" />
+            <path class="ink2 wall" pathLength="1" d="M 516,894 C 600,895 660,897 704,900" />
+            <path class="ink3" pathLength="1" d="M 486,894 C 490,882 512,882 516,894" />
+            <g class="ink3 ticks">
+              <line pathLength="1" x1="330" y1="895" x2="330" y2="888" />
+              <line pathLength="1" x1="366" y1="893" x2="366" y2="886" />
+              <line pathLength="1" x1="402" y1="893" x2="402" y2="886" />
+              <line pathLength="1" x1="438" y1="893" x2="438" y2="886" />
+              <line pathLength="1" x1="546" y1="895" x2="546" y2="888" />
+              <line pathLength="1" x1="582" y1="896" x2="582" y2="889" />
+              <line pathLength="1" x1="618" y1="897" x2="618" y2="890" />
+              <line pathLength="1" x1="654" y1="898" x2="654" y2="891" />
+            </g>
+            <!-- a lone tower off the NE corridor -->
+            <path class="ink2 wall" pathLength="1"
+              d="M 1046,206 C 1045,192 1056,180 1070,181 C 1084,180 1094,192 1093,206 C 1094,219 1083,230 1069,229 C 1056,230 1045,219 1046,206 Z" />
+            <circle class="ink3" cx="1070" cy="205" r="8" pathLength="1" />
+            <path class="ink3 wall" pathLength="1" d="M 1062,232 C 1054,258 1044,290 1034,320" />
+            <path class="ink3 wall" pathLength="1" d="M 1078,232 C 1072,258 1064,288 1056,318" />
+            <!-- gatehouse straddling the causeway -->
+            <path class="ink2 wall" pathLength="1"
+              d="M 588,374 C 596,371 606,370 614,372 C 616,380 616,390 614,398 C 605,400 596,401 588,398 C 586,390 586,381 588,374 Z" />
+            <line class="ink3" pathLength="1" x1="594" y1="374" x2="594" y2="398" />
+            <line class="ink3" pathLength="1" x1="608" y1="372" x2="608" y2="399" />
+            <!-- outbuildings north of the range -->
+            <path class="ink2 wall" pathLength="1"
+              d="M 610,160 C 622,158 636,158 648,160 C 649,170 649,181 648,190 C 636,192 622,192 611,190 C 610,180 609,169 610,160 Z" />
+            <path class="ink2 wall" pathLength="1"
+              d="M 700,154 C 710,152 720,152 730,154 C 731,163 731,174 730,182 C 720,184 710,184 701,182 C 700,173 699,162 700,154 Z" />
+            <circle class="ink2" cx="762" cy="170" r="10" pathLength="1" />
+            <path class="ink2 wall" pathLength="1"
+              d="M 462,168 C 472,166 482,166 490,168 C 491,177 491,186 490,194 C 481,196 471,196 463,194 C 462,186 461,176 462,168 Z" />
+            <!-- dovecote NE of the north range -->
+            <circle class="ink2" cx="1210" cy="168" r="13" pathLength="1" />
+            <circle class="ink3" cx="1210" cy="168" r="5" pathLength="1" />
+            <line class="ink3" pathLength="1" x1="1210" y1="181" x2="1210" y2="192" />
+            <!-- link corridor: cloister → workshop grounds -->
+            <path class="ink2 wall" pathLength="1" d="M 1098,536 C 1120,548 1142,560 1160,570" />
+            <path class="ink2 wall" pathLength="1" d="M 1092,552 C 1112,562 1132,572 1150,582" />
+            <!-- kitchen garden plots south of the kitchens -->
+            <path class="ink2 wall" pathLength="1"
+              d="M 762,804 C 786,802 812,802 834,804 C 835,818 835,832 834,844 C 812,846 786,846 763,844 C 762,832 761,817 762,804 Z" />
+            <path class="ink3 rows" pathLength="1" d="M 770,816 C 792,814 812,814 826,816" />
+            <path class="ink3 rows" pathLength="1" d="M 770,830 C 792,828 812,828 826,830" />
+            <path class="ink2 wall" pathLength="1"
+              d="M 852,808 C 872,806 892,806 908,808 C 909,822 909,834 908,846 C 892,848 872,848 853,846 C 852,834 851,820 852,808 Z" />
+            <path class="ink3 rows" pathLength="1" d="M 860,822 C 878,820 894,820 900,822" />
+            <!-- boathouse + slipway down to the lake -->
+            <path class="ink2 wall" pathLength="1"
+              d="M 1256,870 C 1268,868 1284,868 1296,870 C 1297,878 1297,888 1296,896 C 1284,898 1268,898 1257,896 C 1256,888 1255,878 1256,870 Z" />
+            <line class="ink3" pathLength="1" x1="1298" y1="878" x2="1318" y2="898" />
+            <line class="ink3" pathLength="1" x1="1298" y1="890" x2="1314" y2="906" />
+            <!-- a well in the south yard -->
+            <circle class="ink2" cx="610" cy="856" r="8" pathLength="1" />
+            <circle class="ink3" cx="610" cy="856" r="3" pathLength="1" />
+            <line class="ink3" pathLength="1" x1="602" y1="848" x2="618" y2="864" />
+            <!-- hermit hut deep in the woods, with a wandering path -->
+            <path class="ink2 wall" pathLength="1"
+              d="M 140,494 C 148,492 157,492 164,494 C 165,500 165,508 164,514 C 156,516 147,516 141,514 C 140,508 139,500 140,494 Z" />
+            <circle class="dot faint" cx="172" cy="480" r="1.2" />
+            <circle class="dot faint" cx="181" cy="462" r="1.2" />
+            <circle class="dot faint" cx="189" cy="444" r="1.2" />
+            <!-- a stair climbing off the west corridor, fading -->
+            <line class="ink2" pathLength="1" x1="612" y1="500" x2="630" y2="498" opacity="0.55" />
+            <line class="ink2" pathLength="1" x1="613" y1="490" x2="631" y2="488" opacity="0.4" />
+            <line class="ink2" pathLength="1" x1="614" y1="480" x2="632" y2="478" opacity="0.26" />
+            <line class="ink2" pathLength="1" x1="615" y1="470" x2="633" y2="468" opacity="0.13" />
+          </g>
+
+          <!-- ───────── THE GREAT HALL (unnamed central mass) ───────── -->
+          <g class="art" data-draw="2" aria-hidden="true">
+            <!-- outer walls, drawn in segments to leave door gaps -->
+            <path class="ink1 wall" pathLength="1" d="M 700,424 C 702,450 700,474 700,498" />
+            <path class="ink1 wall" pathLength="1" d="M 700,528 C 699,552 701,574 701,596" />
+            <path class="ink1 wall" pathLength="1" d="M 701,596 C 726,599 752,600 778,600" />
+            <path class="ink1 wall" pathLength="1" d="M 822,600 C 848,600 874,599 899,597" />
+            <path class="ink1 wall" pathLength="1" d="M 899,597 C 901,582 900,566 901,552" />
+            <path class="ink1 wall" pathLength="1" d="M 901,528 C 900,494 901,458 900,424" />
+            <path class="ink1 wall" pathLength="1" d="M 900,424 C 894,423 888,422 882,422" />
+            <path class="ink1 wall" pathLength="1" d="M 858,422 C 818,421 778,422 737,423" />
+            <path class="ink1 wall" pathLength="1" d="M 713,423 C 708,423 704,424 700,424" />
+            <!-- inner wall echo -->
+            <path class="ink3" pathLength="1" d="M 706,430 C 707,486 706,540 707,590 C 740,594 860,594 894,591 C 895,540 895,478 894,430 C 850,428 750,428 706,430" />
+            <!-- buttress ticks along south + east outer walls -->
+            <g class="ink3 ticks">
+              <line pathLength="1" x1="730" y1="600" x2="730" y2="608" />
+              <line pathLength="1" x1="760" y1="601" x2="760" y2="609" />
+              <line pathLength="1" x1="840" y1="601" x2="840" y2="609" />
+              <line pathLength="1" x1="870" y1="600" x2="870" y2="608" />
+              <line pathLength="1" x1="901" y1="450" x2="909" y2="450" />
+              <line pathLength="1" x1="901" y1="480" x2="909" y2="480" />
+              <line pathLength="1" x1="901" y1="570" x2="909" y2="570" />
+            </g>
+            <!-- four long tables + high table (plan view) -->
+            <g class="ink2 tables">
+              <path pathLength="1" d="M 735,452 C 736,492 736,530 737,568" />
+              <path pathLength="1" d="M 743,452 C 744,492 744,530 745,568" />
+              <path pathLength="1" d="M 767,452 C 768,492 768,530 769,568" />
+              <path pathLength="1" d="M 775,452 C 776,492 776,530 777,568" />
+              <path pathLength="1" d="M 823,452 C 824,492 824,530 825,568" />
+              <path pathLength="1" d="M 831,452 C 832,492 832,530 833,568" />
+              <path pathLength="1" d="M 855,452 C 856,492 856,530 857,568" />
+              <path pathLength="1" d="M 863,452 C 864,492 864,530 865,568" />
+              <path pathLength="1" d="M 722,440 C 770,438 830,438 878,440" />
+              <path pathLength="1" d="M 722,446 C 770,444 830,444 878,446" />
+            </g>
+            <!-- porch steps below the grand south doors -->
+            <g class="ink2 rungs">
+              <line pathLength="1" x1="780" y1="606" x2="820" y2="606" />
+              <line pathLength="1" x1="776" y1="613" x2="824" y2="613" />
+              <line pathLength="1" x1="772" y1="620" x2="828" y2="620" />
+            </g>
+            <text class="microlabel" x="800" y="518" text-anchor="middle">the great hall</text>
+          </g>
+
+          <!-- ───────── THE KITCHENS + dungeon stair (unnamed) ───────── -->
+          <g class="art" data-draw="2" aria-hidden="true">
+            <path class="ink1 wall" pathLength="1" d="M 786,690 C 770,690 755,691 740,692 C 739,714 740,738 741,760 C 780,763 820,763 859,760 C 860,738 861,714 860,692 C 845,691 830,690 814,690" />
+            <path class="ink3" pathLength="1" d="M 746,697 C 746,730 746,742 747,755 C 780,757 820,757 853,755 C 854,736 854,714 853,697" />
+            <!-- long prep table + barrels + hearth -->
+            <path class="ink2" pathLength="1" d="M 758,722 C 790,720 812,720 844,722" />
+            <path class="ink2" pathLength="1" d="M 758,728 C 790,726 812,726 844,728" />
+            <circle class="ink2" cx="756" cy="748" r="6" pathLength="1" />
+            <circle class="ink2" cx="771" cy="750" r="6" pathLength="1" />
+            <circle class="ink2" cx="845" cy="748" r="6" pathLength="1" />
+            <g class="ink3 hatch">
+              <line pathLength="1" x1="742" y1="700" x2="754" y2="712" />
+              <line pathLength="1" x1="748" y1="698" x2="758" y2="708" />
+            </g>
+            <text class="microlabel" x="800" y="782" text-anchor="middle">the kitchens</text>
+            <!-- stair descending to the dungeons, fading -->
+            <g class="rungs">
+              <line class="ink2" pathLength="1" x1="874" y1="706" x2="898" y2="704" opacity="0.55" />
+              <line class="ink2" pathLength="1" x1="876" y1="716" x2="900" y2="714" opacity="0.42" />
+              <line class="ink2" pathLength="1" x1="878" y1="726" x2="902" y2="724" opacity="0.3" />
+              <line class="ink2" pathLength="1" x1="880" y1="736" x2="904" y2="734" opacity="0.18" />
+              <line class="ink2" pathLength="1" x1="882" y1="746" x2="906" y2="744" opacity="0.09" />
+            </g>
+            <text class="microlabel" x="936" y="762" text-anchor="middle" transform="rotate(3 936 762)">to the dungeons</text>
+          </g>
+
+          <!-- ───────── THE OWLERY (NW round tower) ───────── -->
+          <a {...linkAttrs(owlery)} class="loc-link" aria-label="The Owlery — send an owl, or connect on LinkedIn.">
+            <g class="loc" data-loc="owlery" transform="translate(330,300)">
+              <rect class="loc-hit" x="-115" y="-125" width="230" height="270" />
+              <g class="art" data-draw="2">
+                <!-- hill contours -->
+                <path class="ink3" pathLength="1" d="M -84,44 C -96,18 -92,-16 -70,-40" />
+                <path class="ink3" pathLength="1" d="M -96,58 C -112,24 -108,-22 -80,-54" />
+                <!-- tower: outer + inner ring (wobbly) -->
+                <path class="ink1 bldg wall" pathLength="1"
+                  d="M -58,2 C -60,-30 -32,-59 0,-57 C 32,-59 59,-31 57,1 C 59,32 30,59 -1,57 C -31,59 -57,31 -58,2 Z" />
+                <path class="ink3 bldg" pathLength="1"
+                  d="M -50,2 C -51,-26 -27,-51 0,-49 C 27,-51 51,-27 49,1 C 51,26 26,51 -1,49 C -26,51 -49,27 -50,2 Z" />
+                <!-- central shaft + spiral stair ticks -->
+                <circle class="ink2" cx="0" cy="0" r="12" pathLength="1" />
+                <g class="ink3 rungs">
+                  <line pathLength="1" x1="12" y1="0" x2="46" y2="4" />
+                  <line pathLength="1" x1="8" y1="9" x2="32" y2="34" />
+                  <line pathLength="1" x1="0" y1="12" x2="-4" y2="46" />
+                  <line pathLength="1" x1="-9" y1="8" x2="-34" y2="31" />
+                  <line pathLength="1" x1="-12" y1="0" x2="-46" y2="-4" />
+                  <line pathLength="1" x1="-8" y1="-9" x2="-31" y2="-34" />
+                  <line pathLength="1" x1="0" y1="-12" x2="4" y2="-46" />
+                  <line pathLength="1" x1="9" y1="-8" x2="34" y2="-31" />
+                </g>
+                <!-- perch dots + droppings (it IS an owlery) -->
+                <circle class="dot" cx="26" cy="-33" r="1.5" />
+                <circle class="dot" cx="40" cy="-12" r="1.5" />
+                <circle class="dot" cx="-38" cy="18" r="1.5" />
+                <circle class="dot" cx="-20" cy="38" r="1.5" />
+                <circle class="dot faint" cx="14" cy="44" r="1.2" />
+                <circle class="dot faint" cx="-44" cy="-16" r="1.2" />
+                <!-- door glyph toward the causeway (SE) -->
+                <g class="ink2">
+                  <line pathLength="1" x1="42" y1="34" x2="52" y2="44" />
+                  <path pathLength="1" d="M 42,34 C 50,32 56,38 52,44" />
+                </g>
+                <!-- two owls on the rim, one in flight -->
+                <g class="owl">
+                  <circle class="ink1 bldg" cx="-30" cy="-52" r="5" pathLength="1" />
+                  <line class="ink2" x1="-33" y1="-56" x2="-35" y2="-60" pathLength="1" />
+                  <line class="ink2" x1="-27" y1="-56" x2="-25" y2="-60" pathLength="1" />
+                  <circle class="dot" cx="-32" cy="-53" r="0.9" />
+                  <circle class="dot" cx="-28" cy="-53" r="0.9" />
+                </g>
+                <g class="owl">
+                  <circle class="ink1 bldg" cx="52" cy="-24" r="5" pathLength="1" />
+                  <line class="ink2" x1="49" y1="-28" x2="47" y2="-32" pathLength="1" />
+                  <line class="ink2" x1="55" y1="-28" x2="57" y2="-32" pathLength="1" />
+                </g>
+                <g class="owl-fly">
+                  <path class="ink1 bldg" pathLength="1" d="M -92,-84 C -84,-94 -76,-86 -72,-82 C -68,-86 -60,-94 -52,-84" />
+                  <circle class="ink2" cx="-72" cy="-81" r="2.4" pathLength="1" />
+                  <line class="ink3" x1="-104" y1="-80" x2="-96" y2="-82" pathLength="1" />
+                  <line class="ink3" x1="-110" y1="-74" x2="-101" y2="-76" pathLength="1" />
+                </g>
+              </g>
+              <g class="loc-banner" data-draw="3">
+                <path pathLength="1" d="M -74,80 C 0,76 0,76 74,80 L 84,93 L 74,106 C 0,110 0,110 -74,106 L -84,93 Z" />
+                <text class="loc-name" x="0" y="98" text-anchor="middle">The Owlery</text>
+              </g>
+              <g transform="translate(0,117)">
+                <g class="loc-desc">
+                  <rect class="loc-card" x="-108" y="-2" width="216" height="68" rx="3" />
+                  <text class="loc-desc-text" x="0" y="17" text-anchor="middle">
+                    {wrap(owlery.desc).map((line, i) => (
+                      <tspan x="0" dy={i === 0 ? 0 : 19}>{line}</tspan>
+                    ))}
+                  </text>
+                </g>
+              </g>
+              <rect class="loc-ring" x="-104" y="-118" width="208" height="256" rx="6" />
+            </g>
+          </a>
+
+          <!-- ───────── THE LIBRARY (NE wing) ───────── -->
+          <a {...linkAttrs(library)} class="loc-link" aria-label="The Library — records of projects, research and employment.">
+            <g class="loc" data-loc="codex" transform="translate(1150,290)">
+              <rect class="loc-hit" x="-152" y="-102" width="304" height="280" />
+              <g class="art" data-draw="2">
+                <!-- outer walls (door gap on the SW end of the south wall) -->
+                <path class="ink1 bldg wall" pathLength="1"
+                  d="M -136,88 C -138,30 -137,-32 -139,-88 C -90,-91 -40,-90 0,-91 C 50,-90 96,-91 141,-88 C 139,-30 140,32 138,88 C 90,91 40,90 -6,91 C -40,90 -80,91 -112,90" />
+                <path class="ink3 bldg" pathLength="1"
+                  d="M -130,82 C -131,28 -130,-30 -132,-81 C -88,-84 -40,-83 0,-84 C 48,-83 92,-84 134,-81 C 132,-28 133,30 131,82 C 88,85 40,84 -4,85 C -44,84 -90,85 -124,84" />
+                <!-- stacks (shelf rows, west half) -->
+                <g class="ink2 shelves">
+                  <path pathLength="1" d="M -118,-60 C -90,-62 -60,-61 -34,-60" />
+                  <path pathLength="1" d="M -118,-55 C -90,-57 -60,-56 -34,-55" />
+                  <path pathLength="1" d="M -118,-32 C -90,-34 -60,-33 -34,-32" />
+                  <path pathLength="1" d="M -118,-27 C -90,-29 -60,-28 -34,-27" />
+                  <path pathLength="1" d="M -118,-4 C -90,-6 -60,-5 -34,-4" />
+                  <path pathLength="1" d="M -118,1 C -90,-1 -60,0 -34,1" />
+                  <path pathLength="1" d="M -118,24 C -90,22 -60,23 -34,24" />
+                  <path pathLength="1" d="M -118,29 C -90,27 -60,28 -34,29" />
+                  <path pathLength="1" d="M -118,52 C -90,50 -60,51 -34,52" />
+                  <path pathLength="1" d="M -118,57 C -90,55 -60,56 -34,57" />
+                </g>
+                <!-- reading tables + chairs (east half) -->
+                <g class="ink2">
+                  <path pathLength="1" d="M 34,-48 C 58,-50 86,-49 108,-48 C 109,-40 109,-34 108,-27 C 84,-25 58,-26 34,-27 C 33,-34 33,-42 34,-48 Z" />
+                  <path pathLength="1" d="M 34,14 C 58,12 86,13 108,14 C 109,22 109,28 108,35 C 84,37 58,36 34,35 C 33,28 33,20 34,14 Z" />
+                  <path class="ink3" pathLength="1" d="M 52,-56 C 56,-60 62,-60 66,-56" />
+                  <path class="ink3" pathLength="1" d="M 80,-56 C 84,-60 90,-60 94,-56" />
+                  <path class="ink3" pathLength="1" d="M 52,-19 C 56,-15 62,-15 66,-19" />
+                  <path class="ink3" pathLength="1" d="M 52,6 C 56,2 62,2 66,6" />
+                  <path class="ink3" pathLength="1" d="M 80,43 C 84,47 90,47 94,43" />
+                </g>
+                <!-- restricted section (NE closet, hatched, padlocked) -->
+                <path class="ink1 bldg wall" pathLength="1" d="M 58,-88 C 59,-74 58,-58 59,-44 C 86,-42 114,-43 138,-44" />
+                <g class="ink3 hatch red">
+                  <line pathLength="1" x1="66" y1="-86" x2="84" y2="-50" />
+                  <line pathLength="1" x1="84" y1="-88" x2="102" y2="-52" />
+                  <line pathLength="1" x1="102" y1="-87" x2="120" y2="-51" />
+                  <line pathLength="1" x1="120" y1="-88" x2="134" y2="-58" />
+                </g>
+                <circle class="ink2 red" cx="59" cy="-66" r="3.5" pathLength="1" />
+                <text class="microlabel tiny" x="99" y="-63" text-anchor="middle">restricted</text>
+                <!-- lectern by the door -->
+                <path class="ink2" pathLength="1" d="M -112,70 L -104,62 L -96,70 L -104,78 Z" />
+                <!-- door leaf + swing at the SW entrance -->
+                <line class="ink2" x1="-112" y1="90" x2="-98" y2="102" pathLength="1" />
+                <path class="ink3 swing" pathLength="1" d="M -112,90 C -104,88 -98,94 -98,102" />
+              </g>
+              <g class="loc-banner" data-draw="3">
+                <path pathLength="1" d="M -68,112 C 0,108 0,108 68,112 L 78,125 L 68,138 C 0,142 0,142 -68,138 L -78,125 Z" />
+                <text class="loc-name" x="0" y="130" text-anchor="middle">The Library</text>
+              </g>
+              <g transform="translate(0,149)">
+                <g class="loc-desc">
+                  <rect class="loc-card" x="-112" y="-2" width="224" height="68" rx="3" />
+                  <text class="loc-desc-text" x="0" y="17" text-anchor="middle">
+                    {wrap(library.desc).map((line, i) => (
+                      <tspan x="0" dy={i === 0 ? 0 : 19}>{line}</tspan>
+                    ))}
+                  </text>
+                </g>
+              </g>
+              <rect class="loc-ring" x="-148" y="-98" width="296" height="270" rx="6" />
+            </g>
+          </a>
+
+          <!-- ───────── THE COMMON ROOM (W round room) ───────── -->
+          <a {...linkAttrs(common)} class="loc-link" aria-label="The Common Room — background, character and ambitions.">
+            <g class="loc" data-loc="about" transform="translate(300,560)">
+              <rect class="loc-hit" x="-115" y="-100" width="230" height="245" />
+              <g class="art" data-draw="2">
+                <!-- round walls -->
+                <path class="ink1 bldg wall" pathLength="1"
+                  d="M -80,3 C -83,-42 -44,-82 1,-79 C 45,-82 82,-44 79,2 C 82,43 42,81 -2,79 C -43,82 -78,44 -80,3 Z" />
+                <path class="ink3 bldg" pathLength="1"
+                  d="M -71,3 C -73,-38 -39,-73 1,-70 C 40,-73 72,-39 70,2 C 72,38 38,72 -2,70 C -38,72 -69,39 -71,3 Z" />
+                <!-- hearth protruding west, hatched -->
+                <path class="ink1 bldg wall" pathLength="1" d="M -79,-14 L -96,-13 L -97,13 L -80,14" />
+                <g class="ink3 hatch">
+                  <line pathLength="1" x1="-94" y1="-10" x2="-84" y2="0" />
+                  <line pathLength="1" x1="-94" y1="0" x2="-84" y2="10" />
+                </g>
+                <!-- rug + armchairs facing the fire + side table -->
+                <ellipse class="ink3 rug" cx="-18" cy="0" rx="34" ry="23" pathLength="1" />
+                <path class="ink2 chair" pathLength="1" d="M -44,-26 C -36,-32 -28,-30 -26,-22 C -32,-18 -40,-18 -44,-26 Z" />
+                <path class="ink2 chair" pathLength="1" d="M -46,24 C -38,30 -30,28 -28,20 C -34,16 -42,16 -46,24 Z" />
+                <path class="ink2 chair" pathLength="1" d="M 8,-4 C 14,-12 24,-12 28,-4 C 24,4 12,4 8,-4 Z" />
+                <circle class="ink2" cx="-14" cy="-1" r="5" pathLength="1" />
+                <circle class="dot faint" cx="-12" cy="-3" r="1" />
+                <!-- window ticks on the rim -->
+                <g class="ink3 ticks">
+                  <line pathLength="1" x1="-4" y1="-80" x2="-4" y2="-88" />
+                  <line pathLength="1" x1="6" y1="-80" x2="6" y2="-88" />
+                  <line pathLength="1" x1="-6" y1="80" x2="-6" y2="88" />
+                  <line pathLength="1" x1="4" y1="80" x2="4" y2="88" />
+                  <line pathLength="1" x1="56" y1="58" x2="62" y2="64" />
+                  <line pathLength="1" x1="62" y1="52" x2="68" y2="58" />
+                </g>
+                <!-- door glyph east, toward the corridor -->
+                <line class="ink2" x1="80" y1="-10" x2="92" y2="-20" pathLength="1" />
+                <path class="ink3 swing" pathLength="1" d="M 80,-10 C 88,-12 94,-16 92,-20" />
+                <!-- a cat crossed the room -->
+                <g class="cat-steps">
+                  <circle class="dot faint" cx="-4" cy="42" r="1.3" />
+                  <circle class="dot faint" cx="8" cy="34" r="1.3" />
+                  <circle class="dot faint" cx="18" cy="42" r="1.3" />
+                  <circle class="dot faint" cx="30" cy="35" r="1.3" />
+                </g>
+              </g>
+              <g class="loc-banner" data-draw="3">
+                <path pathLength="1" d="M -92,98 C 0,94 0,94 92,98 L 102,111 L 92,124 C 0,128 0,128 -92,124 L -102,111 Z" />
+                <text class="loc-name" x="0" y="116" text-anchor="middle">The Common Room</text>
+              </g>
+              <g transform="translate(0,135)">
+                <g class="loc-desc">
+                  <rect class="loc-card" x="-112" y="-2" width="224" height="68" rx="3" />
+                  <text class="loc-desc-text" x="0" y="17" text-anchor="middle">
+                    {wrap(common.desc).map((line, i) => (
+                      <tspan x="0" dy={i === 0 ? 0 : 19}>{line}</tspan>
+                    ))}
+                  </text>
+                </g>
+              </g>
+              <rect class="loc-ring" x="-108" y="-96" width="216" height="235" rx="6" />
+            </g>
+          </a>
+
+          <!-- ───────── THE GREENHOUSES (SW glass houses) ───────── -->
+          <a {...linkAttrs(garden)} class="loc-link" aria-label="The Greenhouses — notes and half-finished ideas, tended daily.">
+            <g class="loc" data-loc="garden" transform="translate(430,790)">
+              <rect class="loc-hit" x="-145" y="-100" width="300" height="230" />
+              <g class="art" data-draw="2">
+                <defs>
+                  <clipPath id="mm-gha"><path d="M -105,-10 L -83,-48 L -38,-48 L -15,-10 L -38,28 L -83,28 Z" /></clipPath>
+                  <clipPath id="mm-ghb"><path d="M -5,-25 L 20,-70 L 88,-70 L 115,-25 L 88,20 L 20,20 Z" /></clipPath>
+                </defs>
+                <!-- greenhouse A (hexagonal, planted rows) -->
+                <path class="ink1 bldg wall" pathLength="1"
+                  d="M -105,-10 C -98,-24 -91,-36 -83,-48 C -68,-49 -53,-49 -38,-48 C -30,-36 -23,-23 -15,-10 C -22,3 -30,15 -38,28 C -53,29 -68,29 -83,28 C -91,15 -98,3 -105,-10 Z" />
+                <g class="ink3 panes" clip-path="url(#mm-gha)">
+                  <line pathLength="1" x1="-110" y1="-40" x2="-10" y2="20" />
+                  <line pathLength="1" x1="-110" y1="-16" x2="-10" y2="44" />
+                  <line pathLength="1" x1="-10" y1="-40" x2="-110" y2="20" />
+                  <line pathLength="1" x1="-10" y1="-16" x2="-110" y2="44" />
+                </g>
+                <path class="ink2 rows" pathLength="1" d="M -96,-4 C -80,-8 -56,-6 -26,-4" />
+                <path class="ink2 rows" pathLength="1" d="M -94,12 C -78,8 -56,10 -28,12" />
+                <!-- greenhouse B (larger, overgrown) -->
+                <path class="ink1 bldg wall" pathLength="1"
+                  d="M -5,-25 C 3,-40 11,-55 20,-70 C 43,-71 65,-71 88,-70 C 97,-55 106,-40 115,-25 C 106,-10 97,5 88,20 C 65,21 43,21 20,20 C 11,5 3,-10 -5,-25 Z" />
+                <g class="ink3 panes" clip-path="url(#mm-ghb)">
+                  <line pathLength="1" x1="-10" y1="-60" x2="120" y2="10" />
+                  <line pathLength="1" x1="-10" y1="-34" x2="120" y2="36" />
+                  <line pathLength="1" x1="120" y1="-60" x2="-10" y2="10" />
+                  <line pathLength="1" x1="120" y1="-34" x2="-10" y2="36" />
+                  <line pathLength="1" x1="55" y1="-72" x2="55" y2="22" />
+                </g>
+                <!-- something big grows in the middle of B -->
+                <path class="leaf" pathLength="1" d="M 50,-30 C 40,-44 56,-52 62,-40 C 70,-50 82,-40 72,-30 C 80,-22 66,-12 58,-22 C 50,-14 42,-22 50,-30 Z" />
+                <path class="ink2 vine" pathLength="1" d="M 55,-70 C 48,-84 64,-90 58,-104 C 54,-112 64,-118 60,-126" />
+                <path class="ink3 vine" pathLength="1" d="M 88,-70 C 98,-80 94,-94 106,-100" />
+                <path class="leaf" pathLength="1" d="M 58,-104 C 50,-106 48,-114 58,-112 C 64,-110 64,-104 58,-104 Z" />
+                <!-- cold frame -->
+                <circle class="ink2" cx="132" cy="28" r="15" pathLength="1" />
+                <line class="ink3" x1="121" y1="18" x2="143" y2="38" pathLength="1" />
+                <line class="ink3" x1="143" y1="18" x2="121" y2="38" pathLength="1" />
+                <!-- planting beds + pots outside -->
+                <g class="ink2">
+                  <path pathLength="1" d="M -92,44 C -70,42 -44,42 -22,44 C -21,50 -21,54 -22,60 C -44,62 -70,62 -92,60 C -93,54 -93,50 -92,44 Z" />
+                  <path class="ink3 rows" pathLength="1" d="M -86,50 C -66,48 -46,48 -28,50" />
+                  <path class="ink3 rows" pathLength="1" d="M -86,55 C -66,53 -46,53 -28,55" />
+                  <path pathLength="1" d="M 2,48 C 22,46 48,46 68,48 C 69,54 69,58 68,64 C 48,66 22,66 2,64 C 1,58 1,54 2,48 Z" />
+                  <path class="ink3 rows" pathLength="1" d="M 8,54 C 28,52 46,52 62,54" />
+                </g>
+                <g class="ink2 pots">
+                  <circle cx="-122" cy="34" r="5" pathLength="1" />
+                  <path class="ink3" pathLength="1" d="M -122,29 C -126,21 -132,23 -128,30" />
+                  <circle cx="-134" cy="46" r="4" pathLength="1" />
+                </g>
+              </g>
+              <g class="loc-banner" data-draw="3">
+                <path pathLength="1" d="M -96,84 C 0,80 0,80 96,84 L 106,97 L 96,110 C 0,114 0,114 -96,110 L -106,97 Z" />
+                <text class="loc-name" x="0" y="102" text-anchor="middle">The Greenhouses</text>
+              </g>
+              <g transform="translate(0,121)">
+                <g class="loc-desc">
+                  <rect class="loc-card" x="-116" y="-2" width="232" height="68" rx="3" />
+                  <text class="loc-desc-text" x="0" y="17" text-anchor="middle">
+                    {wrap(garden.desc).map((line, i) => (
+                      <tspan x="0" dy={i === 0 ? 0 : 19}>{line}</tspan>
+                    ))}
+                  </text>
+                </g>
+              </g>
+              <rect class="loc-ring" x="-140" y="-96" width="290" height="222" rx="6" />
+            </g>
+          </a>
+
+          <!-- ───────── THE WORKSHOP (E wing) ───────── -->
+          <a {...linkAttrs(workshop)} class="loc-link" aria-label="The Workshop — current experiments. Mind the sparks.">
+            <g class="loc" data-loc="now" transform="translate(1250,640)">
+              <rect class="loc-hit" x="-125" y="-90" width="270" height="240" />
+              <g class="art" data-draw="2">
+                <!-- outer walls (door gaps: west to corridor, east big doors) -->
+                <path class="ink1 bldg wall" pathLength="1"
+                  d="M -110,-38 C -111,-50 -110,-62 -111,-73 C -70,-76 -30,-75 0,-76 C 40,-75 76,-76 111,-73 C 110,-56 110,-40 110,-22" />
+                <path class="ink1 bldg wall" pathLength="1"
+                  d="M 110,22 C 110,40 111,58 110,74 C 74,77 38,76 0,77 C -36,76 -74,77 -109,74 C -110,52 -109,28 -110,-6" />
+                <path class="ink3 bldg" pathLength="1"
+                  d="M -103,-34 C -104,-52 -103,-60 -104,-67 C -66,-70 -30,-69 0,-70 C 38,-69 70,-70 104,-67 C 103,-52 103,-40 103,-24 M 103,24 C 103,42 104,56 103,68 C 68,71 36,70 0,71 C -34,70 -68,71 -102,68 C -103,50 -102,28 -103,-2" />
+                <!-- big east doors, swung open -->
+                <line class="ink1 bldg" x1="110" y1="-22" x2="140" y2="-36" pathLength="1" />
+                <line class="ink1 bldg" x1="110" y1="22" x2="140" y2="36" pathLength="1" />
+                <path class="ink3 swing" pathLength="1" d="M 140,-36 C 146,-24 148,-10 147,0" />
+                <path class="ink3 swing" pathLength="1" d="M 140,36 C 146,24 148,10 147,0" />
+                <!-- workbenches with tool marks -->
+                <g class="ink2">
+                  <path pathLength="1" d="M -95,-64 C -70,-66 -40,-65 -16,-64 C -15,-58 -15,-54 -16,-49 C -40,-47 -70,-48 -95,-49 C -96,-54 -96,-58 -95,-64 Z" />
+                  <path pathLength="1" d="M -95,50 C -66,48 -30,49 8,50 C 9,55 9,60 8,65 C -30,67 -66,66 -95,65 C -96,60 -96,55 -95,50 Z" />
+                </g>
+                <g class="ink3 tools">
+                  <line pathLength="1" x1="-84" y1="-60" x2="-78" y2="-54" />
+                  <line pathLength="1" x1="-78" y1="-60" x2="-84" y2="-54" />
+                  <circle pathLength="1" cx="-58" cy="-56" r="2.5" />
+                  <line pathLength="1" x1="-40" y1="-59" x2="-28" y2="-55" />
+                  <line pathLength="1" x1="-72" y1="55" x2="-64" y2="61" />
+                  <line pathLength="1" x1="-64" y1="55" x2="-72" y2="61" />
+                  <circle pathLength="1" cx="-30" cy="58" r="2.5" />
+                  <line pathLength="1" x1="-10" y1="54" x2="0" y2="60" />
+                </g>
+                <!-- forge (hatched) + smoke -->
+                <path class="ink1 bldg wall" pathLength="1" d="M 68,-70 C 69,-60 68,-50 69,-41 C 81,-40 93,-40 104,-41 C 103,-52 104,-62 103,-70" />
+                <g class="ink3 hatch">
+                  <line pathLength="1" x1="72" y1="-66" x2="84" y2="-46" />
+                  <line pathLength="1" x1="84" y1="-68" x2="96" y2="-48" />
+                  <line pathLength="1" x1="96" y1="-67" x2="102" y2="-56" />
+                </g>
+                <path class="smoke" pathLength="1" d="M 86,-76 C 76,-88 98,-96 88,-108 C 80,-118 98,-126 90,-138" />
+                <!-- gears on the floor -->
+                <circle class="ink1 bldg" cx="40" cy="30" r="14" pathLength="1" />
+                <circle class="ink3" cx="40" cy="30" r="5" pathLength="1" />
+                <g class="ink2 gear-teeth">
+                  <line pathLength="1" x1="40" y1="16" x2="40" y2="10" />
+                  <line pathLength="1" x1="40" y1="44" x2="40" y2="50" />
+                  <line pathLength="1" x1="26" y1="30" x2="20" y2="30" />
+                  <line pathLength="1" x1="54" y1="30" x2="60" y2="30" />
+                  <line pathLength="1" x1="30" y1="20" x2="26" y2="16" />
+                  <line pathLength="1" x1="50" y1="40" x2="54" y2="44" />
+                  <line pathLength="1" x1="50" y1="20" x2="54" y2="16" />
+                  <line pathLength="1" x1="30" y1="40" x2="26" y2="44" />
+                </g>
+                <circle class="ink2" cx="64" cy="44" r="7" pathLength="1" />
+                <!-- scorch mark + sparks -->
+                <path class="blot dark" d="M -38,8 C -48,2 -44,-10 -32,-8 C -24,-14 -12,-8 -14,0 C -8,6 -18,14 -26,10 C -30,16 -40,14 -38,8 Z" />
+                <circle class="dot faint" cx="-8" cy="-2" r="1.2" />
+                <circle class="dot faint" cx="-46" cy="2" r="1" />
+                <g class="sparks red">
+                  <path class="spark" pathLength="1" d="M 86,-92 L 86,-100 M 82,-96 L 90,-96" />
+                  <path class="spark" pathLength="1" d="M 104,-84 L 104,-90 M 101,-87 L 107,-87" />
+                  <circle class="dot red" cx="96" cy="-102" r="1.3" />
+                </g>
+              </g>
+              <g class="loc-banner" data-draw="3">
+                <path pathLength="1" d="M -70,96 C 0,92 0,92 70,96 L 80,109 L 70,122 C 0,126 0,126 -70,122 L -80,109 Z" />
+                <text class="loc-name" x="0" y="114" text-anchor="middle">The Workshop</text>
+              </g>
+              <g transform="translate(0,133)">
+                <g class="loc-desc">
+                  <rect class="loc-card" x="-100" y="-2" width="200" height="50" rx="3" />
+                  <text class="loc-desc-text" x="0" y="17" text-anchor="middle">
+                    {wrap(workshop.desc).map((line, i) => (
+                      <tspan x="0" dy={i === 0 ? 0 : 19}>{line}</tspan>
+                    ))}
+                  </text>
+                </g>
+              </g>
+              <rect class="loc-ring" x="-120" y="-86" width="260" height="230" rx="6" />
+            </g>
+          </a>
+
+          <!-- ───────── THE PORTFOLIO (signpost off the library — the road off the map) ───────── -->
+          <a {...linkAttrs(portfolio)} class="loc-link" aria-label="The Portfolio — a curated record of finished work, beyond these grounds.">
+            <g class="loc" data-loc="portfolio" transform="translate(1420,296)">
+              <rect class="loc-hit" x="-70" y="-50" width="140" height="130" />
+              <g class="art" data-draw="2">
+                <!-- post (double-stroked) -->
+                <path class="ink1 bldg" pathLength="1" d="M -1,30 C -2,12 -1,-8 0,-28" />
+                <path class="ink3 bldg" pathLength="1" d="M 3,28 C 2,12 3,-6 4,-26" />
+                <!-- plank arm pointing off the map's edge -->
+                <path class="ink1 bldg" pathLength="1" d="M 4,-24 C 18,-25 30,-24 42,-23 L 54,-15 L 42,-7 C 30,-6 18,-7 4,-8 Z" />
+                <line class="ink3" pathLength="1" x1="10" y1="-16" x2="36" y2="-15" />
+                <!-- red pennant on top -->
+                <path class="red-fill" d="M 0,-30 L 15,-25 L 0,-21 Z" />
+                <path class="ink2 red" pathLength="1" d="M 0,-30 L 15,-25 L 0,-21" />
+                <!-- grass tufts at the base -->
+                <path class="ink3" pathLength="1" d="M -8,30 C -6,25 -4,25 -3,29" />
+                <path class="ink3" pathLength="1" d="M 5,31 C 7,26 9,26 10,30" />
+              </g>
+              <g class="loc-banner" data-draw="3">
+                <path pathLength="1" d="M -74,44 C 0,40 0,40 74,44 L 84,57 L 74,70 C 0,74 0,74 -74,70 L -84,57 Z" />
+                <text class="loc-name" x="0" y="62" text-anchor="middle">The Portfolio</text>
+              </g>
+              <g transform="translate(-20,81)">
+                <g class="loc-desc">
+                  <rect class="loc-card" x="-108" y="-2" width="216" height="68" rx="3" />
+                  <text class="loc-desc-text" x="0" y="17" text-anchor="middle">
+                    {wrap(portfolio.desc).map((line, i) => (
+                      <tspan x="0" dy={i === 0 ? 0 : 19}>{line}</tspan>
+                    ))}
+                  </text>
+                </g>
+              </g>
+              <rect class="loc-ring" x="-66" y="-46" width="132" height="122" rx="6" />
+            </g>
+          </a>
+
+          <!-- ───────── THE FOLLY (E edge — a tower of odd little inventions) ───────── -->
+          <a {...linkAttrs(lab)} class="loc-link" aria-label="The Folly — odd little inventions, built for the joy of it.">
+            <g class="loc" data-loc="lab" transform="translate(1478,655)">
+              <rect class="loc-hit" x="-70" y="-58" width="140" height="140" />
+              <g class="art" data-draw="2">
+                <!-- hexagonal tower (plan view), double-stroked, door gap on the SW wall -->
+                <path class="ink1 bldg wall" pathLength="1"
+                  d="M -33,6 C -34,-6 -25,-20 -15,-27 C -5,-33 8,-32 17,-27 C 27,-21 33,-10 32,1 C 33,12 26,22 16,27 C 6,33 -6,32 -16,27 C -19,25 -22,23 -25,20" />
+                <path class="ink3 bldg" pathLength="1"
+                  d="M -27,4 C -27,-6 -20,-16 -12,-21 C -4,-26 7,-26 14,-21 C 22,-16 27,-8 26,1 C 26,10 21,17 13,22 C 5,26 -5,26 -13,21" />
+                <!-- roof ridges radiating to the lantern (plan view of the pointed cap) -->
+                <g class="ink3">
+                  <line pathLength="1" x1="-24" y1="-14" x2="-5" y2="-3" />
+                  <line pathLength="1" x1="1" y1="-30" x2="0" y2="-6" />
+                  <line pathLength="1" x1="26" y1="-13" x2="6" y2="-3" />
+                  <line pathLength="1" x1="25" y1="15" x2="6" y2="3" />
+                  <line pathLength="1" x1="0" y1="29" x2="0" y2="6" />
+                  <line pathLength="1" x1="-24" y1="16" x2="-6" y2="3" />
+                </g>
+                <circle class="ink2" cx="0" cy="0" r="4" pathLength="1" />
+                <!-- red pennant flying from the lantern -->
+                <path class="red-fill" d="M 2,-10 L 15,-6 L 2,-2 Z" />
+                <path class="ink2 red" pathLength="1" d="M 2,-10 L 15,-6 L 2,-2" />
+                <!-- door leaf + swing where the road from the workshop arrives -->
+                <line class="ink2" pathLength="1" x1="-27" y1="17" x2="-38" y2="24" />
+                <path class="ink3 swing" pathLength="1" d="M -27,17 C -35,16 -39,20 -38,24" />
+                <!-- scattered curiosities: a chalk spiral, a kite, a doodled star -->
+                <path class="ink3" pathLength="1" d="M -50,-26 C -44,-28 -42,-22 -47,-20 C -51,-19 -53,-24 -49,-27 C -46,-30 -41,-27 -42,-22" />
+                <path class="ink3" pathLength="1" d="M 40,-40 L 46,-34 L 40,-28 L 34,-34 Z" />
+                <path class="ink3" pathLength="1" d="M 40,-28 C 38,-22 43,-18 40,-12" />
+                <path class="ink3" pathLength="1" d="M -46,34 L -42,26 L -38,34 L -47,29 L -37,29 Z" />
+                <circle class="dot faint" cx="30" cy="34" r="1.2" />
+                <circle class="dot faint" cx="38" cy="28" r="1" />
+                <!-- grass tufts -->
+                <path class="ink3" pathLength="1" d="M -14,34 C -12,29 -10,29 -9,33" />
+                <path class="ink3" pathLength="1" d="M 8,36 C 10,31 12,31 13,35" />
+              </g>
+              <g class="loc-banner" data-draw="3">
+                <path pathLength="1" d="M -60,48 C 0,44 0,44 60,48 L 70,61 L 60,74 C 0,78 0,78 -60,74 L -70,61 Z" />
+                <text class="loc-name" x="0" y="66" text-anchor="middle">The Folly</text>
+              </g>
+              <g transform="translate(-20,85)">
+                <g class="loc-desc">
+                  <rect class="loc-card" x="-108" y="-2" width="216" height="50" rx="3" />
+                  <text class="loc-desc-text" x="0" y="17" text-anchor="middle">
+                    {wrap(lab.desc).map((line, i) => (
+                      <tspan x="0" dy={i === 0 ? 0 : 19}>{line}</tspan>
+                    ))}
+                  </text>
+                </g>
+              </g>
+              <rect class="loc-ring" x="-66" y="-54" width="132" height="132" rx="6" />
+            </g>
+          </a>
+        </g>
+
+        <!-- ══════════════ LABELS (structural layer; per-location labels live in loc groups) ══════════════ -->
+        <g id="layer-labels" data-draw="3"></g>
+
+        <!-- ══════════════ FLOURISHES ══════════════ -->
+        <g id="layer-flourishes" data-draw="4">
+          <!-- double wobbly frame -->
+          <path class="ink2 frame" pathLength="1"
+            d="M 56,128 C 440,124 1080,126 1544,128 C 1547,400 1546,700 1544,944 C 1120,947 480,946 56,944 C 53,680 54,380 56,128 Z" />
+          <path class="ink3 frame" pathLength="1"
+            d="M 66,138 C 450,135 1090,136 1534,138 C 1536,404 1535,700 1534,934 C 1120,936 480,935 66,934 C 64,676 65,384 66,138 Z" />
+
+          <!-- title ribbon draped over the top frame — clickable: returns home -->
+          <g
+            id="map-home-link"
+            class="title-ribbon"
+            transform="translate(0,52)"
+            role="button"
+            tabindex="0"
+            aria-label="The Archives — close the map and return to the landing page"
+          >
+            <title>Return to the landing page</title>
+            <path class="ink1" pathLength="1"
+              d="M 636,58 L 660,44 L 660,58 L 700,54 C 800,48 800,48 900,54 L 940,58 L 940,44 L 964,58 L 940,72 L 940,86 L 900,90 C 800,96 800,96 700,90 L 660,86 L 660,100 L 636,86 L 654,72 Z" />
+            <path class="ink3 red" pathLength="1" d="M 668,62 C 800,54 800,54 932,62" />
+            <path class="ink3 red" pathLength="1" d="M 668,82 C 800,90 800,90 932,82" />
+            <text class="title-text" x="800" y="80" text-anchor="middle">THE ARCHIVES</text>
+            <!-- transparent hit area so the whole ribbon is clickable -->
+            <rect class="title-hit" x="620" y="36" width="360" height="72" fill="transparent" />
+          </g>
+
+          <!-- corner ornaments -->
+          {corners.map((c) => (
+            <g class="corner" transform={c.t}>
+              <path class="ink2" pathLength="1"
+                d="M 0,0 C 48,2 78,22 70,66 C 66,36 46,20 22,22 C 40,30 46,48 34,66 C 32,44 16,34 0,38" />
+              <path class="ink3" pathLength="1" d="M 4,4 C 32,8 48,22 48,44" />
+              <circle class="dot" cx="0" cy="0" r="2.2" />
+            </g>
+          ))}
+
+          <!-- compass rose (NE open ground) -->
+          <g class="compass" transform="translate(1462,478)">
+            <path class="ink1" pathLength="1"
+              d="M -40,1 C -41,-21 -21,-41 0,-40 C 22,-41 41,-21 40,1 C 41,22 21,41 0,40 C -21,41 -41,21 -40,1 Z" />
+            <g class="ink2">
+              <line pathLength="1" x1="0" y1="0" x2="34" y2="0" />
+              <line pathLength="1" x1="0" y1="0" x2="-34" y2="0" />
+              <line pathLength="1" x1="0" y1="0" x2="0" y2="34" />
+              <line pathLength="1" x1="0" y1="0" x2="22" y2="-22" />
+              <line pathLength="1" x1="0" y1="0" x2="-22" y2="-22" />
+              <line pathLength="1" x1="0" y1="0" x2="22" y2="22" />
+              <line pathLength="1" x1="0" y1="0" x2="-22" y2="22" />
+            </g>
+            <path class="compass-n" pathLength="1" d="M 0,0 L -6,-24 L 0,-42 L 6,-24 Z" />
+            <circle class="ink2" cx="0" cy="0" r="3.5" pathLength="1" />
+            <text class="compass-letter" x="0" y="-50" text-anchor="middle">N</text>
+          </g>
+
+          <!-- the lake (SE corner) -->
+          <g class="lake">
+            <path class="ink2" pathLength="1" d="M 1244,944 C 1290,900 1352,862 1418,840 C 1462,824 1506,812 1534,806" />
+            <g class="ink3 water">
+              <path pathLength="1" d="M 1330,922 C 1344,918 1358,918 1370,922" />
+              <path pathLength="1" d="M 1400,890 C 1414,886 1428,886 1440,890" />
+              <path pathLength="1" d="M 1462,860 C 1476,856 1490,856 1502,860" />
+              <path pathLength="1" d="M 1364,900 C 1374,897 1384,897 1392,900" />
+            </g>
+            <!-- rowboat + a curious tentacle -->
+            <g class="ink2">
+              <path pathLength="1" d="M 1318,900 C 1326,906 1342,906 1350,900 C 1342,896 1326,896 1318,900 Z" />
+              <line class="ink3" pathLength="1" x1="1322" y1="898" x2="1314" y2="890" />
+              <line class="ink3" pathLength="1" x1="1346" y1="898" x2="1354" y2="890" />
+            </g>
+            <path class="ink2 tentacle" pathLength="1" d="M 1476,876 C 1472,864 1480,856 1488,860 C 1494,862 1494,872 1488,874" />
+            <circle class="dot faint" cx="1484" cy="862" r="1.2" />
+            <text class="microlabel" x="1436" y="918" text-anchor="middle" transform="rotate(-3 1436 918)">uncharted depths</text>
+          </g>
+
+          <!-- scribbly trees + one ill-tempered specimen -->
+          <g class="woods">
+            {trees.map((t) => (
+              <path class="ink3 tree" pathLength="1"
+                d={`M ${t.x - t.r},${t.y} C ${t.x - t.r},${t.y - t.r * 1.3} ${t.x + t.r},${t.y - t.r * 1.3} ${t.x + t.r},${t.y} C ${t.x + t.r * 1.2},${t.y + t.r * 0.9} ${t.x - t.r * 1.2},${t.y + t.r * 0.9} ${t.x - t.r},${t.y} Z`} />
+            ))}
+            <path class="ink2 tree angry" pathLength="1"
+              d="M 172,358 C 160,340 176,326 190,334 C 194,320 214,322 216,336 C 232,332 240,350 228,360 C 238,372 222,384 210,376 C 204,388 184,386 182,374 C 168,378 162,366 172,358 Z" />
+            <line class="ink3" x1="196" y1="382" x2="196" y2="398" pathLength="1" />
+            <text class="microlabel" x="196" y="416" text-anchor="middle" transform="rotate(-2 196 416)">an ill-tempered tree</text>
+          </g>
+
+          <!-- decorative footprint trails in the corridors -->
+          <g class="foot-flourish">
+            {trailWest.map((f) => (
+              <g transform={`translate(${f.x},${f.y}) rotate(${f.r})`} opacity={f.o}>
+                <ellipse class="pawprint" cx="-4" cy="0" rx="2.6" ry="5" />
+                <ellipse class="pawprint" cx="4" cy="9" rx="2.6" ry="5" />
+              </g>
+            ))}
+            {trailNE.map((f) => (
+              <g transform={`translate(${f.x},${f.y}) rotate(${f.r})`} opacity={f.o}>
+                <ellipse class="pawprint" cx="-4" cy="0" rx="2.6" ry="5" />
+                <ellipse class="pawprint" cx="4" cy="9" rx="2.6" ry="5" />
+              </g>
+            ))}
+          </g>
+
+          <!-- ink blots, spatter, drips -->
+          <g class="mess">
+            <path class="blot" d="M 108,872 C 94,862 100,842 118,846 C 128,834 148,842 144,856 C 158,860 152,880 138,878 C 136,890 116,890 114,880 C 104,884 100,878 108,872 Z" />
+            <line class="ink3 drip" pathLength="1" x1="120" y1="888" x2="118" y2="912" />
+            <circle class="dot" cx="118" cy="918" r="1.8" />
+            <circle class="dot faint" cx="150" cy="870" r="1.4" />
+            {spatter.map((s) => (
+              <g transform={`translate(${s.x},${s.y})`} class={s.red ? 'red-spatter' : ''}>
+                {s.dots.map((d) => (
+                  <circle class="spatter-dot" cx={d[0]} cy={d[1]} r={d[2]} opacity={d[3]} />
+                ))}
+              </g>
+            ))}
+            <!-- a red wax seal pressed near the south frame -->
+            <g class="wax-seal" transform="translate(1162,906)">
+              <path class="red-fill" d="M -6,-5 C -9,-9 -4,-13 0,-11 C 4,-13 9,-9 7,-4 C 10,0 6,6 1,5 C -4,7 -9,2 -6,-5 Z" />
+              <path class="ink2 red seal-ring" pathLength="1"
+                d="M -10,0 C -11,-6 -5,-12 0,-11 C 6,-12 11,-6 10,0 C 11,6 5,11 0,10 C -6,11 -10,6 -10,0 Z" />
+              <circle class="dot red" cx="9" cy="9" r="1.3" />
+            </g>
+          </g>
+
+          <!-- flavor annotations -->
+          <text class="flavor" x="330" y="700" text-anchor="middle" transform="rotate(-4 330 700)">here dwell unfinished ideas</text>
+          <text class="flavor" x="1258" y="530" text-anchor="middle" transform="rotate(3 1258 530)">mind the sparks</text>
+          <g class="flavor-here" transform="rotate(5 1080 828)">
+            <text class="flavor small" x="1080" y="828" text-anchor="middle">you are here (probably)</text>
+            <path class="ink2 red" pathLength="1" d="M 1066,840 L 1078,852 M 1078,840 L 1066,852" />
+          </g>
+        </g>
+
+        <!-- ══════════════ FOOTPRINTS (empty runtime container — Phase 3) ══════════════ -->
+        <g id="layer-footprints" data-draw="5"></g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- edge hints (narrow viewports only) -->
+  <div class="edge-fade edge-left" data-edge="left" aria-hidden="true">
+    <svg class="chevron" viewBox="0 0 24 24" width="26" height="26"><path d="M15 4 L7 12 L15 20" /></svg>
+  </div>
+  <div class="edge-fade edge-right" data-edge="right" aria-hidden="true">
+    <svg class="chevron" viewBox="0 0 24 24" width="26" height="26"><path d="M9 4 L17 12 L9 20" /></svg>
+  </div>
+
+  <!-- screen-reader fallback navigation -->
+  <nav class="sr-nav" aria-label="Site destinations">
+    <ul>
+      {locs.map((l) => (
+        <li>
+          <a {...linkAttrs(l)}>{l.name}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</div>
+
+<style>
+  /* ── container / parchment ─────────────────────────────────────────── */
+  .marauder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-parchment);
+  }
+  .marauder-tex {
+    position: absolute;
+    inset: 0;
+    background-image: url('/textures/parchment_texture1.jpg');
+    background-size: 520px 520px;
+    background-repeat: repeat;
+    mix-blend-mode: multiply;
+    opacity: 0.26;
+    filter: sepia(0.25);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .marauder-stage {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .marauder-pan {
+    will-change: transform;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  /* fit mode: entire map visible, centred */
+  .marauder-stage.fit .marauder-pan { width: 100%; justify-content: center; }
+  .marauder-stage.fit svg { max-width: 100%; max-height: 100%; width: auto; height: auto; }
+
+  /* pan mode: height fills, width overflows */
+  .marauder-stage.pan { justify-content: flex-start; touch-action: none; cursor: grab; }
+  .marauder-stage.pan.grabbing { cursor: grabbing; }
+  .marauder-stage.pan svg { height: 100%; width: auto; max-width: none; max-height: 100%; }
+
+  svg { display: block; user-select: none; }
+
+  /* ── ink stroke language ───────────────────────────────────────────── */
+  svg path,
+  svg line,
+  svg polyline,
+  svg circle,
+  svg ellipse {
+    fill: none;
+    stroke: #1c1208;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .ink1, .ink1 * { stroke-width: 2.2; opacity: 0.85; }
+  .ink2, .ink2 * { stroke-width: 1.3; opacity: 0.62; }
+  .ink3, .ink3 * { stroke-width: 1; opacity: 0.4; }
+  .dot { fill: rgba(28, 18, 8, 0.75); stroke: none; }
+  .dot.faint { fill: rgba(28, 18, 8, 0.4); }
+
+  /* ghost architecture — background noise, deliberately faint */
+  .ghost { opacity: 0.38; }
+
+  /* red ink — second pen, used sparingly (warnings, seals, the X) */
+  .red, .red * { stroke: #8b1a1a; }
+  .dot.red { fill: rgba(139, 26, 26, 0.7); stroke: none; }
+  .red-fill { fill: rgba(139, 26, 26, 0.68); stroke: none; }
+  .red-spatter .spatter-dot { fill: #8b1a1a; }
+
+  /* mess: blots, stains, spatter */
+  .blot { fill: rgba(28, 18, 8, 0.14); stroke: rgba(28, 18, 8, 0.25); stroke-width: 0.8; }
+  .blot.dark { fill: rgba(28, 18, 8, 0.12); stroke: none; }
+  .stain { fill: rgba(28, 18, 8, 1); stroke: none; }
+  .spatter-dot { fill: rgba(28, 18, 8, 1); stroke: none; }
+
+  /* dotted outdoor trails */
+  .trail path {
+    stroke-width: 2.4;
+    opacity: 0.55;
+    stroke-dasharray: 2.5 13;
+  }
+
+  /* structural details */
+  .swing { stroke-dasharray: 3 4; }
+  .rug { stroke-dasharray: 4 5; }
+  .smoke { stroke-width: 1.2; opacity: 0.45; stroke-dasharray: 3 6; }
+  .spark, .spark * { stroke-width: 1.4; opacity: 0.72; }
+  .leaf { fill: rgba(28, 18, 8, 0.12); stroke: #1c1208; stroke-width: 1; opacity: 0.6; }
+  .pawprint { fill: rgba(28, 18, 8, 0.5); stroke: none; }
+
+  /* compass north tip — the single gold accent */
+  .compass-n { fill: var(--color-gold); stroke: var(--color-gold); stroke-width: 1; opacity: 0.9; }
+  .compass-letter { font-family: 'Cinzel', serif; font-size: 15px; fill: var(--color-ink); opacity: 0.8; stroke: none; }
+
+  /* ── text styles ───────────────────────────────────────────────────── */
+  .title-text {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 3px;
+    fill: var(--color-ink);
+    stroke: none;
+    transition: fill 180ms ease;
+  }
+  .title-ribbon path { fill: rgba(245, 236, 215, 0.75); }
+
+  /* clickable title — subtle affordance on hover/focus */
+  #map-home-link { cursor: pointer; }
+  #map-home-link:hover .title-text,
+  #map-home-link:focus-visible .title-text {
+    fill: var(--color-gold);
+  }
+  #map-home-link:focus-visible {
+    outline: none;
+  }
+  #map-home-link:focus-visible .title-hit {
+    stroke: var(--color-gold);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 3;
+  }
+  .flavor {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 17px;
+    fill: var(--color-ink-muted);
+    stroke: none;
+    opacity: 0.85;
+  }
+  .flavor.small { font-size: 14px; }
+  .microlabel {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 12px;
+    fill: var(--color-ink-muted);
+    stroke: none;
+    opacity: 0.75;
+  }
+  .microlabel.tiny { font-size: 10.5px; opacity: 0.65; }
+
+  /* ── location interaction ──────────────────────────────────────────── */
+  .loc-link { cursor: pointer; outline: none; }
+  .loc-hit { fill: transparent; stroke: none; }
+  .loc { pointer-events: auto; }
+
+  .loc-name {
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-variant-caps: small-caps;
+    font-size: 19px;
+    letter-spacing: 1.2px;
+    fill: var(--color-ink);
+    stroke: none;
+  }
+  .loc-banner path {
+    fill: rgba(245, 236, 215, 0.92);
+    stroke: #1c1208;
+    stroke-width: 1.5;
+    opacity: 0.9;
+    transition: stroke 0.25s ease;
+  }
+  .loc-banner { transition: transform 0.2s ease; transform: translateY(0); }
+
+  .loc-card { fill: rgba(243, 233, 205, 0.985); stroke: rgba(139, 105, 20, 0.55); stroke-width: 1; }
+  .loc-desc-text {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 15.5px;
+    fill: #41321b;
+    stroke: none;
+  }
+  .loc-desc {
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .loc-ring {
+    fill: none;
+    stroke: var(--color-gold);
+    stroke-width: 1.6;
+    stroke-dasharray: 5 5;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  /* building strokes warm toward gold; banner lifts; desc unfurls */
+  .loc .bldg { transition: stroke 0.28s ease; }
+  .loc:hover .bldg,
+  .loc-link:focus-visible .bldg { stroke: var(--color-gold); }
+  .loc:hover .loc-banner path,
+  .loc-link:focus-visible .loc-banner path { stroke: var(--color-gold); }
+  .loc:hover .loc-banner,
+  .loc-link:focus-visible .loc-banner { transform: translateY(-3px); }
+  .loc:hover .loc-desc,
+  .loc-link:focus-visible .loc-desc { opacity: 1; transform: translateY(0); }
+  .loc-link:focus-visible .loc-ring { opacity: 0.9; }
+
+  /* ── edge hints ────────────────────────────────────────────────────── */
+  .edge-fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 74px;
+    z-index: 3;
+    display: none;
+    align-items: center;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+  }
+  .edge-left {
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 8px;
+    background: linear-gradient(to right, rgba(245, 236, 215, 0.9), rgba(245, 236, 215, 0));
+  }
+  .edge-right {
+    right: 0;
+    justify-content: flex-end;
+    padding-right: 8px;
+    background: linear-gradient(to left, rgba(245, 236, 215, 0.9), rgba(245, 236, 215, 0));
+  }
+  .marauder.can-pan .edge-fade.active { display: flex; }
+  .marauder.panned .edge-fade { opacity: 0; }
+  .chevron path { fill: none; stroke: var(--color-gold); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .chevron { opacity: 0.75; }
+  .edge-left .chevron { animation: nudge-left 1.6s ease-in-out infinite; }
+  .edge-right .chevron { animation: nudge-right 1.6s ease-in-out infinite; }
+  @keyframes nudge-left { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-5px); } }
+  @keyframes nudge-right { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+
+  /* ── screen-reader-only nav ────────────────────────────────────────── */
+  .sr-nav {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .sr-nav a:focus {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    width: auto;
+    height: auto;
+    clip: auto;
+    background: var(--color-parchment-light);
+    padding: 6px 12px;
+    z-index: 50;
+    border: 1px solid var(--color-gold);
+  }
+
+  /* ── Phase-2 ceremony draw-on (additive; classes toggled by MapCeremony) ──
+     is-undrawn hides the map; is-drawing animates it in. The controller tags
+     every element with --dd (delay), --ddur (draw duration) and, for fade
+     elements, --cer-op (their natural opacity) + the `cer-fade` class.
+     Dash-drawables = path/line with pathLength that are NOT cer-fade (the
+     controller withholds cer-fade from exactly those); everything else fades.
+     End state removes all these classes/vars → the SVG behaves identically. */
+  .marauder.is-undrawn [pathLength]:not(.cer-fade) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .marauder.is-undrawn .cer-fade {
+    opacity: 0;
+  }
+  .marauder.is-drawing [pathLength]:not(.cer-fade) {
+    animation: map-draw var(--ddur, 650ms) ease-out var(--dd, 0ms) both;
+  }
+  .marauder.is-drawing .cer-fade {
+    animation: cer-fade var(--cer-fade-dur, 400ms) ease var(--dd, 0ms) both;
+  }
+  @keyframes map-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes cer-fade {
+    from { opacity: 0; }
+    to { opacity: var(--cer-op, 1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loc-banner, .loc-desc, .loc .bldg, .loc-ring, .loc-banner path { transition: none; }
+    .chevron { animation: none; }
+
+    /* If a ceremony ever slips through (it should not — index keeps its fast
+       path under reduced motion), never leave the map hidden. */
+    .marauder.is-undrawn [pathLength]:not(.cer-fade) { stroke-dasharray: none; stroke-dashoffset: 0; }
+    .marauder.is-undrawn .cer-fade { opacity: var(--cer-op, 1); }
+    .marauder.is-drawing [pathLength]:not(.cer-fade),
+    .marauder.is-drawing .cer-fade { animation: none; }
+  }
+</style>
+
+<script>
+  const MAP_ASPECT = 1600 / 1000;
+  const FIT_THRESHOLD = 1.2; // container aspect >= this → fit whole map; below → pan
+
+  function initMarauder(root: HTMLElement) {
+    const stage = root.querySelector<HTMLElement>('[data-stage]');
+    const pan = root.querySelector<HTMLElement>('[data-pan]');
+    const edgeLeft = root.querySelector<HTMLElement>('[data-edge="left"]');
+    const edgeRight = root.querySelector<HTMLElement>('[data-edge="right"]');
+    if (!stage || !pan) return;
+
+    let panEnabled = false;
+    let tx = 0;
+    let minX = 0;
+    const maxX = 0;
+    let hasPanned = false;
+    let dragging = false;
+    let startX = 0;
+    let startTx = 0;
+    let rafId = 0;
+    let pendingX = 0;
+    let initialised = false;
+
+    function apply() {
+      pan!.style.transform = `translate3d(${tx}px,0,0)`;
+    }
+
+    function updateEdges() {
+      if (!panEnabled || hasPanned) {
+        edgeLeft?.classList.remove('active');
+        edgeRight?.classList.remove('active');
+        return;
+      }
+      const canLeft = tx < maxX - 1; // content hidden to the left
+      const canRight = tx > minX + 1; // content hidden to the right
+      edgeLeft?.classList.toggle('active', canLeft);
+      edgeRight?.classList.toggle('active', canRight);
+    }
+
+    function clamp(v: number) {
+      return Math.max(minX, Math.min(maxX, v));
+    }
+
+    function layout() {
+      const w = stage!.clientWidth;
+      const h = stage!.clientHeight;
+      if (!w || !h) return;
+      const containerAspect = w / h;
+
+      if (containerAspect >= FIT_THRESHOLD) {
+        panEnabled = false;
+        stage!.classList.add('fit');
+        stage!.classList.remove('pan');
+        root.classList.remove('can-pan', 'panned');
+        tx = 0;
+        pan!.style.transform = '';
+        updateEdges();
+        return;
+      }
+
+      // pan mode
+      stage!.classList.remove('fit');
+      stage!.classList.add('pan');
+      root.classList.add('can-pan');
+      panEnabled = true;
+      const svgW = h * MAP_ASPECT;
+      minX = Math.min(0, w - svgW);
+      if (!initialised) {
+        tx = minX / 2; // start centred
+        initialised = true;
+      }
+      tx = clamp(tx);
+      apply();
+      updateEdges();
+    }
+
+    function onMove(clientX: number) {
+      pendingX = clamp(startTx + (clientX - startX));
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
+          tx = pendingX;
+          apply();
+          updateEdges();
+        });
+      }
+    }
+
+    stage.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (!panEnabled) return;
+      dragging = true;
+      startX = e.clientX;
+      startTx = tx;
+      stage.classList.add('grabbing');
+      try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+
+    stage.addEventListener('pointermove', (e: PointerEvent) => {
+      if (!dragging) return;
+      if (!hasPanned && Math.abs(e.clientX - startX) > 8) {
+        hasPanned = true;
+        root.classList.add('panned');
+      }
+      onMove(e.clientX);
+    });
+
+    function endDrag(e: PointerEvent) {
+      if (!dragging) return;
+      dragging = false;
+      stage!.classList.remove('grabbing');
+      try { stage!.releasePointerCapture(e.pointerId); } catch (_) {}
+    }
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+
+    // Prevent link navigation when a drag moved the map.
+    let moved = 0;
+    stage.addEventListener('pointerdown', () => { moved = 0; });
+    stage.addEventListener('pointermove', (e: PointerEvent) => { if (dragging) moved = Math.abs(e.clientX - startX); });
+    root.querySelectorAll<HTMLAnchorElement>('a.loc-link').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        if (moved > 8) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+    });
+
+    const ro = new ResizeObserver(() => layout());
+    ro.observe(stage);
+    window.addEventListener('resize', layout);
+    layout();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-marauder]').forEach(initMarauder);
+</script>

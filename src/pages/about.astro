@@ -107,13 +107,35 @@ const marginalia   = sections.find((s) => s.id === "marginalia")!;
 
           <!-- Note 4: Where I'm Going -->
           <section class="pinned-note scroll-reveal">
-            <h2 class="font-display text-lg text-ink mb-3">{whereImGoing.heading}</h2>
+            <h2 class="font-display text-lg text-ink mb-3">
+              {whereImGoing.heading}
+            </h2>
+
             <div class="text-ink-muted leading-relaxed space-y-3 font-body">
-              {(whereImGoing.paragraphs ?? []).map((p) => <p><ProseText text={p} /></p>)}
-              {whereImGoing.quote && (
-                <p class="font-fell italic text-ink" style="font-size: 1rem;">
-                  "{whereImGoing.quote}"
+              {(whereImGoing.paragraphs ?? []).map((p) => (
+                <p>
+                  <ProseText text={p} />
                 </p>
+              ))}
+
+              {whereImGoing.quote && (
+                <figure class="mt-4">
+                  <blockquote
+                    class="font-fell italic text-ink"
+                    style="font-size: 1rem;"
+                  >
+                    "{whereImGoing.quote}"
+                  </blockquote>
+
+                  {whereImGoing.cite && (
+                    <figcaption 
+                      class="font-fell italic text-ink"
+                      style="font-size: 1rem;"
+                    >
+                      — {whereImGoing.cite}
+                    </figcaption>
+                  )}
+                </figure>
               )}
             </div>
           </section>

@@ -62,6 +62,15 @@ export function parseProse(para: string): ProsePart[] {
   return parts;
 }
 
+/** Flatten a block to plain text — for <meta> tags and anywhere markup can't render. */
+export function stripProse(raw: string): string {
+  return parseProse(raw)
+    .map((p) => (p.type === 'text' ? p.value : p.text))
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /** Parse a multi-paragraph string (blank-line separated) into parts per paragraph. */
 export function parseProseBlocks(raw: string): ProsePart[][] {
   return raw.split('\n\n').map(parseProse);

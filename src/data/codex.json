@@ -27,9 +27,9 @@
       "title": "Cohort Lead @ WAISI",
       "dateRange": "Oct 2025 – Present",
       "description": "I take a group of students through eight weeks of technical AI safety. Teaching it turned out to be the fastest way to find the holes in my own understanding.",
-      "detail": "Cohort Lead on the technical team at the Wisconsin AI Safety Initiative, covering reward specification, interpretability, and adversarial evaluation.\n\n• Lead a cohort of students through an 8-week technical AI safety curriculum, facilitating discussions and learning sessions\n• Update and refine curriculum to incorporate the latest AI safety research and materials from BlueDot Impact\n• Participate in a reading group and conduct structured research replications of relevant papers\n• Completed the technical and policy fundamentals programs, including compute governance and international coordination\n• Leading a second cohort starting this fall",
+      "detail": "Cohort Lead on the technical team at the Wisconsin AI Safety Initiative, covering reward specification, interpretability, and adversarial evaluation.\n\n• Lead a cohort of students through an 8-week technical AI safety curriculum, facilitating discussions and learning sessions\n• Update and refine curriculum to incorporate the latest AI safety research and materials from BlueDot Impact\n• Participate in a reading group going through recent AI safety literature\n• Completed the technical and policy fundamentals programs\n• Leading a second cohort starting this fall",
       "links": [{ "label": "Org page", "href": "https://www.waisi.org/" }],
-      "tags": ["AI Safety", "Leadership", "Research"],
+      "tags": ["AI Safety", "Leadership"],
       "rotation": -0.5,
       "categories": ["Pinned", "Community", "Research"]
     },

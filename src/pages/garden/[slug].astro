@@ -4,12 +4,10 @@
  * Dedicated journal page for each Garden note.
  * Single-column, open field journal aesthetic.
  */
+import { getCollection, render } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
-import gardenData from '@/data/garden.json';
-
-function slugify(title: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-}
+import ProseText from '@/components/ProseText.astro';
+import { stripProse } from '@/lib/prose';
 
 function tagColor(tag: string): string {
   if (tag === 'Cooking' || ['AI', 'Theory', 'Complexity', 'Systems'].includes(tag)) return '#6B1515';
@@ -18,20 +16,26 @@ function tagColor(tag: string): string {
   return '#3C2A1A';
 }
 
-const notes = gardenData.notes;
-
-// SSR mode: look up note by slug at request time
+// SSR mode: look up the note by slug at request time. The greenhouse loader
+// uses the filename as the entry id, so the slug IS the filename.
 const { slug } = Astro.params;
-const note = notes.find((n) => slugify(n.title) === slug);
+const entry = (await getCollection('greenhouse')).find((e) => e.id === slug);
 
-if (!note) {
+if (!entry) {
   return Astro.redirect('/garden');
 }
+
+const note = entry.data;
+const { Content } = await render(entry);
+
+// An unwritten note is a file with frontmatter and nothing under it (a template
+// comment doesn't count) — those still get the "in progress" placeholder.
+const hasBody = (entry.body ?? '').replace(/<!--[\s\S]*?-->/g, '').trim().length > 0;
 ---
 
 <Layout
   title={`${note.title} — The Herbarium`}
-  description={note.excerpt}
+  description={stripProse(note.excerpt)}
   variant="interior"
   pageTitle={note.title}
 >
@@ -98,7 +102,7 @@ if (!note) {
         </div>
 
         <!-- Excerpt (enlarged) -->
-        <p class="dispatch-excerpt">{note.excerpt}</p>
+        <p class="dispatch-excerpt"><ProseText text={note.excerpt} /></p>
 
         <!-- Second botanical divider -->
         <div class="dispatch-divider" aria-hidden="true">
@@ -110,18 +114,25 @@ if (!note) {
           </svg>
         </div>
 
-        <!-- Placeholder content block — torn paper style -->
-        <div class="dispatch-placeholder">
-          <!-- Wax stamp corner -->
-          <div class="dispatch-wax-stamp" aria-hidden="true">
-            <span>IN<br/>PROGRESS</span>
+        <!-- The dispatch itself — markdown body of src/data/greenhouse/<slug>.md -->
+        {hasBody ? (
+          <div class="dispatch-body">
+            <Content />
           </div>
+        ) : (
+          <!-- Placeholder content block — torn paper style -->
+          <div class="dispatch-placeholder">
+            <!-- Wax stamp corner -->
+            <div class="dispatch-wax-stamp" aria-hidden="true">
+              <span>IN<br/>PROGRESS</span>
+            </div>
 
-          <p class="dispatch-placeholder-text">
-            This note hasn't been written yet.
-            I'm still organizing my thoughts and will share them here soon.
-          </p>
-        </div>
+            <p class="dispatch-placeholder-text">
+              This note hasn't been written yet.
+              I'm still organizing my thoughts and will share them here soon.
+            </p>
+          </div>
+        )}
 
       </article>
 
@@ -235,6 +246,96 @@ if (!note) {
     font-size: 1.2rem;
     color: #4a3c2e;
     line-height: 1.8;
+  }
+
+  /* ── Dispatch body ───────────────────────────────────────────────────────────
+     Rendered markdown from src/data/greenhouse/<slug>.md. Everything the writer
+     can reasonably type gets a home here, so a note never lands unstyled. */
+  .dispatch-body {
+    font-family: 'Crimson Text', serif;
+    font-size: 1.05rem;
+    color: #4a3c2e;
+    line-height: 1.85;
+  }
+
+  .dispatch-body > * + * {
+    margin-top: 1.15rem;
+  }
+
+  .dispatch-body h2,
+  .dispatch-body h3 {
+    font-family: 'Cinzel', serif;
+    color: #1C1208;
+    letter-spacing: 0.02em;
+    margin-top: 2.25rem;
+  }
+
+  .dispatch-body h2 { font-size: 1.25rem; }
+  .dispatch-body h3 { font-size: 1.05rem; }
+
+  .dispatch-body ul,
+  .dispatch-body ol {
+    padding-left: 1.4rem;
+  }
+
+  .dispatch-body ul { list-style: none; }
+  .dispatch-body ol { list-style: decimal; }
+
+  /* Leaf glyph instead of a bullet — the herbarium's own list marker. */
+  .dispatch-body ul > li::before {
+    content: '❧';
+    color: #8B6914;
+    font-size: 0.7em;
+    margin-left: -1.4rem;
+    margin-right: 0.65rem;
+    vertical-align: 0.1em;
+  }
+
+  .dispatch-body li + li {
+    margin-top: 0.4rem;
+  }
+
+  .dispatch-body blockquote {
+    border-left: 2px solid rgba(139, 105, 20, 0.45);
+    padding-left: 1.1rem;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: #5a4a38;
+  }
+
+  .dispatch-body strong { font-weight: 600; color: #1C1208; }
+  .dispatch-body em     { font-style: italic; }
+
+  .dispatch-body code {
+    font-size: 0.88em;
+    background: rgba(234, 217, 184, 0.5);
+    border: 1px solid rgba(139, 105, 20, 0.2);
+    padding: 0.05em 0.35em;
+  }
+
+  .dispatch-body pre {
+    background: rgba(28, 18, 8, 0.04);
+    border: 1px solid rgba(139, 105, 20, 0.25);
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .dispatch-body pre code {
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+
+  .dispatch-body img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid rgba(139, 105, 20, 0.3);
+  }
+
+  .dispatch-body hr {
+    border: 0;
+    border-top: 1px solid rgba(139, 105, 20, 0.3);
+    margin: 2rem 0;
   }
 
   /* ── Placeholder block ───────────────────────────────────────────────────── */

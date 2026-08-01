@@ -1,0 +1,439 @@
+---
+/**
+ * greenhouse/edit.astro — the writing desk. DEV ONLY.
+ *
+ * Left: the raw markdown file. Right: the real <GardenNote> card and the real
+ * rendered dispatch body, refreshed as you type. Both panes come from
+ * /api/greenhouse, which renders them with the site's own components and
+ * markdown pipeline — so the preview can't drift from what ships.
+ *
+ * Not reachable in production: this page 404s outside `astro dev`, as does the
+ * API behind it.
+ */
+import '@/styles/global.css';
+import '@/styles/prose.css';
+import '@/styles/pages/garden.css';
+
+export const prerender = false;
+
+if (!import.meta.env.DEV) {
+  return new Response('Not found', { status: 404 });
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Greenhouse — writing desk</title>
+  </head>
+
+  <body class="gh-body">
+    <!-- ── Toolbar ────────────────────────────────────────────────────────── -->
+    <header class="gh-bar">
+      <span class="gh-brand">❧ Greenhouse</span>
+
+      <select id="gh-picker" class="gh-select" aria-label="Note to edit"></select>
+
+      <button id="gh-new" class="gh-btn" type="button">+ New note</button>
+
+      <span class="gh-spacer"></span>
+
+      <span id="gh-status" class="gh-status" role="status" aria-live="polite"></span>
+
+      <button id="gh-save" class="gh-btn gh-btn-primary" type="button">
+        Save <kbd>⌘S</kbd>
+      </button>
+    </header>
+
+    <!-- ── Split view ─────────────────────────────────────────────────────── -->
+    <main class="gh-split">
+      <section class="gh-pane gh-editor-pane">
+        <textarea
+          id="gh-source"
+          class="gh-textarea"
+          spellcheck="true"
+          autocomplete="off"
+          autocapitalize="off"
+          placeholder="Pick a note above, or start a new one."
+        ></textarea>
+      </section>
+
+      <section class="gh-pane gh-preview-pane">
+        <!-- Frontmatter problems surface here rather than blanking the preview -->
+        <ul id="gh-errors" class="gh-errors" hidden></ul>
+
+        <p class="gh-pane-label">On the board</p>
+        <div class="gh-card-stage">
+          <div class="garden-grid" id="gh-card"></div>
+        </div>
+
+        <p class="gh-pane-label">The dispatch</p>
+        <div class="gh-dispatch-stage">
+          <article class="gh-dispatch-page">
+            <div id="gh-dispatch" class="dispatch-body"></div>
+            <p id="gh-dispatch-empty" class="gh-empty">
+              Nothing under the frontmatter yet — the dispatch page will show its
+              “in progress” placeholder.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+      const picker   = $<HTMLSelectElement>('gh-picker');
+      const source   = $<HTMLTextAreaElement>('gh-source');
+      const statusEl = $<HTMLElement>('gh-status');
+      const errorsEl = $<HTMLUListElement>('gh-errors');
+      const cardEl   = $<HTMLElement>('gh-card');
+      const bodyEl   = $<HTMLElement>('gh-dispatch');
+      const emptyEl  = $<HTMLElement>('gh-dispatch-empty');
+
+      let slug = '';
+      let saved = '';
+      let previewTimer: number | undefined;
+
+      const dirty = () => source.value !== saved;
+
+      function setStatus(text: string, tone: 'idle' | 'ok' | 'warn' = 'idle') {
+        statusEl.textContent = text;
+        statusEl.dataset.tone = tone;
+      }
+
+      const api = async (init?: RequestInit, query = '') => {
+        const res = await fetch(`/api/greenhouse${query}`, init);
+        return res.json();
+      };
+
+      // ── Load the note list ───────────────────────────────────────────────
+      async function loadList(select?: string) {
+        const { notes } = await api(undefined, '?action=list');
+        picker.innerHTML = '';
+        for (const n of notes) {
+          const opt = document.createElement('option');
+          opt.value = n.slug;
+          opt.textContent = `${n.title}  ·  ${n.slug}.md`;
+          picker.append(opt);
+        }
+        const target = select ?? notes[0]?.slug;
+        if (target) {
+          picker.value = target;
+          await open(target);
+        }
+      }
+
+      async function open(next: string) {
+        if (dirty() && !confirm('You have unsaved changes. Discard them?')) {
+          picker.value = slug;
+          return;
+        }
+        const { raw } = await api(undefined, `?slug=${encodeURIComponent(next)}`);
+        slug = next;
+        saved = raw;
+        source.value = raw;
+        setStatus('');
+        refresh();
+      }
+
+      // ── Preview ──────────────────────────────────────────────────────────
+      async function refresh() {
+        const { errors, card, body } = await api({
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'preview', raw: source.value, slug }),
+        });
+
+        errorsEl.hidden = !errors?.length;
+        errorsEl.innerHTML = '';
+        for (const e of errors ?? []) {
+          const li = document.createElement('li');
+          li.textContent = e;
+          errorsEl.append(li);
+        }
+
+        cardEl.innerHTML = card ?? '';
+        bindCard();
+
+        bodyEl.innerHTML = body ?? '';
+        bodyEl.hidden = !body;
+        emptyEl.hidden = !!body;
+      }
+
+      /** The injected card is inert HTML — re-attach the expand/collapse behaviour. */
+      function bindCard() {
+        const wrapper = cardEl.querySelector<HTMLElement>('.garden-note-wrapper');
+        if (!wrapper) return;
+        // Start expanded so the summary is visible while you're writing it.
+        wrapper.classList.add('is-expanded');
+
+        cardEl.querySelector('.dispatch-btn')
+          ?.addEventListener('click', () => wrapper.classList.add('is-expanded'));
+        cardEl.querySelector('.close-dispatch-btn')
+          ?.addEventListener('click', () => wrapper.classList.remove('is-expanded'));
+      }
+
+      // ── Save ─────────────────────────────────────────────────────────────
+      async function save() {
+        if (!slug) return;
+        setStatus('Saving…');
+        const res = await api({
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'save', slug, raw: source.value }),
+        });
+        if (res.error) return setStatus(res.error, 'warn');
+        saved = source.value;
+        setStatus(`Saved ${slug}.md`, 'ok');
+        window.setTimeout(() => statusEl.textContent === `Saved ${slug}.md` && setStatus(''), 2000);
+      }
+
+      // ── Wiring ───────────────────────────────────────────────────────────
+      source.addEventListener('input', () => {
+        if (dirty()) setStatus('Unsaved changes', 'warn');
+        window.clearTimeout(previewTimer);
+        previewTimer = window.setTimeout(refresh, 350);
+      });
+
+      picker.addEventListener('change', () => open(picker.value));
+
+      $('gh-save').addEventListener('click', save);
+
+      $('gh-new').addEventListener('click', async () => {
+        // Don't let a new note quietly swallow edits to the current one.
+        if (dirty()) {
+          const keep = confirm(`Save your changes to ${slug}.md first?`);
+          if (keep) await save();
+          else saved = source.value;
+        }
+
+        const title = prompt('Title of the new note?');
+        if (!title) return;
+        const res = await api({
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'create', title, date: '', tags: [] }),
+        });
+        if (res.error) return alert(res.error);
+        await loadList(res.slug);
+        setStatus(`Created ${res.slug}.md — fill in the date and tags`, 'ok');
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+          e.preventDefault();
+          save();
+        }
+      });
+
+      window.addEventListener('beforeunload', (e) => {
+        if (!dirty()) return;
+        e.preventDefault();
+        e.returnValue = ''; // older browsers still want this to show the prompt
+      });
+
+      loadList();
+    </script>
+
+    <style is:global>
+      /* The editor is a tool, not a page — plain, high-contrast, out of the way.
+         The preview panes below reuse the site's real garden CSS. */
+      .gh-body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #F5ECD7;
+        color: #1C1208;
+        overflow: hidden;
+      }
+
+      .gh-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 1rem;
+        border-bottom: 1px solid rgba(139, 105, 20, 0.35);
+        background: #FAF4E6;
+        flex: none;
+      }
+
+      .gh-brand {
+        font-family: 'Cinzel', serif;
+        font-size: 0.85rem;
+        letter-spacing: 0.12em;
+        color: #8B6914;
+      }
+
+      .gh-spacer { flex: 1; }
+
+      .gh-select,
+      .gh-btn {
+        font-family: 'Crimson Text', serif;
+        font-size: 0.9rem;
+        color: #1C1208;
+        background: #F5ECD7;
+        border: 1px solid rgba(139, 105, 20, 0.45);
+        padding: 0.3rem 0.7rem;
+        cursor: pointer;
+      }
+
+      .gh-btn:hover { border-color: #8B6914; background: #EAD9B8; }
+
+      .gh-btn-primary {
+        background: #8B6914;
+        border-color: #8B6914;
+        color: #FAF4E6;
+      }
+
+      .gh-btn-primary:hover { background: #6f540f; color: #FAF4E6; }
+
+      .gh-btn kbd {
+        font-family: inherit;
+        font-size: 0.75em;
+        opacity: 0.75;
+        margin-left: 0.35rem;
+      }
+
+      .gh-status {
+        font-family: 'Crimson Text', serif;
+        font-size: 0.85rem;
+        font-style: italic;
+        color: #7C6A4E;
+      }
+
+      .gh-status[data-tone='ok']   { color: #2C4A2C; }
+      .gh-status[data-tone='warn'] { color: #6B1515; }
+
+      .gh-split {
+        flex: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        min-height: 0;
+      }
+
+      @media (max-width: 900px) {
+        .gh-split { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      }
+
+      .gh-pane { min-height: 0; overflow: auto; }
+
+      .gh-editor-pane { border-right: 1px solid rgba(139, 105, 20, 0.35); display: flex; }
+
+      .gh-textarea {
+        flex: 1;
+        width: 100%;
+        border: 0;
+        outline: none;
+        resize: none;
+        padding: 1.5rem;
+        background: #FAF4E6;
+        color: #1C1208;
+        font-family: 'SFMono-Regular', ui-monospace, 'Cascadia Code', Menlo, monospace;
+        font-size: 0.9rem;
+        line-height: 1.75;
+        tab-size: 2;
+      }
+
+      /* Preview side — green herbarium light, same as the real page. */
+      .gh-preview-pane { background: #E8EDD8; padding: 1rem 1.25rem 3rem; }
+
+      .gh-pane-label {
+        font-family: 'Cinzel Decorative', serif;
+        font-size: 0.5rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #8B6914;
+        margin: 1.25rem 0 0.25rem;
+      }
+
+      /* One card, centred, at its natural board width. */
+      .gh-card-stage .garden-grid {
+        grid-template-columns: minmax(0, 340px);
+        justify-content: center;
+      }
+
+      .gh-dispatch-stage { display: flex; justify-content: center; }
+
+      .gh-dispatch-page {
+        width: 100%;
+        max-width: 620px;
+        background: #F5ECD7;
+        border: 1px solid rgba(139, 105, 20, 0.3);
+        padding: 1.75rem;
+        box-shadow: 0 2px 12px rgba(28, 18, 8, 0.08);
+      }
+
+      .gh-empty {
+        font-family: 'Crimson Text', serif;
+        font-style: italic;
+        font-size: 0.9rem;
+        color: #7C6A4E;
+      }
+
+      .gh-errors {
+        list-style: none;
+        margin: 0 0 0.5rem;
+        padding: 0.6rem 0.9rem;
+        background: rgba(107, 21, 21, 0.08);
+        border: 1px solid rgba(107, 21, 21, 0.35);
+        font-family: 'Crimson Text', serif;
+        font-size: 0.85rem;
+        color: #6B1515;
+      }
+
+      /* The dispatch preview borrows the real body styles, which live scoped to
+         the [slug] page — restate the essentials here. */
+      .gh-dispatch-page .dispatch-body {
+        font-family: 'Crimson Text', serif;
+        font-size: 1.05rem;
+        color: #4a3c2e;
+        line-height: 1.85;
+      }
+
+      .gh-dispatch-page .dispatch-body > * + * { margin-top: 1.15rem; }
+
+      .gh-dispatch-page .dispatch-body h2,
+      .gh-dispatch-page .dispatch-body h3 {
+        font-family: 'Cinzel', serif;
+        color: #1C1208;
+        margin-top: 2rem;
+      }
+
+      .gh-dispatch-page .dispatch-body h2 { font-size: 1.25rem; }
+      .gh-dispatch-page .dispatch-body h3 { font-size: 1.05rem; }
+
+      .gh-dispatch-page .dispatch-body ul { list-style: none; padding-left: 1.4rem; }
+      .gh-dispatch-page .dispatch-body ol { list-style: decimal; padding-left: 1.4rem; }
+
+      .gh-dispatch-page .dispatch-body ul > li::before {
+        content: '❧';
+        color: #8B6914;
+        font-size: 0.7em;
+        margin-left: -1.4rem;
+        margin-right: 0.65rem;
+      }
+
+      .gh-dispatch-page .dispatch-body blockquote {
+        border-left: 2px solid rgba(139, 105, 20, 0.45);
+        padding-left: 1.1rem;
+        font-family: 'IM Fell English', serif;
+        font-style: italic;
+        color: #5a4a38;
+      }
+
+      .gh-dispatch-page .dispatch-body code {
+        font-size: 0.88em;
+        background: rgba(234, 217, 184, 0.5);
+        border: 1px solid rgba(139, 105, 20, 0.2);
+        padding: 0.05em 0.35em;
+      }
+
+      /* No entrance animation in the preview — the card should just be there. */
+      .gh-card-stage .garden-note-wrapper { opacity: 1 !important; }
+    </style>
+  </body>
+</html>

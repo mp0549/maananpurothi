@@ -20,7 +20,7 @@
         { "glyph": "❧", "text": "Exploring. Learning things, trying things, following a question well past the point where it's obviously useful. From cooking to games to what I'm working on, I'm constantly looking around for new ideas." },
         { "glyph": "❧", "text": "Impact. I want to leave something behind. Even if nobody remembers it was me, I'd like there to be some lasting effect from what I did; whether that comes from something I built, something I found, or the people I knew." },
         { "glyph": "❧", "text": "Knowing why. I want to understand how something actually works, not just how to use it. That goes for systems and, honestly, for people too, I like knowing what makes things tick." },
-        { "glyph": "❧", "text": "Not sitting on it. Knowledge is worth close to nothing held still; we're all here because some caveman told another cavman you could hit things with rocks. Teaching is also the fastest way I've found to check whether I actually understand something." }
+        { "glyph": "❧", "text": "Not sitting on it. Knowledge is worth close to nothing held still; we're all here because some caveman told another cavman you could bonk things with rocks. Teaching is also the fastest way I've found to check whether I actually understand something." }
       ]
     },
     {
@@ -28,8 +28,8 @@
       "heading": "How I Got Here",
       "paragraphs": [
         "I came into college wanting to study how machines understand and generate language, and assumed I'd end up on a PhD track working on NLP and LLMs. Software engineering was something I was good at and enjoyed but hadn't quite fallen for yet.",
-        "Meta is where that changed, and it was less about the work than about how it felt to finish things. I was on the infrastructure side of deployment, and I kept picking up small projects alongside my main internship project, from something like a like/dislike button on agent responses, right up to a front-facing dashboard that a bunch of teams used to find bottlenecks in company-wide deployments. Finishing something and then watching people use it felt better than any good result I'd gotten on a benchmark. I came out of that summer wanting a lot more of it, and I still do.",
-        "AI safety came out of the same instinct, which surprised me. I took the impact-maximizing habit I'd picked up over the summer and started pointing it at everything, and this kept coming back as a place where the gap between how much it matters and how many people work on it is enormous. It was also just interesting, a whole school of thought I'd previously met only through scifi books and movies. An [EAG|EA Global — a conference series for people working on high-impact problems, AI safety among them.] conference is where it went from being a curiosity to a path I wanted to go down."
+        "Things changed at Meta, and it was less about the work than about how it felt to finish things. I was on the [ENSD|Edge Network Services-Deployment] team on the Infra side, and I kept picking up small projects alongside my main internship project, from something like a like/dislike button on agent responses, right up to a front-facing dashboard that a bunch of teams used to find bottlenecks in company-wide deployments. Finishing something and then watching people use it felt better than any good result I'd gotten on a benchmark. I came out of that summer wanting a lot more of it, and I still do.",
+        "AI safety came out of the same instinct, which surprised me. I took the impact-maximizing habit I'd picked up over the summer and started pointing it at everything, and this kept coming back as a place where the gap between how much it matters and how many people work on it is enormous. It was also just interesting, a whole school of thought I'd previously met only through scifi books and movies. An [EAG|EA Global- a conference series for people working on high-impact problems, AI safety among them.] conference is where it went from being a curiosity to a path I wanted to go down."
       ]
     },
     {
@@ -38,7 +38,8 @@
       "paragraphs": [
         "Thoughts in draft."
       ],
-      "quote": "Not all those who wander are lost — but most of them are making maps."
+      "quote": "Not all those who wander are lost- but most of them are making maps.",
+      "cite": "Inspired by J.R.R. Tolkien"
     },
     {
       "id": "marginalia",
@@ -46,10 +47,10 @@
       "paragraphs": [
         "I have been cooking a lot over the past year, when I moved into an apartment. I default to fried rice in a rush, but love trying out new things. I also enjoy going on hikes whenever I get the chance, and same goes for reading- fiction or otherwise. Planning on turning these into their own corners in the [the Greehouses](/garden/), where I'll talk a bit more about what I'm up to.",
         "[Harry Potter|Click here to read Death of the Author](https://writing.upenn.edu/~taransky/Barthes.pdf) obviously, if you picked up on what I was going for with the theme lol.",
-        "I'm also mildly obsessed with oreos, and always have a pack of them in reach around my working area. Same for coffee, though I've been trying to control the caffeine intake off finals season.",
-        "I fought karate nationally, play basketball, and have spent most of this summer in the gym. Guitar and piano too, though not well. Games tend to come and go; right now I'm playing Minecraft and Assassin's Creed Odyssey.",
+        "I'm also mildly obsessed with oreos, and always have a pack of them within reach around my working area. Same for coffee, though I've been trying to control the caffeine intake off (finals) season.",
+        "I fought karate nationally, play basketball, and have spent most of this summer in the gym. I play the guitar and piano too, though not well. Games tend to come and go; right now I'm playing Minecraft and Assassin's Creed Odyssey.",
         "Chess is the one I keep coming back to. I used to compete when I was young, but got back into it in middle school after a few years of hiatus. The higher my elo gets, the more I realize how much room there is to grow above me, which is both annoying and the reason I haven't put it down.",
-        " "
+        "\n"
       ],
       "notes": [
         "coffee coffee coffee",

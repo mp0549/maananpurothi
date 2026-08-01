@@ -2,14 +2,22 @@
 /**
  * GardenNote.astro — Individual herbarium note card.
  * Torn journal page with pushpin, excerpt, tag stamps, and expand/collapse dispatch.
+ *
+ * Fed by the `greenhouse` collection — one markdown file per note in
+ * src/data/greenhouse/ (see src/content.config.ts).
+ *
+ * Excerpt and summary copy go through <ProseText>, so a note's frontmatter takes
+ * the same inline markup as about.json ([text](url), [text|definition], word(url)).
+ * Summaries additionally split on blank lines into separate paragraphs.
  */
+import ProseText from '@/components/ProseText.astro';
 
 interface Props {
   note: {
     title: string;
     date: string;
     excerpt: string;
-    summary: string;
+    summary?: string;
     slug: string;
     tags: string[];
   };
@@ -47,6 +55,12 @@ const botanicalSVGs = [
   `<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24 40 C24 40 26 28 30 19 C34 10 31 4 26 7 C21 10 22 22 24 40Z" stroke="#1C1208" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M24 33 C24 33 17 30 13 25 C9 20 10 14 15 17 C20 20 24 33 24 33Z" stroke="#1C1208" stroke-width="1" fill="none" stroke-linecap="round"/></svg>`,
 ];
 
+// Blank line = paragraph break, same convention as the drafts in src/data.
+const summaryParagraphs = (note.summary ?? '')
+  .split(/\n\s*\n/)
+  .map((p) => p.trim())
+  .filter(Boolean);
+
 const clipPath = clipPaths[index % 6];
 const showBotanical = index % 2 === 1;
 const botanicalSVG = botanicalSVGs[Math.floor(index / 2) % 3];
@@ -69,7 +83,7 @@ const botanicalSVG = botanicalSVGs[Math.floor(index / 2) % 3];
     <div class="garden-note-rule" aria-hidden="true"></div>
 
     <!-- Excerpt -->
-    <p class="garden-note-excerpt">{note.excerpt}</p>
+    <p class="garden-note-excerpt"><ProseText text={note.excerpt} /></p>
 
     <!-- Specimen stamp tags -->
     <div class="flex flex-wrap gap-1.5 mt-4">
@@ -100,7 +114,9 @@ const botanicalSVG = botanicalSVGs[Math.floor(index / 2) % 3];
       </div>
 
       <p class="garden-summary-label">SUMMARY</p>
-      <p class="garden-summary-text">{note.summary}</p>
+      {summaryParagraphs.map((p) => (
+        <p class="garden-summary-text"><ProseText text={p} /></p>
+      ))}
 
       <div class="garden-expand-actions">
         <a href={`/garden/${note.slug}`} class="see-full-dispatch">SEE FULL DISPATCH &rarr;</a>

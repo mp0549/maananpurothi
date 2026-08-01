@@ -2,12 +2,19 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import vercel from '@astrojs/vercel';
+import rehypeProse from './src/lib/rehype-prose.mjs';
 
 export default defineConfig({
   integrations: [
     react(),
     tailwind({ applyBaseStyles: false }),
   ],
+
+  // Greenhouse note bodies are markdown; rehypeProse adds the house
+  // [text|definition] tooltip syntax on top of it. See src/lib/rehype-prose.mjs.
+  markdown: {
+    rehypePlugins: [rehypeProse],
+  },
   // Switch to 'static' if you prefer a fully static export
   output: 'server',
   adapter: vercel(),

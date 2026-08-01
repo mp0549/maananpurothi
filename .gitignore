@@ -94,3 +94,8 @@ Thumbs.db
 
 # Local writing scratch — old copy drafts, notes to self
 *.drafts.md
+
+# Content-collection build cache (regenerated on every dev/build)
+.astro/collections/
+
+.env*

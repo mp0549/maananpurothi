@@ -3,14 +3,10 @@
  * garden.astro — The Herbarium
  * Wizard's field journal / naturalist's herbarium aesthetic.
  */
+import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import GardenNote from '@/components/garden/GardenNote.astro';
-import gardenData from '@/data/garden.json';
 import '@/styles/pages/garden.css';
-
-function slugify(title: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-}
 
 function tagColor(tag: string): string {
   if (tag === 'Thinking') return '#6B1515';
@@ -24,7 +20,12 @@ function tagColor(tag: string): string {
   return '#3C2A1A';
 }
 
-const notes = gardenData.notes.map((n) => ({ ...n, slug: slugify(n.title) }));
+// One markdown file per note in src/data/greenhouse/ — the filename is the slug.
+// Board order comes from frontmatter `order`; anything without one sorts to the
+// end, alphabetically.
+const notes = (await getCollection('greenhouse'))
+  .sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title))
+  .map((entry) => ({ ...entry.data, slug: entry.id }));
 
 // Only show tags that appear on 2+ cards in the filter bar
 const tagCounts = notes.flatMap(n => n.tags).reduce((acc, t) => {
@@ -75,7 +76,6 @@ const botanicalTileStyle = "background-image: url(\"data:image/svg+xml,%3Csvg xm
         <p class="font-fell italic text-ink" style="font-size: 1.1rem; line-height: 1.6;">
           This is where I think out loud. Nothing here is finished.
           Some ideas are nearly ripe; others are seeds planted to see what grows.
-          All are honest.
         </p>
       </div>
 

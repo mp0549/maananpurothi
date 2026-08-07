@@ -9,7 +9,7 @@ excerpt: >-
 summary: |
   A running list of what I'm reading and what actually stuck. Currently working
   through The Shining, Shutter Island, and various AI safety literature. The full
-  shelf, with notes, is coming soon.
+  shelf, with notes, is coming soon as another section
 
   I love [Death of The Author](https://writing.upenn.edu/~taransky/Barthes.pdf)
   and the idea that the author is dead, but I also love reading about the author.
@@ -19,4 +19,8 @@ summary: |
 
 <!-- The full dispatch goes here — plain markdown, write as much as you like.
      Until there's something below this line, the dispatch page shows its
-     "not written yet" placeholder. -->
+     "not written yet" placeholder. -->i
+
+**The Shining**- Love horror, enjoying it so far, not doing a great job getting through it. 
+
+**Shutter Island**- The mystery/thriller is really fun so far, reading a few chapters a week. 
